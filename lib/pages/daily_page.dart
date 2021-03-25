@@ -100,7 +100,7 @@ class _DailyPage extends State<DailyPage> {
         children: [
           // Expanded(
           //   flex: 1,
-          //   child: FlatButton(
+          //   child: TextButton(
           //     child: Icon(Icons.arrow_back_ios),
           //     onPressed: () => Navigator.pop(context),
           //   ),
@@ -137,7 +137,7 @@ class _DailyPage extends State<DailyPage> {
         children: [
           Expanded(
             flex: 1,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {
                 setState(() {
                   _dayDecrease();
@@ -151,7 +151,7 @@ class _DailyPage extends State<DailyPage> {
           ),
           Expanded(
             flex: 6,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {
                 Future<DateTime> selectedDate = showDatePicker(
                   context: context,
@@ -187,7 +187,7 @@ class _DailyPage extends State<DailyPage> {
           ),
           Expanded(
             flex: 1,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {
                 setState(() {
                   _dayIncrease();

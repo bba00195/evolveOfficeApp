@@ -202,14 +202,16 @@ class _LoginPageState extends State<LoginPage> {
     final loginButton = Container(
       height: 40,
       padding: EdgeInsets.only(left: 35.0, right: 35.0),
-      child: RaisedButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          shape: new RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(24),
+          ),
+          primary: Color.fromRGBO(102, 209, 182, 1.0),
         ),
         onPressed: () async {
           _login(_idTextEditController.text, _passwordTextEditController.text);
         },
-        color: Color.fromRGBO(102, 209, 182, 1.0),
         child: Text(
           'Sign in',
           style: TextStyle(
@@ -222,8 +224,7 @@ class _LoginPageState extends State<LoginPage> {
     // #endregion
 
     // #region Label
-    final forgotLabel = FlatButton(
-      height: 17.0,
+    final forgotLabel = TextButton(
       child: Text(
         'Login to your account',
         style: TextStyle(color: Colors.black54),
@@ -441,7 +442,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             height: 50,
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text(
                                 "취소",
                                 style: TextStyle(
@@ -464,7 +465,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             height: 50,
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text(
                                 "확인",
                                 style: TextStyle(

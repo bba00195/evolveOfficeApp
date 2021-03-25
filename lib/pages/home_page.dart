@@ -380,7 +380,7 @@ class _HomePage extends State<HomePage> {
                                 ),
                               ),
                               height: 50,
-                              child: FlatButton(
+                              child: TextButton(
                                 child: Text(
                                   "취소",
                                   style: TextStyle(
@@ -403,7 +403,7 @@ class _HomePage extends State<HomePage> {
                                 ),
                               ),
                               height: 50,
-                              child: FlatButton(
+                              child: TextButton(
                                 child: Text(
                                   "확인",
                                   style: TextStyle(
