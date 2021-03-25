@@ -149,7 +149,7 @@ class _HomePage extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('일일 업무 보고'),
+              Text('일일 업무'),
               // SizedBox(
               //   height: 170.0,
               // )
