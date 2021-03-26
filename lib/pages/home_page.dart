@@ -454,50 +454,266 @@ class _HomePage extends State<HomePage> {
               alignment: Alignment.centerLeft,
               height: 70,
               color: Color.fromRGBO(101, 209, 182, 1.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: Container(
+                      child: Text(
+                        "안녕하세요 " + member.user.nameKor + " 님",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontFamily: 'NotoSansKR',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        left: 5,
+                        right: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color.fromRGBO(111, 217, 191, 1.0),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(5),
+                        ),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 1.5,
+                        ),
+                      ),
+                      height: 40,
+                      child: TextButton(
+                        child: Text(
+                          "로그아웃",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontFamily: 'NotoSansKR',
+                          ),
+                        ),
+                        onPressed: () {
+                          storage.delete(key: "login");
+                          Navigator.pushReplacement(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => LoginPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              height: 40,
+              padding: EdgeInsets.only(
+                left: 10,
+              ),
+              alignment: Alignment.centerLeft,
               child: Text(
-                member.user.nameKor,
+                '업무관리',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontFamily: 'NotoSansKR',
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            ListTile(
-              title: Text('일일 업무 보고'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (context) => DailyPage(
-                      id: id,
-                      member: member,
+            Row(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.grey[400],
+                        ),
+                        right: BorderSide(
+                          color: Colors.grey[400],
+                        ),
+                        bottom: BorderSide(
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            margin: EdgeInsets.only(left: 5),
+                            child: Icon(
+                              Icons.create,
+                              color: Colors.black,
+                              // size: 55.0,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 9,
+                          child: Container(
+                            child: TextButton(
+                              child: Text(
+                                '일일 업무 보고',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontFamily: 'NotoSansKR',
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => DailyPage(
+                                      id: id,
+                                      member: member,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
-            ),
-            ListTile(
-              title: Text('닫기'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('로그아웃'),
-              onTap: () {
-                //delete 함수를 통하여 key 이름이 login인것을 완전히 폐기 시켜 버린다.
-                //이를 통하여 다음 로그인시에는 로그인 정보가 없어 정보를 불러 올 수가 없게 된다.
-                storage.delete(key: "login");
-                Navigator.pushReplacement(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (context) => LoginPage(),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.grey[400],
+                        ),
+                        bottom: BorderSide(
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            margin: EdgeInsets.only(left: 3),
+                            child: Icon(
+                              Icons.calendar_today_outlined,
+                              color: Colors.black,
+                              // size: 55.0,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 9,
+                          child: Container(
+                            child: TextButton(
+                              child: Text(
+                                '일일업무 기간별조회',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontFamily: 'NotoSansKR',
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              onPressed: () {},
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          color: Colors.grey[400],
+                        ),
+                        bottom: BorderSide(
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            margin: EdgeInsets.only(left: 5),
+                            child: Icon(
+                              Icons.location_on,
+                              color: Colors.black,
+                              // size: 55.0,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 9,
+                          child: Container(
+                            child: TextButton(
+                              child: Text(
+                                '행선지 등록',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontFamily: 'NotoSansKR',
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              onPressed: () {},
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: Container(),
+                ),
+              ],
+            ),
+            // ListTile(
+            //   title: Text('닫기'),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //   },
+            // ),
+            // ListTile(
+            //   title: Text('로그아웃'),
+            //   onTap: () {
+            //     //delete 함수를 통하여 key 이름이 login인것을 완전히 폐기 시켜 버린다.
+            //     //이를 통하여 다음 로그인시에는 로그인 정보가 없어 정보를 불러 올 수가 없게 된다.
+            //     storage.delete(key: "login");
+            //     Navigator.pushReplacement(
+            //       context,
+            //       CupertinoPageRoute(
+            //         builder: (context) => LoginPage(),
+            //       ),
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:evolveofficeapp/common/widget.dart';
+import 'package:evolveofficeapp/pages/dailyWrite_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
@@ -291,7 +292,19 @@ class _DailyPage extends State<DailyPage> {
                     backgroundColor: MaterialStateProperty.all<Color>(
                         Color.fromRGBO(255, 153, 130, 1.0)),
                   ),
-                  onPressed: () => null,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => DailyWritePage(
+                          id: id,
+                          isDay: true,
+                          workDate: workDate,
+                          member: mem,
+                        ),
+                      ),
+                    );
+                  },
                   child: Icon(
                     Icons.create,
                     color: Colors.white,
@@ -329,9 +342,9 @@ class _DailyPage extends State<DailyPage> {
       body: Center(
         child: ListView(
           children: [
-            // menuName,
+            menuName,
             SizedBox(height: 30),
-            // selectDate,
+            selectDate,
             SizedBox(height: 20),
             todayReport,
           ],
@@ -341,11 +354,9 @@ class _DailyPage extends State<DailyPage> {
   }
   // #endregion
 
-  _report(String sOrganizationCode, String sUserId, String sWorkDate) async {
+  _report(String sOrganizationCode, String sUserId, String sWorkDate) {
     APIService apiService = new APIService();
-    await apiService
-        .report(sOrganizationCode, sUserId, sWorkDate)
-        .then((value) {
+    apiService.report(sOrganizationCode, sUserId, sWorkDate).then((value) {
       if (value.day.isNotEmpty) {
         isReport = true;
         dayReport = value.day.elementAt(0).dayReport;
@@ -354,7 +365,7 @@ class _DailyPage extends State<DailyPage> {
         dayReport = '';
         nextReport = '';
       }
-      print('22222222222');
+      // print('22222222222');
     });
   }
 }
