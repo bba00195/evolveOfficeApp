@@ -1,6 +1,7 @@
 import 'package:evolveofficeapp/common/widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
 
 class DailyPage extends StatefulWidget {
@@ -24,17 +25,47 @@ class _DailyPage extends State<DailyPage> {
   bool isChanged = false;
   int sDay = 0;
   DateTime _selectedTime;
+  DateTime nowDateTime = DateTime.now().add(Duration(hours: 9));
+  String workDate;
+
+  bool isReport = false;
+  String dayReport = '';
+  String dayReportTemp = '';
+  String nextReport = '';
 
   @override
   void initState() {
     super.initState();
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     mem = widget.member;
+    String year = nowDateTime.year.toString();
+    String month = nowDateTime.month.toString().padLeft(2, '0');
+    String day = nowDateTime.day.toString().padLeft(2, '0');
+
+    workDate = year + month + day;
+    print('1.initState');
   }
 
   @override
   Widget build(BuildContext context) {
+    print('2.build');
     var manager = mem;
+
+    void main(String selectedDate) async {
+      await _report(
+        mem.user.organizationCode,
+        mem.user.userId,
+        selectedDate,
+      );
+    }
+
+    String _getWorkDate(DateTime datetime) {
+      String year = datetime.year.toString();
+      String month = datetime.month.toString().padLeft(2, '0');
+      String day = datetime.day.toString().padLeft(2, '0');
+
+      return year + month + day;
+    }
 
     String _getDateString(DateTime datetime) {
       String year = datetime.year.toString();
@@ -68,11 +99,12 @@ class _DailyPage extends State<DailyPage> {
           break;
       }
 
+      workDate = _getWorkDate(datetime);
       return year + ". " + month + ". " + day + weekday;
     }
 
     String _getDate(int day) {
-      var _now = DateTime.now().add(Duration(days: sDay));
+      var _now = nowDateTime.add(Duration(days: sDay));
       _selectedTime = _now;
       return _getDateString(_selectedTime);
     }
@@ -82,6 +114,7 @@ class _DailyPage extends State<DailyPage> {
       sDay--;
       print(sDay);
       changeDate = _getDate(sDay);
+      main(workDate);
       print(changeDate);
     }
 
@@ -90,8 +123,11 @@ class _DailyPage extends State<DailyPage> {
       sDay++;
       print(sDay);
       changeDate = _getDate(sDay);
+      main(workDate);
       print(changeDate);
     }
+
+    main(workDate);
 
     final menuName = Container(
       height: 50,
@@ -132,7 +168,7 @@ class _DailyPage extends State<DailyPage> {
         left: 40,
         right: 40,
       ),
-      height: 40,
+      height: 50,
       child: Row(
         children: [
           Expanded(
@@ -146,12 +182,17 @@ class _DailyPage extends State<DailyPage> {
               child: Icon(
                 Icons.arrow_back_ios,
                 size: 28.0,
+                color: Colors.black,
               ),
             ),
           ),
           Expanded(
             flex: 6,
             child: TextButton(
+              style: ButtonStyle(
+                  // alignment: AlignmentGeometry.lerp(1, 1, 1),
+                  // backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                  ),
               onPressed: () {
                 Future<DateTime> selectedDate = showDatePicker(
                   context: context,
@@ -171,6 +212,9 @@ class _DailyPage extends State<DailyPage> {
                     _selectedTime = dateTime;
                     sDay = dateTime.difference(DateTime.now()).inDays;
                     changeDate = _getDateString(_selectedTime);
+                    main(
+                      workDate,
+                    );
                   });
                 });
               },
@@ -178,9 +222,10 @@ class _DailyPage extends State<DailyPage> {
                 isChanged ? changeDate : _getDate(0),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 24,
                   fontFamily: 'NotoSansKR',
                   fontWeight: FontWeight.w600,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -195,6 +240,7 @@ class _DailyPage extends State<DailyPage> {
               },
               child: Icon(
                 Icons.arrow_forward_ios,
+                color: Colors.black,
                 size: 28.0,
               ),
             ),
@@ -238,22 +284,54 @@ class _DailyPage extends State<DailyPage> {
                   ),
                 ),
               ),
+              Expanded(
+                flex: 1,
+                child: TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        Color.fromRGBO(255, 153, 130, 1.0)),
+                  ),
+                  onPressed: () => null,
+                  child: Icon(
+                    Icons.create,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ],
-          )
+          ),
+          Container(
+            height: 140,
+            alignment: Alignment.topLeft,
+            // color: Colors.red,
+            child: Text(
+              dayReport,
+            ),
+          ),
         ],
       ),
     );
 
     // #region Body
+
+    // APIService apiService = new APIService();
+    // apiService
+    //     .report(mem.user.organizationCode, mem.user.userId, workDate)
+    //     .then((value) async {
+    //   print('apiService');
+    // });
+
+    print('End');
+    print(dayReport);
     return Scaffold(
       appBar: KulsWidget().appBar,
       bottomNavigationBar: KulsWidget().bottomNavi,
       body: Center(
         child: ListView(
           children: [
-            menuName,
+            // menuName,
             SizedBox(height: 30),
-            selectDate,
+            // selectDate,
             SizedBox(height: 20),
             todayReport,
           ],
@@ -262,4 +340,21 @@ class _DailyPage extends State<DailyPage> {
     );
   }
   // #endregion
+
+  _report(String sOrganizationCode, String sUserId, String sWorkDate) async {
+    APIService apiService = new APIService();
+    await apiService
+        .report(sOrganizationCode, sUserId, sWorkDate)
+        .then((value) {
+      if (value.day.isNotEmpty) {
+        isReport = true;
+        dayReport = value.day.elementAt(0).dayReport;
+        nextReport = value.day.elementAt(0).nextReport;
+      } else {
+        dayReport = '';
+        nextReport = '';
+      }
+      print('22222222222');
+    });
+  }
 }

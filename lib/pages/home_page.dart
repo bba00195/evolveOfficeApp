@@ -41,7 +41,7 @@ class _HomePage extends State<HomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     var member = mem;
-    print(member.user);
+    // print(member.user);
 
     // #region 헤더 결재관리
     SliverToBoxAdapter _buildHeader(double screenHeight) {

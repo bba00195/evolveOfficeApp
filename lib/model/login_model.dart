@@ -49,7 +49,7 @@ class ResultModel {
 
   factory ResultModel.fromJson(Map<String, dynamic> json) {
     var list = json['RESULT'] != null ? json['RESULT'] as List : [];
-    print(list.runtimeType);
+    // print(list.runtimeType);
     List<UserResponseModel> userList =
         list.map((i) => UserResponseModel.fromJson(i)).toList();
     return ResultModel(user: userList);
