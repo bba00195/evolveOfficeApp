@@ -250,80 +250,89 @@ class _DailyPage extends State<DailyPage> {
       ),
     );
 
-    final todayReport = Container(
-      height: 235,
-      margin: EdgeInsets.only(
-        left: 20,
-        right: 20,
-      ),
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 6.0,
-            offset: const Offset(0.0, 3.0),
-            color: Color.fromRGBO(0, 0, 0, 0.16),
-          )
-        ],
-        color: Colors.white,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 7,
-                child: Text(
-                  '업무 내용',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'NotoSansKR',
-                    fontWeight: FontWeight.w600,
+    _writeReport(String sType) {
+      return Container(
+        height: 215,
+        margin: EdgeInsets.only(
+          left: 20,
+          right: 20,
+        ),
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 6.0,
+              offset: const Offset(0.0, 3.0),
+              color: Color.fromRGBO(0, 0, 0, 0.16),
+            )
+          ],
+          color: Colors.white,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Text(
+                    (sType == "today") ? '업무 내용' : '익일 업무',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'NotoSansKR',
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                        Color.fromRGBO(255, 153, 130, 1.0)),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => DailyWritePage(
-                          id: id,
-                          isDay: true,
-                          workDate: workDate,
-                          member: mem,
+                Expanded(
+                  flex: 1,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                          Color.fromRGBO(255, 153, 130, 1.0)),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => (sType == "today")
+                              ? DailyWritePage(
+                                  id: id,
+                                  isDay: true,
+                                  selectDate: _selectedTime,
+                                  member: mem,
+                                )
+                              : DailyWritePage(
+                                  id: id,
+                                  isDay: false,
+                                  selectDate: _selectedTime,
+                                  member: mem,
+                                ),
                         ),
-                      ),
-                    );
-                  },
-                  child: Icon(
-                    Icons.create,
-                    color: Colors.white,
+                      );
+                    },
+                    child: Icon(
+                      Icons.create,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Container(
-            height: 140,
-            alignment: Alignment.topLeft,
-            // color: Colors.red,
-            child: Text(
-              dayReport,
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+            Container(
+              height: 120,
+              alignment: Alignment.topLeft,
+              // color: Colors.red,
+              child: Text(
+                (sType == "today") ? dayReport : nextReport,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     // #region Body
 
@@ -333,9 +342,6 @@ class _DailyPage extends State<DailyPage> {
     //     .then((value) async {
     //   print('apiService');
     // });
-
-    print('End');
-    print(dayReport);
     return Scaffold(
       appBar: KulsWidget().appBar,
       bottomNavigationBar: KulsWidget().bottomNavi,
@@ -346,7 +352,9 @@ class _DailyPage extends State<DailyPage> {
             SizedBox(height: 30),
             selectDate,
             SizedBox(height: 20),
-            todayReport,
+            _writeReport("today"),
+            SizedBox(height: 30),
+            _writeReport("next"),
           ],
         ),
       ),
@@ -365,7 +373,6 @@ class _DailyPage extends State<DailyPage> {
         dayReport = '';
         nextReport = '';
       }
-      // print('22222222222');
     });
   }
 }

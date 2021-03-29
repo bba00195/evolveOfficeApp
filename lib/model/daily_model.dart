@@ -57,3 +57,34 @@ class DailyResultModel {
     return DailyResultModel(day: dayList);
   }
 }
+
+class InsertResponseModel {
+  final String rsCode;
+  final String rsMsg;
+
+  InsertResponseModel({
+    this.rsCode,
+    this.rsMsg,
+  });
+
+  factory InsertResponseModel.fromJson(Map<String, dynamic> json) {
+    return InsertResponseModel(
+      rsCode: json['RS_CODE'] != null ? json['RS_CODE'] as String : "",
+      rsMsg: json['RS_MSG'] != null ? json['RS_MSG'] as String : "",
+    );
+  }
+}
+
+class InsertResultModel {
+  List<InsertResponseModel> result;
+
+  InsertResultModel({this.result});
+
+  factory InsertResultModel.fromJson(Map<String, dynamic> json) {
+    var list = json['RESULT'] != null ? json['RESULT'] as List : [];
+    // print(list.runtimeType);
+    List<InsertResponseModel> resultList =
+        list.map((i) => InsertResponseModel.fromJson(i)).toList();
+    return InsertResultModel(result: resultList);
+  }
+}
