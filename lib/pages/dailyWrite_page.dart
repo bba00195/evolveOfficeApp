@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:evolveofficeapp/common/widget.dart';
+import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
@@ -217,7 +215,7 @@ class _DailyWritePage extends State<DailyWritePage> {
                                 } else {
                                   //  일일 업무내용 정보가 DB에 있을 때
                                   apiService
-                                      .dayReportUpdate(
+                                      .nextReportUpdate(
                                           //  nextReport
                                           mem.user.organizationCode,
                                           mem.user.userId,
@@ -336,7 +334,7 @@ class _DailyWritePage extends State<DailyWritePage> {
                                   } else {
                                     //  일일 업무내용 정보가 DB에 있을 때
                                     apiService
-                                        .dayReportUpdate(
+                                        .nextReportUpdate(
                                             //  nextReport
                                             mem.user.organizationCode,
                                             mem.user.userId,
@@ -365,7 +363,7 @@ class _DailyWritePage extends State<DailyWritePage> {
                                   });
                                 } else {
                                   apiService
-                                      .dayReportUpdate(
+                                      .nextReportUpdate(
                                           //  nextReport
                                           mem.user.organizationCode,
                                           mem.user.userId,
@@ -436,7 +434,7 @@ class _DailyWritePage extends State<DailyWritePage> {
     // #region Body
     return Scaffold(
       // appBar: KulsWidget().appBar,
-      bottomNavigationBar: KulsWidget().bottomNavi,
+      bottomNavigationBar: KulsBottomBar(),
       body: WillPopScope(
         child: Center(
           child: ListView(

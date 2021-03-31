@@ -1,4 +1,5 @@
-import 'package:evolveofficeapp/common/widget.dart';
+import 'package:evolveofficeapp/common/kulsWidget.dart';
+import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:evolveofficeapp/pages/dailyWrite_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +9,12 @@ import 'package:evolveofficeapp/common/common.dart';
 class DailyPage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
   final String id;
+  final String pass;
   final UserManager member;
 
   DailyPage({
     this.id,
+    this.pass,
     this.member,
   });
   @override
@@ -21,45 +24,46 @@ class DailyPage extends StatefulWidget {
 class _DailyPage extends State<DailyPage> {
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
+  String pass;
+  UserManager member;
   String changeDate;
-  UserManager mem;
   bool isChanged = false;
   int sDay = 0;
   DateTime _selectedTime;
   DateTime nowDateTime = DateTime.now().add(Duration(hours: 9));
   String workDate;
 
-  bool isReport = false;
   String dayReport = '';
   String dayReportTemp = '';
   String nextReport = '';
+  Future<DailyResultModel> futureAlbum;
+
+  void _report(String selectedDate) async {
+    setState(() {
+      APIService apiService = new APIService();
+      futureAlbum = apiService.report(
+          member.user.organizationCode, member.user.userId, selectedDate);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
-    mem = widget.member;
+    pass = widget.pass;
+    member = widget.member;
     String year = nowDateTime.year.toString();
     String month = nowDateTime.month.toString().padLeft(2, '0');
     String day = nowDateTime.day.toString().padLeft(2, '0');
 
     workDate = year + month + day;
-    print('1.initState');
   }
 
   @override
   Widget build(BuildContext context) {
-    print('2.build');
-    var manager = mem;
-
-    void main(String selectedDate) async {
-      await _report(
-        mem.user.organizationCode,
-        mem.user.userId,
-        selectedDate,
-      );
-    }
-
+    _report(
+      workDate,
+    );
     String _getWorkDate(DateTime datetime) {
       String year = datetime.year.toString();
       String month = datetime.month.toString().padLeft(2, '0');
@@ -113,35 +117,24 @@ class _DailyPage extends State<DailyPage> {
     _dayDecrease() {
       isChanged = true;
       sDay--;
-      print(sDay);
       changeDate = _getDate(sDay);
-      main(workDate);
-      print(changeDate);
+      _report(workDate);
     }
 
     _dayIncrease() {
       isChanged = true;
       sDay++;
-      print(sDay);
       changeDate = _getDate(sDay);
-      main(workDate);
-      print(changeDate);
+      _report(workDate);
     }
 
-    main(workDate);
+    // main(workDate);
 
     final menuName = Container(
       height: 50,
       color: Color.fromRGBO(101, 209, 182, 1.0),
       child: Row(
         children: [
-          // Expanded(
-          //   flex: 1,
-          //   child: TextButton(
-          //     child: Icon(Icons.arrow_back_ios),
-          //     onPressed: () => Navigator.pop(context),
-          //   ),
-          // ),
           Expanded(
             flex: 1,
             child: Container(),
@@ -213,7 +206,7 @@ class _DailyPage extends State<DailyPage> {
                     _selectedTime = dateTime;
                     sDay = dateTime.difference(DateTime.now()).inDays;
                     changeDate = _getDateString(_selectedTime);
-                    main(
+                    _report(
                       workDate,
                     );
                   });
@@ -302,13 +295,13 @@ class _DailyPage extends State<DailyPage> {
                                   id: id,
                                   isDay: true,
                                   selectDate: _selectedTime,
-                                  member: mem,
+                                  member: member,
                                 )
                               : DailyWritePage(
                                   id: id,
                                   isDay: false,
                                   selectDate: _selectedTime,
-                                  member: mem,
+                                  member: member,
                                 ),
                         ),
                       );
@@ -324,10 +317,24 @@ class _DailyPage extends State<DailyPage> {
             Container(
               height: 120,
               alignment: Alignment.topLeft,
-              // color: Colors.red,
-              child: Text(
-                (sType == "today") ? dayReport : nextReport,
+              child: FutureBuilder<DailyResultModel>(
+                future: futureAlbum,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data.day.isNotEmpty) {
+                      dayReport = snapshot.data.day.elementAt(0).dayReport;
+                      nextReport = snapshot.data.day.elementAt(0).nextReport;
+                      return Text(
+                        (sType == "today") ? dayReport : nextReport,
+                      );
+                    } else {}
+                  }
+                  return Text('');
+                },
               ),
+              // Text(
+              // (sType == "today") ? dayReport : nextReport,
+              // ),
             ),
           ],
         ),
@@ -343,8 +350,12 @@ class _DailyPage extends State<DailyPage> {
     //   print('apiService');
     // });
     return Scaffold(
-      appBar: KulsWidget().appBar,
-      bottomNavigationBar: KulsWidget().bottomNavi,
+      appBar: KulsAppBar(
+        id: id,
+        pass: pass,
+        member: member,
+      ),
+      bottomNavigationBar: KulsBottomBar(),
       body: Center(
         child: ListView(
           children: [
@@ -361,18 +372,4 @@ class _DailyPage extends State<DailyPage> {
     );
   }
   // #endregion
-
-  _report(String sOrganizationCode, String sUserId, String sWorkDate) {
-    APIService apiService = new APIService();
-    apiService.report(sOrganizationCode, sUserId, sWorkDate).then((value) {
-      if (value.day.isNotEmpty) {
-        isReport = true;
-        dayReport = value.day.elementAt(0).dayReport;
-        nextReport = value.day.elementAt(0).nextReport;
-      } else {
-        dayReport = '';
-        nextReport = '';
-      }
-    });
-  }
 }

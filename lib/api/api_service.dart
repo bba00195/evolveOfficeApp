@@ -139,4 +139,26 @@ class APIService {
       json.decode(response.body),
     );
   }
+
+  Future<InsertResultModel> nextReportUpdate(String sOrganizationCode,
+      String sUserId, String sWorkDate, String sDayReport) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "UPDATE",
+          "QUERY":
+              "UPDATE TB_WORK_DAILYREPORT SET NEXT_REPORT = (?), LAST_UPDATED_BY = (?), LAST_UPDATE_DATE = GETDATE() " +
+                  "WHERE ORGANIZATION_CODE = (?) AND WORK_DATE =(?) AND EMPLOY_ID_NO = (?)",
+          "TOKEN": token,
+          "PARAMS": [sDayReport, sUserId, sOrganizationCode, sWorkDate, sUserId]
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return InsertResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
 }

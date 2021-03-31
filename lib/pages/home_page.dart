@@ -1,10 +1,11 @@
+import 'package:evolveofficeapp/api/api_service.dart';
+import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:evolveofficeapp/pages/daily_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'login_page.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:evolveofficeapp/common/widget.dart';
+import 'package:evolveofficeapp/common/kulsWidget.dart';
 
 class HomePage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
@@ -26,11 +27,27 @@ class _HomePage extends State<HomePage> {
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
   String pass;
+  DateTime nowDateTime = DateTime.now().add(Duration(hours: 9));
+  String workDate;
   UserManager mem;
+  Future<DailyResultModel> futureAlbum;
+
+  void _report(String selectedDate) async {
+    setState(() {
+      APIService apiService = new APIService();
+      futureAlbum = apiService.report(
+          mem.user.organizationCode, mem.user.userId, selectedDate);
+    });
+  }
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    String year = nowDateTime.year.toString();
+    String month = nowDateTime.month.toString().padLeft(2, '0');
+    String day = nowDateTime.day.toString().padLeft(2, '0');
+
+    workDate = year + month + day;
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass; //widget.pass LogOutPage에서 전달받은 pass 의미한다.
     mem = widget.member;
@@ -41,7 +58,7 @@ class _HomePage extends State<HomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     var member = mem;
-    // print(member.user);
+    _report(workDate);
 
     // #region 헤더 결재관리
     SliverToBoxAdapter _buildHeader(double screenHeight) {
@@ -132,7 +149,10 @@ class _HomePage extends State<HomePage> {
             bottom: 25.0,
             right: 45.0,
           ),
-          padding: EdgeInsets.only(left: 55.0, right: 55.0),
+          padding: EdgeInsets.only(
+            left: 15.0,
+            right: 15.0,
+          ),
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
@@ -146,14 +166,77 @@ class _HomePage extends State<HomePage> {
               Radius.circular(25.0),
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('일일 업무 보고'),
-              // SizedBox(
-              //   height: 170.0,
-              // )
-            ],
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => DailyPage(
+                    id: id,
+                    member: member,
+                  ),
+                ),
+              );
+            },
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 9,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(
+                          top: 15.0,
+                        ),
+                        height: 30,
+                        child: Text(
+                          '일일 업무 보고',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'NotoSansKR',
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        alignment: Alignment.topLeft,
+                        height: 120,
+                        child: FutureBuilder<DailyResultModel>(
+                          future: futureAlbum,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              if (snapshot.data.day.isNotEmpty) {
+                                return Text(
+                                  snapshot.data.day.elementAt(0).dayReport,
+                                  overflow: TextOverflow.fade,
+                                  softWrap: true,
+                                );
+                              } else {
+                                return Text("${snapshot.error}");
+                              }
+                            }
+                            return Text('');
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 36,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -266,48 +349,6 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 150.0,
-                    height: 150.0,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 15.0,
-                          offset: const Offset(3.0, 5.0),
-                          color: Color.fromRGBO(0, 0, 0, 0.16),
-                        )
-                      ],
-                      color: Color.fromRGBO(98, 208, 181, 1.0),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(25.0),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 150.0,
-                    height: 150.0,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 15.0,
-                          offset: const Offset(3.0, 5.0),
-                          color: Color.fromRGBO(0, 0, 0, 0.16),
-                        )
-                      ],
-                      color: Color.fromRGBO(255, 243, 243, 1.0),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(25.0),
-                      ),
                     ),
                   ),
                 ],
@@ -430,8 +471,12 @@ class _HomePage extends State<HomePage> {
 
     // #region Body
     return Scaffold(
-      appBar: KulsWidget().appBar,
-      bottomNavigationBar: KulsWidget().bottomNavi,
+      appBar: KulsAppBar(
+        id: id,
+        pass: pass,
+        member: member,
+      ),
+      bottomNavigationBar: KulsBottomBar(),
       body: WillPopScope(
         child: Center(
           child: CustomScrollView(
@@ -446,276 +491,11 @@ class _HomePage extends State<HomePage> {
         ),
         onWillPop: _onBackPressed,
       ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            Container(
-              padding: EdgeInsets.only(left: 20),
-              alignment: Alignment.centerLeft,
-              height: 70,
-              color: Color.fromRGBO(101, 209, 182, 1.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: Container(
-                      child: Text(
-                        "안녕하세요 " + member.user.nameKor + " 님",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontFamily: 'NotoSansKR',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Container(
-                      margin: EdgeInsets.only(
-                        left: 5,
-                        right: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(111, 217, 191, 1.0),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1.5,
-                        ),
-                      ),
-                      height: 40,
-                      child: TextButton(
-                        child: Text(
-                          "로그아웃",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontFamily: 'NotoSansKR',
-                          ),
-                        ),
-                        onPressed: () {
-                          storage.delete(key: "login");
-                          Navigator.pushReplacement(
-                            context,
-                            CupertinoPageRoute(
-                              builder: (context) => LoginPage(),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Container(
-              height: 40,
-              padding: EdgeInsets.only(
-                left: 10,
-              ),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '업무관리',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'NotoSansKR',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors.grey[400],
-                        ),
-                        right: BorderSide(
-                          color: Colors.grey[400],
-                        ),
-                        bottom: BorderSide(
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            margin: EdgeInsets.only(left: 5),
-                            child: Icon(
-                              Icons.create,
-                              color: Colors.black,
-                              // size: 55.0,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 9,
-                          child: Container(
-                            child: TextButton(
-                              child: Text(
-                                '일일 업무 보고',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontFamily: 'NotoSansKR',
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                    builder: (context) => DailyPage(
-                                      id: id,
-                                      member: member,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: Colors.grey[400],
-                        ),
-                        bottom: BorderSide(
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            margin: EdgeInsets.only(left: 3),
-                            child: Icon(
-                              Icons.calendar_today_outlined,
-                              color: Colors.black,
-                              // size: 55.0,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 9,
-                          child: Container(
-                            child: TextButton(
-                              child: Text(
-                                '일일업무 기간별조회',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontFamily: 'NotoSansKR',
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              onPressed: () {},
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        right: BorderSide(
-                          color: Colors.grey[400],
-                        ),
-                        bottom: BorderSide(
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            margin: EdgeInsets.only(left: 5),
-                            child: Icon(
-                              Icons.location_on,
-                              color: Colors.black,
-                              // size: 55.0,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 9,
-                          child: Container(
-                            child: TextButton(
-                              child: Text(
-                                '행선지 등록',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontFamily: 'NotoSansKR',
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              onPressed: () {},
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 5,
-                  child: Container(),
-                ),
-              ],
-            ),
-            // ListTile(
-            //   title: Text('닫기'),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //   },
-            // ),
-            // ListTile(
-            //   title: Text('로그아웃'),
-            //   onTap: () {
-            //     //delete 함수를 통하여 key 이름이 login인것을 완전히 폐기 시켜 버린다.
-            //     //이를 통하여 다음 로그인시에는 로그인 정보가 없어 정보를 불러 올 수가 없게 된다.
-            //     storage.delete(key: "login");
-            //     Navigator.pushReplacement(
-            //       context,
-            //       CupertinoPageRoute(
-            //         builder: (context) => LoginPage(),
-            //       ),
-            //     );
-            //   },
-            // ),
-          ],
-        ),
+      drawer: KulsDrawer(
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
       ),
     );
   }
