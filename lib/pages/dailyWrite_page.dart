@@ -72,14 +72,6 @@ class _DailyWritePage extends State<DailyWritePage> {
 
   @override
   Widget build(BuildContext context) {
-    // print(workDate);
-
-    // String _getDate(int day) {
-    //   var _now = nowDateTime.add(Duration(days: sDay));
-    //   _selectedTime = _now;
-    //   return _getDateString(_selectedTime);
-    // }
-
     final menuName = Container(
       height: 50,
       color: Color.fromRGBO(101, 209, 182, 1.0),

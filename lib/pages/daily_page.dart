@@ -27,14 +27,15 @@ class _DailyPage extends State<DailyPage> {
   String pass;
   UserManager member;
   String changeDate;
+  DateTime changeDateTime;
+
   bool isChanged = false;
   int sDay = 0;
   DateTime _selectedTime;
   DateTime nowDateTime = DateTime.now().add(Duration(hours: 9));
-  String workDate;
+  String date;
 
   String dayReport = '';
-  String dayReportTemp = '';
   String nextReport = '';
   Future<DailyResultModel> futureAlbum;
 
@@ -52,83 +53,31 @@ class _DailyPage extends State<DailyPage> {
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
     member = widget.member;
-    String year = nowDateTime.year.toString();
-    String month = nowDateTime.month.toString().padLeft(2, '0');
-    String day = nowDateTime.day.toString().padLeft(2, '0');
 
-    workDate = year + month + day;
+    date = Date().date(null);
   }
 
   @override
   Widget build(BuildContext context) {
     _report(
-      workDate,
+      date,
     );
-    String _getWorkDate(DateTime datetime) {
-      String year = datetime.year.toString();
-      String month = datetime.month.toString().padLeft(2, '0');
-      String day = datetime.day.toString().padLeft(2, '0');
-
-      return year + month + day;
-    }
-
-    String _getDateString(DateTime datetime) {
-      String year = datetime.year.toString();
-      String month = datetime.month.toString();
-      String day = datetime.day.toString();
-      String weekday;
-
-      switch (datetime.weekday) {
-        case 1:
-          weekday = "(월)";
-          break;
-        case 2:
-          weekday = "(화)";
-          break;
-        case 3:
-          weekday = "(수)";
-          break;
-        case 4:
-          weekday = "(목)";
-          break;
-        case 5:
-          weekday = "(금)";
-          break;
-        case 6:
-          weekday = "(토)";
-          break;
-        case 7:
-          weekday = "(일)";
-          break;
-        default:
-          break;
-      }
-
-      workDate = _getWorkDate(datetime);
-      return year + ". " + month + ". " + day + weekday;
-    }
-
-    String _getDate(int day) {
-      var _now = nowDateTime.add(Duration(days: sDay));
-      _selectedTime = _now;
-      return _getDateString(_selectedTime);
-    }
 
     _dayDecrease() {
       isChanged = true;
       sDay--;
-      changeDate = _getDate(sDay);
-      _report(workDate);
+      changeDate = Date().getDate(sDay);
+      date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
+      _report(date);
     }
 
     _dayIncrease() {
       isChanged = true;
       sDay++;
-      changeDate = _getDate(sDay);
-      _report(workDate);
+      changeDate = Date().getDate(sDay);
+      date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
+      _report(date);
     }
-
-    // main(workDate);
 
     final menuName = Container(
       height: 50,
@@ -183,10 +132,7 @@ class _DailyPage extends State<DailyPage> {
           Expanded(
             flex: 6,
             child: TextButton(
-              style: ButtonStyle(
-                  // alignment: AlignmentGeometry.lerp(1, 1, 1),
-                  // backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-                  ),
+              style: ButtonStyle(),
               onPressed: () {
                 Future<DateTime> selectedDate = showDatePicker(
                   context: context,
@@ -205,15 +151,16 @@ class _DailyPage extends State<DailyPage> {
                   setState(() {
                     _selectedTime = dateTime;
                     sDay = dateTime.difference(DateTime.now()).inDays;
-                    changeDate = _getDateString(_selectedTime);
+                    changeDate = Date().getDateString(_selectedTime);
+                    date = Date().date(_selectedTime);
                     _report(
-                      workDate,
+                      date,
                     );
                   });
                 });
               },
               child: Text(
-                isChanged ? changeDate : _getDate(0),
+                isChanged ? changeDate : Date().getDate(0),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
@@ -327,14 +274,13 @@ class _DailyPage extends State<DailyPage> {
                       return Text(
                         (sType == "today") ? dayReport : nextReport,
                       );
-                    } else {}
+                    } else {
+                      return Text('');
+                    }
                   }
                   return Text('');
                 },
               ),
-              // Text(
-              // (sType == "today") ? dayReport : nextReport,
-              // ),
             ),
           ],
         ),
@@ -342,13 +288,6 @@ class _DailyPage extends State<DailyPage> {
     }
 
     // #region Body
-
-    // APIService apiService = new APIService();
-    // apiService
-    //     .report(mem.user.organizationCode, mem.user.userId, workDate)
-    //     .then((value) async {
-    //   print('apiService');
-    // });
     return Scaffold(
       appBar: KulsAppBar(
         id: id,

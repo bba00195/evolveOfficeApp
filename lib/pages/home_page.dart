@@ -27,8 +27,7 @@ class _HomePage extends State<HomePage> {
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
   String pass;
-  DateTime nowDateTime = DateTime.now().add(Duration(hours: 9));
-  String workDate;
+  String date;
   UserManager mem;
   Future<DailyResultModel> futureAlbum;
 
@@ -43,11 +42,7 @@ class _HomePage extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    String year = nowDateTime.year.toString();
-    String month = nowDateTime.month.toString().padLeft(2, '0');
-    String day = nowDateTime.day.toString().padLeft(2, '0');
-
-    workDate = year + month + day;
+    date = Date().date(null);
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass; //widget.pass LogOutPage에서 전달받은 pass 의미한다.
     mem = widget.member;
@@ -58,7 +53,7 @@ class _HomePage extends State<HomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     var member = mem;
-    _report(workDate);
+    _report(date);
 
     // #region 헤더 결재관리
     SliverToBoxAdapter _buildHeader(double screenHeight) {
@@ -87,45 +82,11 @@ class _HomePage extends State<HomePage> {
 
     // #region 요일
     SliverToBoxAdapter _buildDate(double screenHeight) {
-      var _now = DateTime.now();
-      String year = _now.year.toString();
-      String month = _now.month.toString();
-      String day = _now.day.toString();
-      String weekday;
-
-      switch (_now.weekday) {
-        case 1:
-          weekday = "월요일";
-          break;
-        case 2:
-          weekday = "화요일";
-          break;
-        case 3:
-          weekday = "수요일";
-          break;
-        case 4:
-          weekday = "목요일";
-          break;
-        case 5:
-          weekday = "금요일";
-          break;
-        case 6:
-          weekday = "토요일";
-          break;
-        case 7:
-          weekday = "일요일";
-          break;
-        default:
-          break;
-      }
-
-      String date = year + "년 " + month + "월 " + day + "일 " + weekday;
-
       return SliverToBoxAdapter(
         child: Container(
           margin: EdgeInsets.only(top: 6.0, right: 12.0),
           child: Text(
-            date,
+            Date().dateWeek(null),
             style: TextStyle(
               fontSize: 16,
               fontFamily: 'NotoSansKR',
@@ -215,7 +176,7 @@ class _HomePage extends State<HomePage> {
                                   softWrap: true,
                                 );
                               } else {
-                                return Text("${snapshot.error}");
+                                return Text('');
                               }
                             }
                             return Text('');
