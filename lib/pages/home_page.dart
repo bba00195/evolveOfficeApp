@@ -7,6 +7,8 @@ import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 
+import 'dayText_page.dart';
+
 class HomePage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
   final String id;
@@ -72,7 +74,12 @@ class _HomePage extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(),
+              SizedBox(
+                height: 10,
+              ),
+              Center(
+                child: Text("준비중입니다."),
+              ),
             ],
           ),
         ),
@@ -132,7 +139,7 @@ class _HomePage extends State<HomePage> {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => DailyPage(
+                  builder: (context) => DailyTextPage(
                     id: id,
                     member: member,
                   ),
@@ -231,36 +238,41 @@ class _HomePage extends State<HomePage> {
                         Radius.circular(25.0),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(
-                            top: 15,
-                            left: 15,
-                          ),
-                          alignment: Alignment.centerLeft,
-                          child: Icon(
-                            Icons.airplanemode_active,
-                            color: Colors.deepOrange[300],
-                            size: 55.0,
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                            top: 43,
-                            right: 15,
-                          ),
-                          alignment: Alignment.bottomRight,
-                          child: Text(
-                            '휴가원 관리',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: 'NotoSansKR',
-                              fontWeight: FontWeight.w600,
+                    child: InkWell(
+                      onTap: () {
+                        KulsMessage(sMessage: "준비중입니다.");
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(
+                              top: 15,
+                              left: 15,
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: Icon(
+                              Icons.airplanemode_active,
+                              color: Colors.deepOrange[300],
+                              size: 55.0,
                             ),
                           ),
-                        ),
-                      ],
+                          Container(
+                            margin: EdgeInsets.only(
+                              top: 43,
+                              right: 15,
+                            ),
+                            alignment: Alignment.bottomRight,
+                            child: Text(
+                              '휴가원 관리',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontFamily: 'NotoSansKR',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Container(

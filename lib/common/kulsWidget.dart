@@ -1,4 +1,5 @@
 import 'package:evolveofficeapp/pages/daily_page.dart';
+import 'package:evolveofficeapp/pages/dayText_page.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:evolveofficeapp/pages/login_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,14 +17,14 @@ class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return new AppBar(
       actions: [
-        new IconButton(
-          icon: new Icon(
-            Icons.notifications,
-            color: Colors.white,
-            size: 30,
-          ),
-          onPressed: null,
-        ),
+        // new IconButton(
+        //   icon: new Icon(
+        //     Icons.notifications,
+        //     color: Colors.white,
+        //     size: 30,
+        //   ),
+        //   onPressed: null,
+        // ),
         new IconButton(
           icon: new Icon(
             Icons.person,
@@ -236,7 +237,7 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                               Navigator.push(
                                 context,
                                 CupertinoPageRoute(
-                                  builder: (context) => DailyPage(
+                                  builder: (context) => DailyTextPage(
                                     id: id,
                                     member: member,
                                   ),
@@ -358,6 +359,35 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
+
+  @override
+  Size get preferredSize => new Size.fromHeight(kToolbarHeight);
+}
+
+class KulsMessage extends StatelessWidget implements PreferredSizeWidget {
+  final String sMessage;
+  KulsMessage({Key key, this.sMessage}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      // title: Text('AlertDialog Title'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Text(sMessage),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text('확인'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  } // 비밀번호 불일치
 
   @override
   Size get preferredSize => new Size.fromHeight(kToolbarHeight);

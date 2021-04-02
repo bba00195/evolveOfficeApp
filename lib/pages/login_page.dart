@@ -274,10 +274,10 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 height: 72.0,
               ),
-              forgotLabel,
-              SizedBox(
-                height: 24.0,
-              ),
+              // forgotLabel,
+              // SizedBox(
+              //   height: 24.0,
+              // ),
               pnlUserName,
               SizedBox(
                 height: 36.0,

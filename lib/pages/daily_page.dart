@@ -59,6 +59,8 @@ class _DailyPage extends State<DailyPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    print(screenHeight);
     _report(
       date,
     );
@@ -192,7 +194,7 @@ class _DailyPage extends State<DailyPage> {
 
     _writeReport(String sType) {
       return Container(
-        height: 215,
+        height: screenHeight * 0.31,
         margin: EdgeInsets.only(
           left: 20,
           right: 20,
@@ -305,6 +307,7 @@ class _DailyPage extends State<DailyPage> {
             _writeReport("today"),
             SizedBox(height: 30),
             _writeReport("next"),
+            SizedBox(height: 30),
           ],
         ),
       ),
