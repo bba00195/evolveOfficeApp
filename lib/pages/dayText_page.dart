@@ -1,6 +1,5 @@
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';
-import 'package:evolveofficeapp/pages/dailyWrite_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';

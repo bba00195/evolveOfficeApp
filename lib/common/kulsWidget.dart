@@ -1,4 +1,3 @@
-import 'package:evolveofficeapp/pages/daily_page.dart';
 import 'package:evolveofficeapp/pages/dayText_page.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:evolveofficeapp/pages/login_page.dart';

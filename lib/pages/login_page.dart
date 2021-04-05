@@ -224,13 +224,13 @@ class _LoginPageState extends State<LoginPage> {
     // #endregion
 
     // #region Label
-    final forgotLabel = TextButton(
-      child: Text(
-        'Login to your account',
-        style: TextStyle(color: Colors.black54),
-      ),
-      onPressed: () {},
-    );
+    // final forgotLabel = TextButton(
+    //   child: Text(
+    //     'Login to your account',
+    //     style: TextStyle(color: Colors.black54),
+    //   ),
+    //   onPressed: () {},
+    // );
     // #endregion
 
     // #endregion
