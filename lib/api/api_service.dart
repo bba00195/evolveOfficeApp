@@ -140,6 +140,28 @@ class APIService {
     );
   }
 
+  Future<InsertResultModel> nextReportInsert(String sOrganizationCode,
+      String sUserId, String sWorkDate, String sDayReport) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "INSERT",
+          "QUERY":
+              "INSERT INTO TB_WORK_DAILYREPORT (ORGANIZATION_CODE, WORK_DATE,  EMPLOY_ID_NO, NEXT_REPORT, CREATED_BY, CREATION_DATE)" +
+                  "VALUES (?, ?,  ?,  ?,  ?,  GETDATE())",
+          "TOKEN": token,
+          "PARAMS": [sOrganizationCode, sWorkDate, sUserId, sDayReport, sUserId]
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return InsertResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
+
   Future<InsertResultModel> nextReportUpdate(String sOrganizationCode,
       String sUserId, String sWorkDate, String sDayReport) async {
     final response = await http.post(

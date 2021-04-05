@@ -434,63 +434,80 @@ class _DailyTextPage extends State<DailyTextPage> {
   void _dayFocusChange(BuildContext context, FocusNode currentFocus) {
     currentFocus.unfocus(); //현재 FocusNode의 포커스를 지운다.
     APIService apiService = new APIService();
-    // if (_dayTextEditController.text != "") {
-    if (dayReport == "") {
-      //  INSERT
-      if (nextReport == "") {
-        //  익일 업무내용 정보가 DB에 없을 때
-        apiService
-            .dayReportInsert(member.user.organizationCode, member.user.userId,
-                date, _dayTextEditController.text)
-            .then((value) {
-          if (value.result.isNotEmpty) {
-          } else {}
-        });
-      } else {
-        //  익일 업무내용 정보가 DB에 있을 때
-        apiService
-            .dayReportUpdate(member.user.organizationCode, member.user.userId,
-                date, _dayTextEditController.text)
-            .then((value) {
-          if (value.result.isNotEmpty) {
-          } else {}
-        });
+    if (dayReport != _dayTextEditController.text) {
+      if (_dayTextEditController.text != "") {
+        if (dayReport == "") {
+          //  INSERT
+          if (nextReport == "") {
+            //  익일 업무내용 정보가 DB에 없을 때
+            apiService
+                .dayReportInsert(member.user.organizationCode,
+                    member.user.userId, date, _dayTextEditController.text)
+                .then((value) {
+              if (value.result.isNotEmpty) {
+              } else {}
+            });
+          } else {
+            //  익일 업무내용 정보가 DB에 있을 때
+            apiService
+                .dayReportUpdate(member.user.organizationCode,
+                    member.user.userId, date, _dayTextEditController.text)
+                .then((value) {
+              if (value.result.isNotEmpty) {
+              } else {}
+            });
+          }
+        } else {
+          apiService
+              .dayReportUpdate(member.user.organizationCode, member.user.userId,
+                  date, _dayTextEditController.text)
+              .then((value) {
+            if (value.result.isNotEmpty) {
+            } else {}
+          });
+        }
       }
-    } else {
-      apiService
-          .dayReportUpdate(member.user.organizationCode, member.user.userId,
-              date, _dayTextEditController.text)
-          .then((value) {
-        if (value.result.isNotEmpty) {
-        } else {}
-      });
     }
+    // if (_dayTextEditController.text != "") {
     // }
   }
 
   void _nextFocusChange(BuildContext context, FocusNode currentFocus) {
     currentFocus.unfocus(); //현재 FocusNode의 포커스를 지운다.
     APIService apiService = new APIService();
-    if (nextReport == "") {
-      //  INSERT
-      if (dayReport == "") {
-        //  일일 업무내용 정보가 DB에 없을 때
-        apiService
-            .dayReportInsert(member.user.organizationCode, member.user.userId,
-                date, _nextTextEditController.text)
-            .then((value) {
-          if (value.result.isNotEmpty) {
-          } else {}
-        });
-      } else {
-        //  일일 업무내용 정보가 DB에 있을 때
-        apiService
-            .nextReportUpdate(member.user.organizationCode, member.user.userId,
-                date, _nextTextEditController.text)
-            .then((value) {
-          if (value.result.isNotEmpty) {
-          } else {}
-        });
+    if (nextReport != _nextTextEditController.text) {
+      if (_nextTextEditController.text != "") {
+        if (nextReport == "") {
+          //  INSERT
+          if (dayReport == "") {
+            //  일일 업무내용 정보가 DB에 없을 때
+            apiService
+                .nextReportInsert(member.user.organizationCode,
+                    member.user.userId, date, _nextTextEditController.text)
+                .then((value) {
+              if (value.result.isNotEmpty) {
+              } else {}
+            });
+          } else {
+            //  일일 업무내용 정보가 DB에 있을 때
+            apiService
+                .nextReportUpdate(member.user.organizationCode,
+                    member.user.userId, date, _nextTextEditController.text)
+                .then((value) {
+              if (value.result.isNotEmpty) {
+              } else {}
+            });
+          }
+        } else {
+          //  일일 업무내용 정보가 DB에 있을 때
+          apiService
+              .nextReportUpdate(member.user.organizationCode,
+                  member.user.userId, date, _nextTextEditController.text)
+              .then((value) {
+            if (value.result.isNotEmpty) {
+            } else {}
+          });
+        }
       }
     }
   }
