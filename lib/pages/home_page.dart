@@ -53,9 +53,31 @@ class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    print(screenHeight);
+    print(screenWidth);
 
     var member = mem;
     _report(date);
+
+    _show(String sMessage) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text(sMessage),
+            actions: [
+              TextButton(
+                child: Text("확인"),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
 
     // #region 헤더 결재관리
     SliverToBoxAdapter _buildHeader(double screenHeight) {
@@ -71,16 +93,112 @@ class _HomePage extends State<HomePage> {
               fit: BoxFit.fitWidth,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 10,
-              ),
-              Center(
-                child: Text("준비중입니다."),
-              ),
-            ],
+          child: Container(
+            margin: EdgeInsets.only(
+              left: screenHeight * 0.045,
+              right: screenHeight * 0.045,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.format_list_bulleted_rounded,
+                      size: screenHeight * 0.04,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      ' 결재 내역',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: screenHeight * 0.025,
+                        fontFamily: 'NotoSansKR',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.airplanemode_active,
+                        size: screenHeight * 0.04,
+                        color: Colors.white,
+                      ),
+                      Container(
+                        width: screenWidth * 0.52,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              ' 유OO',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: screenHeight * 0.027,
+                                fontFamily: 'NotoSansKR',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              ' 21.4.16 ~ 21.4.19',
+                              style: TextStyle(
+                                fontFamily: 'NotoSansKR',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        style: ButtonStyle(
+                          side: MaterialStateProperty.all(
+                            BorderSide(
+                              width: 2,
+                              color: Colors.white,
+                            ),
+                          ),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18.0),
+                            ),
+                          ),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            Color.fromRGBO(113, 229, 200, 1.0),
+                          ),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                            left: 15,
+                            right: 15,
+                          ),
+                          child: Text(
+                            'Request',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'NotoSansKR',
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        onPressed: () {
+                          _show("준비중입니다.");
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -240,7 +358,8 @@ class _HomePage extends State<HomePage> {
                     ),
                     child: InkWell(
                       onTap: () {
-                        KulsMessage(sMessage: "준비중입니다.");
+                        _show("준비중입니다.");
+                        // KulsMessage(sMessage: "준비중입니다.");
                       },
                       child: Column(
                         children: [
@@ -291,37 +410,43 @@ class _HomePage extends State<HomePage> {
                         Radius.circular(25.0),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.only(
-                            top: 15,
-                            left: 15,
-                          ),
-                          alignment: Alignment.centerLeft,
-                          child: Icon(
-                            Icons.location_on,
-                            color: Colors.white,
-                            size: 55.0,
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                            top: 43,
-                            right: 15,
-                          ),
-                          alignment: Alignment.bottomRight,
-                          child: Text(
-                            '행선지 등록',
-                            style: TextStyle(
+                    child: InkWell(
+                      onTap: () {
+                        _show("준비중입니다.");
+                        // KulsMessage(sMessage: "준비중입니다.");
+                      },
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(
+                              top: 15,
+                              left: 15,
+                            ),
+                            alignment: Alignment.centerLeft,
+                            child: Icon(
+                              Icons.location_on,
                               color: Colors.white,
-                              fontSize: 18,
-                              fontFamily: 'NotoSansKR',
-                              fontWeight: FontWeight.w600,
+                              size: 55.0,
                             ),
                           ),
-                        ),
-                      ],
+                          Container(
+                            margin: EdgeInsets.only(
+                              top: 43,
+                              right: 15,
+                            ),
+                            alignment: Alignment.bottomRight,
+                            child: Text(
+                              '행선지 등록',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontFamily: 'NotoSansKR',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -31,7 +31,24 @@ class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
             color: Colors.white,
             size: 30,
           ),
-          onPressed: null,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  content: Text('준비중입니다.'),
+                  actions: [
+                    TextButton(
+                      child: Text("확인"),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          },
         )
       ],
       backgroundColor: Color.fromRGBO(101, 209, 182, 1.0),
@@ -290,7 +307,24 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                                 color: Colors.black,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content: Text('준비중입니다.'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("확인"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -341,7 +375,24 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                                 color: Colors.black,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    content: Text('준비중입니다.'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("확인"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                           ),
                         ),
                       ),
