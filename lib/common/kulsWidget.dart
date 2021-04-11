@@ -1,6 +1,9 @@
 import 'package:evolveofficeapp/pages/dayText_page.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
+import 'package:evolveofficeapp/pages/home_page_new.dart';
 import 'package:evolveofficeapp/pages/login_page.dart';
+import 'package:evolveofficeapp/pages/menu_page.dart';
+import 'package:evolveofficeapp/pages/whereis_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -113,6 +116,126 @@ class KulsBottomBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => new Size.fromHeight(kToolbarHeight);
 }
 
+// ignore: must_be_immutable
+class KulsNavigationBottomBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  final String id;
+  final String pass;
+  final UserManager member;
+  final int selectedIndex;
+
+  KulsNavigationBottomBar(
+      {Key key, this.id, this.pass, this.member, this.selectedIndex})
+      : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    int _selectedIndex = selectedIndex;
+    return Container(
+      height: 70,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.16),
+            blurRadius: 6.0,
+            offset: const Offset(0.0, 3.0),
+          ),
+        ],
+      ),
+      margin: EdgeInsets.only(
+        left: screenWidth * 0.05,
+        right: screenWidth * 0.05,
+        top: screenHeight * 0.01,
+        bottom: screenHeight * 0.01,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Color.fromRGBO(248, 246, 255, 1),
+          // backgroundColor: Colors.red,
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.black,
+          selectedFontSize: 14,
+          unselectedFontSize: 14,
+          currentIndex: _selectedIndex, //현재 선택된 Index
+          onTap: (int index) {
+            if (_selectedIndex != index && index == 0) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => MenuPage(
+                    id: id,
+                    pass: pass,
+                    member: member,
+                  ),
+                ),
+              );
+            } else if (index == 1) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => HomePageNew(
+                    id: id,
+                    pass: pass,
+                    member: member,
+                  ),
+                ),
+              );
+            } else if (_selectedIndex != index && index == 2) {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: Text("준비중입니다."),
+                    actions: [
+                      TextButton(
+                        child: Text("확인"),
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+            _selectedIndex = index;
+          },
+          items: [
+            BottomNavigationBarItem(
+              label: 'Menu',
+              icon: Icon(
+                Icons.menu_rounded,
+                size: 26,
+              ),
+            ),
+            BottomNavigationBarItem(
+              label: 'Home',
+              icon: Icon(
+                Icons.home,
+                size: 26,
+              ),
+            ),
+            BottomNavigationBarItem(
+              label: 'Profile',
+              icon: Icon(
+                Icons.person_outline,
+                size: 26,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => new Size.fromHeight(kToolbarHeight);
+}
+
 class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
   final String id;
   final String pass;
@@ -176,7 +299,8 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                         ),
                       ),
                       onPressed: () {
-                        storage.delete(key: "login");
+                        // storage.delete(key: "login");
+                        storage.deleteAll();
                         Navigator.pushReplacement(
                           context,
                           CupertinoPageRoute(
@@ -375,21 +499,14 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                               ),
                             ),
                             onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    content: Text('준비중입니다.'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text("확인"),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(true);
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => WhereIsPage(
+                                    id: id,
+                                    member: member,
+                                  ),
+                                ),
                               );
                             },
                           ),

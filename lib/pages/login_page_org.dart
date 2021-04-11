@@ -13,12 +13,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'home_page_new.dart';
 // #endregion
 
-class LoginPage extends StatefulWidget {
+class LoginPageOrg extends StatefulWidget {
   @override
-  _LoginPageState createState() => new _LoginPageState();
+  _LoginPageOrgState createState() => new _LoginPageOrgState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageOrgState extends State<LoginPageOrg> {
   bool hidePassword = true; // Password Hide
 
   final _idTextEditController = TextEditingController();
@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
 
     // #region IdTextField
     final txtUserName = Material(
-      borderRadius: BorderRadius.circular(5.0),
+      borderRadius: BorderRadius.circular(25.0),
       child: Form(
         key: _idFormKey,
         child: TextField(
@@ -118,36 +118,36 @@ class _LoginPageState extends State<LoginPage> {
           focusNode: idFocusNode,
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
-              // borderRadius: BorderRadius.circular(32.0),
+              borderRadius: BorderRadius.circular(32.0),
               borderSide: BorderSide(
                 color: Colors.transparent,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              // borderRadius: BorderRadius.circular(32.0),
+              borderRadius: BorderRadius.circular(32.0),
               borderSide: BorderSide(
                 color: Colors.transparent,
               ),
             ),
-            // contentPadding: EdgeInsets.fromLTRB(80.0, 8.0, 0.0, 8.0),
+            contentPadding: EdgeInsets.fromLTRB(80.0, 8.0, 0.0, 8.0),
             filled: true,
             fillColor: Colors.white,
             hintText: 'Username',
           ),
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 12,
             fontFamily: 'NotoSansKR',
           ),
         ),
       ),
       elevation: 6.0,
-      shadowColor: Color.fromRGBO(121, 102, 254, 0.3),
+      shadowColor: Color.fromRGBO(187, 235, 223, 1.0),
     );
     // #endregion
 
     // #region PasswordTextField
     final txtPassword = Material(
-      borderRadius: BorderRadius.circular(5.0),
+      borderRadius: BorderRadius.circular(25.0),
       child: Form(
         key: _passwordFormKey,
         child: TextField(
@@ -156,18 +156,18 @@ class _LoginPageState extends State<LoginPage> {
           focusNode: passwordFocusNode,
           decoration: InputDecoration(
             enabledBorder: OutlineInputBorder(
-              // borderRadius: BorderRadius.circular(32.0),
+              borderRadius: BorderRadius.circular(32.0),
               borderSide: BorderSide(
                 color: Colors.transparent,
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              // borderRadius: BorderRadius.circular(32.0),
+              borderRadius: BorderRadius.circular(32.0),
               borderSide: BorderSide(
                 color: Colors.transparent,
               ),
             ),
-            // contentPadding: EdgeInsets.fromLTRB(80.0, 8.0, 0.0, 8.0),
+            contentPadding: EdgeInsets.fromLTRB(80.0, 8.0, 0.0, 8.0),
             filled: true,
             fillColor: Colors.white,
             hintText: 'Password',
@@ -183,14 +183,14 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 12,
             fontFamily: 'NotoSansKR',
           ),
           obscureText: hidePassword,
         ),
       ),
       elevation: 6.0,
-      shadowColor: Color.fromRGBO(121, 102, 254, 0.3),
+      shadowColor: Color.fromRGBO(187, 235, 223, 1.0),
     );
     // #endregion
 
@@ -201,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
         alignment: AlignmentDirectional.center, //alignment:new Alignment(x, y)
         children: <Widget>[
           txtUserName,
-          // userIcon,
+          userIcon,
         ],
       ),
     );
@@ -214,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
         alignment: AlignmentDirectional.center, //alignment:new Alignment(x, y)
         children: <Widget>[
           txtPassword,
-          // lockIcon,
+          lockIcon,
         ],
       ),
     );
@@ -222,14 +222,14 @@ class _LoginPageState extends State<LoginPage> {
 
     // #region ButtonLogin
     final loginButton = Container(
-      height: 50,
-      // padding: EdgeInsets.only(left: 35.0, right: 35.0),
+      height: 40,
+      padding: EdgeInsets.only(left: 35.0, right: 35.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(5),
+            borderRadius: new BorderRadius.circular(24),
           ),
-          primary: Color.fromRGBO(121, 102, 254, 1.0),
+          primary: Color.fromRGBO(102, 209, 182, 1.0),
         ),
         onPressed: () {
           _login(_idTextEditController.text, _passwordTextEditController.text);
@@ -238,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
           // _log(_idTextEditController.text, _passwordTextEditController.text);
         },
         child: Text(
-          'LOGIN',
+          'Sign in',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -256,7 +256,6 @@ class _LoginPageState extends State<LoginPage> {
         style: TextStyle(
           color: Colors.black,
           fontSize: 18,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -276,15 +275,25 @@ class _LoginPageState extends State<LoginPage> {
               shrinkWrap: false,
               padding: EdgeInsets.only(left: 55.0, right: 55.0),
               children: <Widget>[
-                SizedBox(height: 135.0),
+                SizedBox(
+                  height: 135.0,
+                ),
                 logo,
-                SizedBox(height: 48.0),
+                SizedBox(
+                  height: 72.0,
+                ),
                 forgotLabel,
-                SizedBox(height: 36.0),
+                SizedBox(
+                  height: 24.0,
+                ),
                 pnlUserName,
-                SizedBox(height: 36.0),
+                SizedBox(
+                  height: 36.0,
+                ),
                 pnlPassword,
-                SizedBox(height: 48.0),
+                SizedBox(
+                  height: 48.0,
+                ),
                 loginButton,
                 // hiddenLogin
               ],
@@ -311,11 +320,9 @@ class _LoginPageState extends State<LoginPage> {
   _login(String sUserId, String sPassword) async {
     if (sUserId == '') {
       show("아이디를 입력해주세요."); // 아이디 미입력
-      return;
     }
     if (sPassword == '') {
       show("비밀번호를 입력해주세요."); // 비밀번호 미입력
-      return;
     }
 
     APIService apiService = new APIService();

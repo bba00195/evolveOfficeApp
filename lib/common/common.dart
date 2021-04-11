@@ -101,7 +101,7 @@ class Date {
   String dateWeek(DateTime date) {
     //  ex) 2021년 4월 1일 목요일
     if (date == null) {
-      dateTime = DateTime.now().add(Duration(hours: 9));
+      dateTime = DateTime.now();
     } else {
       dateTime = date;
     }

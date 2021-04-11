@@ -53,8 +53,6 @@ class _HomePage extends State<HomePage> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    print(screenHeight);
-    print(screenWidth);
 
     var member = mem;
     _report(date);
@@ -158,41 +156,41 @@ class _HomePage extends State<HomePage> {
                           ],
                         ),
                       ),
-                      TextButton(
-                        style: ButtonStyle(
-                          side: MaterialStateProperty.all(
-                            BorderSide(
-                              width: 2,
-                              color: Colors.white,
-                            ),
-                          ),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                            ),
-                          ),
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                            Color.fromRGBO(113, 229, 200, 1.0),
-                          ),
-                        ),
-                        child: Container(
-                          padding: EdgeInsets.only(
-                            left: 15,
-                            right: 15,
-                          ),
-                          child: Text(
-                            'Request',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'NotoSansKR',
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        onPressed: () {
-                          _show("준비중입니다.");
-                        },
-                      ),
+                      // TextButton(
+                      //   style: ButtonStyle(
+                      //     side: MaterialStateProperty.all(
+                      //       BorderSide(
+                      //         width: 2,
+                      //         color: Colors.white,
+                      //       ),
+                      //     ),
+                      //     shape:
+                      //         MaterialStateProperty.all<RoundedRectangleBorder>(
+                      //       RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(18.0),
+                      //       ),
+                      //     ),
+                      //     backgroundColor: MaterialStateProperty.all<Color>(
+                      //       Color.fromRGBO(113, 229, 200, 1.0),
+                      //     ),
+                      //   ),
+                      //   child: Container(
+                      //     padding: EdgeInsets.only(
+                      //       left: 15,
+                      //       right: 15,
+                      //     ),
+                      //     child: Text(
+                      //       'Request',
+                      //       style: TextStyle(
+                      //           color: Colors.white,
+                      //           fontFamily: 'NotoSansKR',
+                      //           fontWeight: FontWeight.w600),
+                      //     ),
+                      //   ),
+                      //   onPressed: () {
+                      //     _show("준비중입니다.");
+                      //   },
+                      // ),
                     ],
                   ),
                 ),

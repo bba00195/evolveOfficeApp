@@ -119,6 +119,34 @@ class APIService {
     );
   }
 
+  Future<InsertResultModel> remarkReportUpdate(String sOrganizationCode,
+      String sUserId, String sWorkDate, String sRemarkReport) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "UPDATE",
+          "QUERY":
+              "UPDATE TB_WORK_DAILYREPORT SET MISC_REPORT = (?), LAST_UPDATED_BY = (?), LAST_UPDATE_DATE = GETDATE() " +
+                  "WHERE ORGANIZATION_CODE = (?) AND WORK_DATE =(?) AND EMPLOY_ID_NO = (?)",
+          "TOKEN": token,
+          "PARAMS": [
+            sRemarkReport,
+            sUserId,
+            sOrganizationCode,
+            sWorkDate,
+            sUserId
+          ]
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return InsertResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
+
   Future<InsertResultModel> dayReportDelete(
       String sOrganizationCode, String sUserId, String sWorkDate) async {
     final response = await http.post(
@@ -174,6 +202,44 @@ class APIService {
                   "WHERE ORGANIZATION_CODE = (?) AND WORK_DATE =(?) AND EMPLOY_ID_NO = (?)",
           "TOKEN": token,
           "PARAMS": [sDayReport, sUserId, sOrganizationCode, sWorkDate, sUserId]
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return InsertResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
+
+  Future<InsertResultModel> whereIs(
+      String sOrganizationCode,
+      String sUserId,
+      String sArea,
+      String sDate,
+      String sStart,
+      String sEnd,
+      String sLocate) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "INSERT",
+          "QUERY":
+              "INSERT INTO TB_WORK_WHEREIS (ORGANIZATION_CODE, WHEREIS_DATE,  EMPLOY_ID_NO, START_TIME, END_TIME, " +
+                  "AREA, WHEREIS_CONTENTS, CREATED_BY, CREATION_DATE)" +
+                  "VALUES (?, ?,  ?,  ?,  ?,  ?, ?, ?, GETDATE())",
+          "TOKEN": token,
+          "PARAMS": [
+            sOrganizationCode,
+            sDate,
+            sUserId,
+            sStart,
+            sEnd,
+            sArea,
+            sLocate,
+            sUserId
+          ]
         },
       ),
       headers: {'Content-Type': "application/json"},
