@@ -262,7 +262,7 @@ class _DailyPage extends State<DailyPage> {
         //   },
         // )
       ],
-      backgroundColor: Color.fromRGBO(228, 220, 255, 1),
+      backgroundColor: Color.fromRGBO(248, 246, 255, 1),
       centerTitle: true,
       title: Text(
         '일일 업무 보고',
@@ -279,7 +279,7 @@ class _DailyPage extends State<DailyPage> {
     );
 
     final selectDate = Container(
-      color: Color.fromRGBO(228, 220, 255, 1),
+      color: Color.fromRGBO(248, 246, 255, 1),
       // margin: EdgeInsets.only(
       //   right: screenWidth * 0.05,
       // ),
@@ -391,10 +391,38 @@ class _DailyPage extends State<DailyPage> {
     );
 
     _writeReport(String sType) {
-      return Stack(
-        alignment:
-            AlignmentDirectional.topStart, //alignment:new Alignment(x, y)
+      return Column(
+        // alignment:
+        //     AlignmentDirectional.topStart, //alignment:new Alignment(x, y)
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            height: 30,
+            width: screenWidth * 0.9,
+            margin: EdgeInsets.only(
+              left: screenWidth * 0.05,
+              right: screenWidth * 0.05,
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color.fromRGBO(45, 43, 77, 1),
+                  width: 3,
+                ),
+              ),
+            ),
+            // color: Color.fromRGBO(121, 101, 254, 1),
+            child: Text(
+              (sType == "today") ? ' 금일 업무 내용' : ' 익일 업무',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: Color.fromRGBO(86, 98, 112, 1),
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+            ),
+          ),
           Container(
             height: screenHeight * 0.22,
             margin: EdgeInsets.only(
@@ -412,7 +440,7 @@ class _DailyPage extends State<DailyPage> {
                   color: Color.fromRGBO(0, 0, 0, 0.16),
                 )
               ],
-              color: Color.fromRGBO(228, 220, 255, 1),
+              color: Color.fromRGBO(248, 246, 255, 1),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -538,32 +566,60 @@ class _DailyPage extends State<DailyPage> {
               ],
             ),
           ),
-          Container(
-            alignment: Alignment.center,
-            height: 30,
-            width: 100,
-            margin: EdgeInsets.only(
-              left: screenWidth * 0.1,
-              right: screenWidth * 0.05,
-            ),
-            color: Color.fromRGBO(121, 101, 254, 1),
-            child: Text(
-              (sType == "today") ? '금일 업무 내용' : '익일 업무',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
         ],
       );
     }
 
     _remark() {
-      return Stack(
-        alignment:
-            AlignmentDirectional.topStart, //alignment:new Alignment(x, y)
+      return Column(
+        // alignment:
+        //     AlignmentDirectional.topStart, //alignment:new Alignment(x, y)
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            height: 30,
+            width: screenWidth * 0.9,
+            margin: EdgeInsets.only(
+              left: screenWidth * 0.05,
+              right: screenWidth * 0.05,
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Color.fromRGBO(45, 43, 77, 1),
+                  width: 3,
+                ),
+              ),
+            ),
+            // color: Color.fromRGBO(121, 101, 254, 1),
+            child: Text(
+              '특이사항',
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                color: Color.fromRGBO(86, 98, 112, 1),
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          // Container(
+          //   alignment: Alignment.center,
+          //   height: 30,
+          //   width: 100,
+          //   margin: EdgeInsets.only(
+          //     left: screenWidth * 0.1,
+          //     right: screenWidth * 0.05,
+          //   ),
+          //   color: Color.fromRGBO(121, 101, 254, 1),
+          //   child: Text(
+          //     '특이사항',
+          //     style: TextStyle(
+          //       color: Colors.white,
+          //       fontWeight: FontWeight.w700,
+          //     ),
+          //   ),
+          // ),
           Container(
             height: screenHeight * 0.14,
             margin: EdgeInsets.only(
@@ -581,7 +637,7 @@ class _DailyPage extends State<DailyPage> {
                   color: Color.fromRGBO(0, 0, 0, 0.16),
                 )
               ],
-              color: Color.fromRGBO(228, 220, 255, 1),
+              color: Color.fromRGBO(248, 246, 255, 1),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -647,23 +703,6 @@ class _DailyPage extends State<DailyPage> {
               ],
             ),
           ),
-          Container(
-            alignment: Alignment.center,
-            height: 30,
-            width: 100,
-            margin: EdgeInsets.only(
-              left: screenWidth * 0.1,
-              right: screenWidth * 0.05,
-            ),
-            color: Color.fromRGBO(121, 101, 254, 1),
-            child: Text(
-              '특이사항',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
         ],
       );
     }
@@ -679,7 +718,7 @@ class _DailyPage extends State<DailyPage> {
       ),
       body: GestureDetector(
         child: Container(
-          color: Color.fromRGBO(228, 220, 255, 1),
+          color: Color.fromRGBO(248, 246, 255, 1),
           child: ListView(
             children: [
               selectDate,

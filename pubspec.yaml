@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.0+3
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -30,6 +30,7 @@ dependencies:
   cupertino_icons: ^1.0.0
   http: "0.11.3+17"
   flutter_secure_storage: ^4.1.0
+  horizontal_data_table: ^2.5.0
 
 dev_dependencies:
   flutter_test:
@@ -84,16 +85,8 @@ flutter:
     - family: NotoSansKR
       fonts:
         - asset: resource/fonts/NotoSansKR-Regular.otf
-        - asset: resource/fonts/NotoSansKR-Thin.otf
-          weight: 100
-        - asset: resource/fonts/NotoSansKR-Light.otf
-          weight: 300
-        - asset: resource/fonts/NotoSansKR-Medium.otf
-          weight: 500
         - asset: resource/fonts/NotoSansKR-Bold.otf
           weight: 700
-        - asset: resource/fonts/NotoSansKR-Black.otf
-          weight: 900
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

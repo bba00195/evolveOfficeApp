@@ -1,3 +1,4 @@
+import 'package:evolveofficeapp/model/whereis_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../model/login_model.dart';
@@ -71,6 +72,50 @@ class APIService {
     );
 
     return DailyResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
+
+  Future<WhereResultModel> whereIsManage(
+      String sOrganizationCode, String sUserId, String sWorkDate) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "SELECT",
+          "QUERY": "SELECT DBO.F_GET_DEPTNAME(A.DEPT_CODE) AS DEPT_NAME, " +
+              "A.USERNAME_KOR AS USER_NAME, " +
+              "B.START_TIME, " +
+              "B.END_TIME, " +
+              "B.AREA, " +
+              "B.WHEREIS_CONTENTS, " +
+              "dbo.fn_get_codemaster('WHEREIS_CAR_TYPE',B.car_type) AS CAR_TYPE_NAME,	   " +
+              "B.CAR_TYPE, " +
+              "B.ORGANIZATION_CODE " +
+              "FROM TB_ADMIN_USER  A  " +
+              "LEFT OUTER JOIN TB_WORK_WHEREIS  B  " +
+              "ON WHEREIS_DATE = '" +
+              sWorkDate +
+              "' " +
+              "AND B.ORGANIZATION_CODE = '" +
+              sOrganizationCode +
+              "' " +
+              "AND A.USERID = B.EMPLOY_ID_NO , " +
+              "TB_ADMIN_DEPTCODE  C " +
+              "WHERE A.ORGANIZATION_CODE 	= C.ORGANIZATION_CODE " +
+              "  AND A.ORGANIZATION_CODE 	=  '" +
+              sOrganizationCode +
+              "' " +
+              "  AND A.DEPT_CODE         		= C.DEPT_CODE " +
+              "  AND A.USE_FLAG              	= 'Y' " +
+              "ORDER BY a.dept_code, A.SORT_SEQ",
+          "TOKEN": token,
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return WhereResultModel.fromJson(
       json.decode(response.body),
     );
   }
@@ -219,7 +264,8 @@ class APIService {
       String sDate,
       String sStart,
       String sEnd,
-      String sLocate) async {
+      String sLocate,
+      String sCarType) async {
     final response = await http.post(
       url,
       body: jsonEncode(
@@ -227,8 +273,8 @@ class APIService {
           "TYPE": "INSERT",
           "QUERY":
               "INSERT INTO TB_WORK_WHEREIS (ORGANIZATION_CODE, WHEREIS_DATE,  EMPLOY_ID_NO, START_TIME, END_TIME, " +
-                  "AREA, WHEREIS_CONTENTS, CREATED_BY, CREATION_DATE)" +
-                  "VALUES (?, ?,  ?,  ?,  ?,  ?, ?, ?, GETDATE())",
+                  "AREA, WHEREIS_CONTENTS, CAR_TYPE, CREATED_BY, CREATION_DATE)" +
+                  "VALUES (?, ?,  ?,  ?,  ?, ?, ?, ?, ?, GETDATE())",
           "TOKEN": token,
           "PARAMS": [
             sOrganizationCode,
@@ -238,6 +284,7 @@ class APIService {
             sEnd,
             sArea,
             sLocate,
+            sCarType,
             sUserId
           ]
         },

@@ -47,6 +47,16 @@ class _WhereIsPage extends State<WhereIsPage> {
   String sStartTime = '';
   String sEndTime = '';
 
+  final _valueList = [
+    'MYCAR',
+    'MEMBER_CAR',
+    'BUS',
+    'TRAIN',
+    'AIRPLANE',
+    'COMPANY_CAR'
+  ];
+  var selectedValue = 'MYCAR';
+
   @override
   void dispose() {
     _areaTextEditController.dispose();
@@ -96,7 +106,7 @@ class _WhereIsPage extends State<WhereIsPage> {
     }
 
     void _whereInsert(String sArea, String sDate, String sStart, String sEnd,
-        String sLocate) async {
+        String sLocate, String sCarType) async {
       areaFocusNode.unfocus();
       locateFocusNode.unfocus();
       if (sArea == '') {
@@ -124,7 +134,7 @@ class _WhereIsPage extends State<WhereIsPage> {
         APIService apiService = new APIService();
         apiService
             .whereIs(member.user.organizationCode, member.user.userId, sArea,
-                sDate, sStart, sEnd, sLocate)
+                sDate, sStart, sEnd, sLocate, sCarType)
             .then((value) {
           if (value.result.isNotEmpty) {
             if (value.result.elementAt(0).rsCode == "E") {
@@ -148,7 +158,7 @@ class _WhereIsPage extends State<WhereIsPage> {
         color: Colors.black, //change your color here
       ),
       actions: [],
-      backgroundColor: Color.fromRGBO(228, 220, 255, 1),
+      backgroundColor: Color.fromRGBO(248, 246, 255, 1),
       centerTitle: true,
       title: Text(
         '행선지 등록',
@@ -480,6 +490,99 @@ class _WhereIsPage extends State<WhereIsPage> {
       ),
     );
 
+    String vehicle(String value) {
+      String result = '';
+      switch (value) {
+        case 'MYCAR':
+          result = "자기차량";
+          break;
+        case 'MEMBER_CAR':
+          result = "동행인차량";
+          break;
+        case 'BUS':
+          result = "버스";
+          break;
+        case 'TRAIN':
+          result = "철도";
+          break;
+        case 'AIRPLANE':
+          result = "항공";
+          break;
+        case 'COMPANY_CAR':
+          result = "회사차량";
+          break;
+        default:
+          break;
+      }
+      return result;
+    }
+
+    final carType = Container(
+      height: 50,
+      margin: EdgeInsets.only(
+        left: screenWidth * 0.1,
+        right: screenWidth * 0.1,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 6.0,
+            offset: const Offset(0.0, 3.0),
+            color: Color.fromRGBO(0, 0, 0, 0.16),
+          )
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Container(
+              // padding: EdgeInsets.only(
+              //   left: 10,
+              // ),
+              child: Icon(
+                Icons.directions_car_rounded,
+                color: Colors.green,
+                size: 32,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 9,
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton(
+                isExpanded: true,
+                value: selectedValue,
+                items: _valueList.map(
+                  (value) {
+                    return DropdownMenuItem(
+                      value: value,
+                      child: Text(vehicle(value)),
+                    );
+                  },
+                ).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedValue = value;
+                  });
+                },
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: EdgeInsets.only(
+                right: 10,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
     final saveButton = Container(
       height: 50,
       padding: EdgeInsets.only(left: 35.0, right: 35.0),
@@ -492,7 +595,7 @@ class _WhereIsPage extends State<WhereIsPage> {
         ),
         onPressed: () {
           _whereInsert(_areaTextEditController.text, date, sStartTime, sEndTime,
-              _locateTextEditController.text);
+              _locateTextEditController.text, selectedValue);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -532,7 +635,7 @@ class _WhereIsPage extends State<WhereIsPage> {
                 AlignmentDirectional.topCenter, //alignment:new Alignment(x, y)
             children: [
               Container(
-                color: Color.fromRGBO(228, 220, 255, 1),
+                color: Color.fromRGBO(248, 246, 255, 1),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -551,6 +654,9 @@ class _WhereIsPage extends State<WhereIsPage> {
                   margin: EdgeInsets.only(
                     top: 30,
                   ),
+                  // padding: EdgeInsets.only(
+                  //   top: 70,
+                  // ),
                   child: ListView(
                     children: [
                       SizedBox(height: 70),
@@ -562,7 +668,10 @@ class _WhereIsPage extends State<WhereIsPage> {
                       SizedBox(height: 30),
                       locate,
                       SizedBox(height: 30),
+                      carType,
+                      SizedBox(height: 30),
                       saveButton,
+                      SizedBox(height: 30),
                     ],
                   ),
                 ),

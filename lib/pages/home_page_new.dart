@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:evolveofficeapp/pages/whereis_page.dart';
+import 'package:evolveofficeapp/pages/wheremanage_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/common/common.dart';
@@ -178,7 +179,7 @@ class _HomePageNew extends State<HomePageNew> {
     // #region 일일 업무보고
     Widget buildSearchButton = Column(
       children: [
-        SizedBox(height: 30),
+        SizedBox(height: 10),
         InkWell(
           child: Container(
             margin: EdgeInsets.only(
@@ -222,10 +223,10 @@ class _HomePageNew extends State<HomePageNew> {
     // #region 일일 업무보고
     Widget buildDashboard = Container(
       margin: EdgeInsets.only(
-        top: screenHeight * 0.05,
+        top: screenHeight * 0.02,
         left: screenWidth * 0.05,
         right: screenWidth * 0.05,
-        bottom: screenHeight * 0.05,
+        bottom: screenHeight * 0.01,
       ),
       height: 70.0,
       child: ListView(
@@ -357,229 +358,300 @@ class _HomePageNew extends State<HomePageNew> {
 
     // #endregion
 
-    SliverToBoxAdapter _buildManage(double screenHeight) {
-      return SliverToBoxAdapter(
-        child: Container(
-          // alignment: Alignment.topCenter,
-          height: 300.0,
-          margin: EdgeInsets.only(
-            left: screenWidth * 0.05,
-            right: screenWidth * 0.05,
-          ),
-          child: ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.only(
-              top: 0,
-            ),
-            children: <Widget>[
-              InkWell(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10.0,
-                        offset: const Offset(3.0, 5.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                      )
-                    ],
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(25.0),
-                    ),
-                  ),
-                  height: screenHeight * 0.1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(width: 14),
-                      Container(
-                        width: screenHeight * 0.07,
-                        height: screenHeight * 0.07,
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(244, 242, 255, 1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.shopping_bag,
-                          color: Color.fromRGBO(121, 102, 254, 1),
-                          size: 36,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 18,
-                      ),
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          "일일업무보고",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          size: 30,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) => DailyPage(
-                        id: id,
-                        member: member,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 14),
-              InkWell(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10.0,
-                        offset: const Offset(3.0, 5.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                      )
-                    ],
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(25.0),
-                    ),
-                  ),
-                  height: screenHeight * 0.1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(width: 14),
-                      Container(
-                        width: screenHeight * 0.07,
-                        height: screenHeight * 0.07,
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(244, 242, 255, 1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.directions_car_rounded,
-                          color: Color.fromRGBO(180, 115, 222, 1),
-                          size: 36,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 18,
-                      ),
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          "행선지 등록",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          size: 30,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                onTap: () {
-                  // _show("준비중입니다.");
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) => WhereIsPage(
-                        id: id,
-                        pass: pass,
-                        member: member,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(height: 14),
-              InkWell(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 10.0,
-                        offset: const Offset(3.0, 5.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                      )
-                    ],
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(25.0),
-                    ),
-                  ),
-                  height: screenHeight * 0.1,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(width: 14),
-                      Container(
-                        width: screenHeight * 0.07,
-                        height: screenHeight * 0.07,
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(254, 242, 246, 1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.directions_boat,
-                          color: Color.fromRGBO(255, 101, 129, 1),
-                          size: 36,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 18,
-                      ),
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          "휴가원 관리",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          size: 30,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                onTap: () {
-                  _show("준비중입니다.");
-                },
-              ),
-            ],
-          ),
+    Widget buildManage = Container(
+      // alignment: Alignment.topCenter,
+      // height: 300.0,
+      margin: EdgeInsets.only(
+        left: screenWidth * 0.05,
+        right: screenWidth * 0.05,
+      ),
+      child: ListView(
+        shrinkWrap: true,
+        padding: EdgeInsets.only(
+          top: 0,
         ),
-      );
-    }
+        children: <Widget>[
+          SizedBox(height: 14),
+          InkWell(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10.0,
+                    offset: const Offset(3.0, 5.0),
+                    color: Color.fromRGBO(0, 0, 0, 0.16),
+                  )
+                ],
+                borderRadius: BorderRadius.all(
+                  Radius.circular(25.0),
+                ),
+              ),
+              height: screenHeight * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 14),
+                  Container(
+                    width: screenHeight * 0.07,
+                    height: screenHeight * 0.07,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(244, 242, 255, 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.shopping_bag,
+                      color: Color.fromRGBO(121, 102, 254, 1),
+                      size: 36,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 18,
+                  ),
+                  Expanded(
+                    flex: 9,
+                    child: Text(
+                      "일일업무보고",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'NotoSansKR',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => DailyPage(
+                    id: id,
+                    member: member,
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 14),
+          InkWell(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10.0,
+                    offset: const Offset(3.0, 5.0),
+                    color: Color.fromRGBO(0, 0, 0, 0.16),
+                  )
+                ],
+                borderRadius: BorderRadius.all(
+                  Radius.circular(25.0),
+                ),
+              ),
+              height: screenHeight * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 14),
+                  Container(
+                    width: screenHeight * 0.07,
+                    height: screenHeight * 0.07,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(244, 242, 255, 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.directions_car_rounded,
+                      color: Color.fromRGBO(180, 115, 222, 1),
+                      size: 36,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 18,
+                  ),
+                  Expanded(
+                    flex: 9,
+                    child: Text(
+                      "행선지 등록",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'NotoSansKR',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              // _show("준비중입니다.");
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => WhereIsPage(
+                    id: id,
+                    pass: pass,
+                    member: member,
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 14),
+          InkWell(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10.0,
+                    offset: const Offset(3.0, 5.0),
+                    color: Color.fromRGBO(0, 0, 0, 0.16),
+                  )
+                ],
+                borderRadius: BorderRadius.all(
+                  Radius.circular(25.0),
+                ),
+              ),
+              height: screenHeight * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 14),
+                  Container(
+                    width: screenHeight * 0.07,
+                    height: screenHeight * 0.07,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(244, 242, 255, 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.directions_bus_sharp,
+                      color: Colors.orange[700],
+                      size: 36,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 18,
+                  ),
+                  Expanded(
+                    flex: 9,
+                    child: Text(
+                      "행선지 관리",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'NotoSansKR',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              // _show("준비중입니다.");
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => WhereManagePage(
+                    id: id,
+                    pass: pass,
+                    member: member,
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 14),
+          InkWell(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10.0,
+                    offset: const Offset(3.0, 5.0),
+                    color: Color.fromRGBO(0, 0, 0, 0.16),
+                  )
+                ],
+                borderRadius: BorderRadius.all(
+                  Radius.circular(25.0),
+                ),
+              ),
+              height: screenHeight * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 14),
+                  Container(
+                    width: screenHeight * 0.07,
+                    height: screenHeight * 0.07,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(254, 242, 246, 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.directions_boat,
+                      color: Color.fromRGBO(255, 101, 129, 1),
+                      size: 36,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 18,
+                  ),
+                  Expanded(
+                    flex: 9,
+                    child: Text(
+                      "휴가원 관리",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'NotoSansKR',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              _show("준비중입니다.");
+            },
+          ),
+          SizedBox(height: 14),
+          SizedBox(height: screenHeight * 0.07),
+        ],
+      ),
+    );
 
     // #region 종료버튼
     Future<bool> _onBackPressed() {
@@ -701,16 +773,10 @@ class _HomePageNew extends State<HomePageNew> {
           child: Column(
             children: [
               buildHeader,
-              buildSearchButton,
+              // buildSearchButton,
               buildDashboard,
               Expanded(
-                child: CustomScrollView(
-                  // customScrollView 에서는 children 대신 slivers를 사용
-                  slivers: [
-                    // _buildDate(screenHeight),
-                    _buildManage(screenHeight),
-                  ],
-                ),
+                child: buildManage,
               ),
             ],
           ),
