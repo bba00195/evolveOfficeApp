@@ -97,6 +97,7 @@ class _HomePageNew extends State<HomePageNew> {
       }
     }
 
+    print(screenHeight);
     // #region 헤더 결재관리
     Widget buildHeader = Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -109,7 +110,7 @@ class _HomePageNew extends State<HomePageNew> {
             left: screenWidth * 0.05,
             right: screenWidth * 0.05,
           ),
-          height: 160.0,
+          height: screenHeight * 0.2,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,10 +163,10 @@ class _HomePageNew extends State<HomePageNew> {
                   Expanded(
                     flex: 1,
                     child: Container(
-                      width: screenHeight * 0.1,
-                      height: (screenHeight * 0.1),
+                      width: 90,
+                      height: 90,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(screenHeight * 0.1),
+                        borderRadius: BorderRadius.circular(45),
                         border: Border.all(
                           color: Colors.white,
                           width: 3,

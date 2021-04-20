@@ -134,7 +134,7 @@ class KulsNavigationBottomBar extends StatelessWidget
     final screenWidth = MediaQuery.of(context).size.width;
     int _selectedIndex = selectedIndex;
     return Container(
-      height: 70,
+      height: screenHeight * 0.1,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
@@ -201,6 +201,7 @@ class KulsNavigationBottomBar extends StatelessWidget
           },
           items: [
             BottomNavigationBarItem(
+              backgroundColor: Colors.red,
               label: 'Menu',
               icon: Icon(
                 Icons.menu_rounded,
@@ -211,14 +212,12 @@ class KulsNavigationBottomBar extends StatelessWidget
               label: 'Home',
               icon: Icon(
                 Icons.home,
-                size: 26,
               ),
             ),
             BottomNavigationBarItem(
               label: 'Profile',
               icon: Icon(
                 Icons.person_outline,
-                size: 26,
               ),
             ),
           ],
