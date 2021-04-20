@@ -23,7 +23,8 @@ class APIService {
               "DEPT_NAME, " +
               "GRADE_CODE, " +
               "GRADE_NAME, " +
-              "MOBILE_TEL " +
+              "MOBILE_TEL, " +
+              "UPLOAD_IMG_SAJIN " +
               "FROM tb_admin_user " +
               "WHERE USERID = '" +
               sUserId +
@@ -257,7 +258,7 @@ class APIService {
     );
   }
 
-  Future<InsertResultModel> whereIs(
+  Future<InsertResultModel> whereIsInsert(
       String sOrganizationCode,
       String sUserId,
       String sArea,
@@ -287,6 +288,68 @@ class APIService {
             sCarType,
             sUserId
           ]
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return InsertResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
+
+  Future<InsertResultModel> whereIsUpdate(
+      String sOrganizationCode,
+      String sUserId,
+      String sArea,
+      String sDate,
+      String sStart,
+      String sEnd,
+      String sLocate,
+      String sCarType) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "UPDATE",
+          "QUERY": "UPDATE TB_WORK_WHEREIS SET START_TIME = (?), END_TIME = (?), AREA = (?), CAR_TYPE = (?)" +
+              ", WHEREIS_CONTENTS = (?), LAST_UPDATED_BY=(?), LAST_UPDATE_DATE = GETDATE()" +
+              " WHERE ORGANIZATION_CODE = (?) AND WHEREIS_DATE = (?) AND EMPLOY_ID_NO = (?) AND START_TIME = (?) AND END_TIME = (?)",
+          "TOKEN": token,
+          "PARAMS": [
+            sStart,
+            sEnd,
+            sArea,
+            sCarType,
+            sLocate,
+            sUserId,
+            sOrganizationCode,
+            sDate,
+            sUserId,
+            sStart,
+            sEnd
+          ]
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return InsertResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
+
+  Future<InsertResultModel> whereIsDelete(String sOrganizationCode,
+      String sUserId, String sDate, String sStart, String sEnd) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "DELETE",
+          "QUERY":
+              "DELETE TB_WORK_WHEREIS WHERE ORGANIZATION_CODE = (?) AND WHEREIS_DATE = (?) AND EMPLOY_ID_NO = (?) AND START_TIME = (?) AND END_TIME = (?) ",
+          "TOKEN": token,
+          "PARAMS": [sOrganizationCode, sDate, sUserId, sStart, sEnd]
         },
       ),
       headers: {'Content-Type': "application/json"},

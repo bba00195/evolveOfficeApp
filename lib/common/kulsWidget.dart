@@ -3,6 +3,7 @@ import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:evolveofficeapp/pages/home_page_new.dart';
 import 'package:evolveofficeapp/pages/login_page.dart';
 import 'package:evolveofficeapp/pages/menu_page.dart';
+import 'package:evolveofficeapp/pages/profile_page.dart';
 import 'package:evolveofficeapp/pages/whereis_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -185,21 +186,15 @@ class KulsNavigationBottomBar extends StatelessWidget
                 ),
               );
             } else if (_selectedIndex != index && index == 2) {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    content: Text("준비중입니다."),
-                    actions: [
-                      TextButton(
-                        child: Text("확인"),
-                        onPressed: () {
-                          Navigator.of(context).pop(true);
-                        },
-                      ),
-                    ],
-                  );
-                },
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => ProfilePage(
+                    id: id,
+                    pass: pass,
+                    member: member,
+                  ),
+                ),
               );
             }
             _selectedIndex = index;

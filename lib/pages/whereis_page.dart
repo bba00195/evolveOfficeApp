@@ -10,11 +10,25 @@ class WhereIsPage extends StatefulWidget {
   final String id;
   final String pass;
   final UserManager member;
+  final bool isUpdate;
+  final DateTime updateDate;
+  final String startTime;
+  final String endTime;
+  final String area;
+  final String contents;
+  final String carType;
 
   WhereIsPage({
     this.id,
     this.pass,
     this.member,
+    this.isUpdate,
+    this.updateDate,
+    this.startTime,
+    this.endTime,
+    this.area,
+    this.contents,
+    this.carType,
   });
   @override
   _WhereIsPage createState() => new _WhereIsPage();
@@ -47,6 +61,12 @@ class _WhereIsPage extends State<WhereIsPage> {
   String sStartTime = '';
   String sEndTime = '';
 
+  bool isUpdate = false;
+  DateTime updateDate;
+  String area;
+  String contents;
+  String carType;
+
   final _valueList = [
     'MYCAR',
     'MEMBER_CAR',
@@ -70,15 +90,31 @@ class _WhereIsPage extends State<WhereIsPage> {
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
     member = widget.member;
+    isUpdate = widget.isUpdate;
 
-    date = Date().date(null);
+    if (isUpdate) {
+      _selectedTime = widget.updateDate;
+      date = Date().date(_selectedTime);
+      changeDate = Date().getDateString(_selectedTime);
+      sStartTime = widget.startTime;
+      sEndTime = widget.endTime;
+      _selectedStart =
+          sStartTime.substring(0, 2) + ":" + sStartTime.substring(2, 4);
+      _selectedEnd = sEndTime.substring(0, 2) + ":" + sEndTime.substring(2, 4);
+      _areaTextEditController.text = widget.area;
+      _locateTextEditController.text = widget.contents;
+      carType = widget.carType;
+    } else {
+      date = Date().date(null);
+      _selectedTime = nowDateTime;
+      sStartTime = "0830";
+      sEndTime = "1800";
+      _selectedStart = "08:30";
+      _selectedEnd = "18:00";
+    }
+
     areaFocusNode = FocusNode();
     locateFocusNode = FocusNode();
-    _selectedTime = nowDateTime;
-    _selectedStart = "08:30";
-    sStartTime = "0830";
-    _selectedEnd = "18:00";
-    sEndTime = "1800";
   }
 
   @override
@@ -106,7 +142,7 @@ class _WhereIsPage extends State<WhereIsPage> {
     }
 
     void _whereInsert(String sArea, String sDate, String sStart, String sEnd,
-        String sLocate, String sCarType) async {
+        String sLocate, String sCarType, bool isUpdate) async {
       areaFocusNode.unfocus();
       locateFocusNode.unfocus();
       if (sArea == '') {
@@ -132,22 +168,42 @@ class _WhereIsPage extends State<WhereIsPage> {
 
       setState(() {
         APIService apiService = new APIService();
-        apiService
-            .whereIs(member.user.organizationCode, member.user.userId, sArea,
-                sDate, sStart, sEnd, sLocate, sCarType)
-            .then((value) {
-          if (value.result.isNotEmpty) {
-            if (value.result.elementAt(0).rsCode == "E") {
-              if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
-                _show("이미 등록된 내용입니다.");
-                return;
+
+        if (isUpdate) {
+          apiService
+              .whereIsUpdate(member.user.organizationCode, member.user.userId,
+                  sArea, sDate, sStart, sEnd, sLocate, sCarType)
+              .then((value) {
+            if (value.result.isNotEmpty) {
+              if (value.result.elementAt(0).rsCode == "E") {
+                if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+                  _show("이미 등록된 내용입니다.");
+                  return;
+                }
+                _show(value.result.elementAt(0).rsMsg);
               }
-              _show(value.result.elementAt(0).rsMsg);
+            } else {
+              _show("등록에 실패하였습니다.");
             }
-          } else {
-            _show("등록에 실패하였습니다.");
-          }
-        });
+          });
+        } else {
+          apiService
+              .whereIsInsert(member.user.organizationCode, member.user.userId,
+                  sArea, sDate, sStart, sEnd, sLocate, sCarType)
+              .then((value) {
+            if (value.result.isNotEmpty) {
+              if (value.result.elementAt(0).rsCode == "E") {
+                if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+                  _show("이미 등록된 내용입니다.");
+                  return;
+                }
+                _show(value.result.elementAt(0).rsMsg);
+              }
+            } else {
+              _show("등록에 실패하였습니다.");
+            }
+          });
+        }
         _areaTextEditController.text = "";
         _locateTextEditController.text = "";
       });
@@ -283,6 +339,7 @@ class _WhereIsPage extends State<WhereIsPage> {
                   );
                   selectedDate.then((dateTime) {
                     setState(() {
+                      isUpdate = false;
                       isChanged = true;
                       _selectedTime = dateTime;
                       sDay = dateTime.difference(DateTime.now()).inDays;
@@ -292,7 +349,9 @@ class _WhereIsPage extends State<WhereIsPage> {
                   });
                 },
                 child: Text(
-                  isChanged ? changeDate : Date().getDate(0),
+                  isUpdate
+                      ? changeDate
+                      : (isChanged ? changeDate : Date().getDate(0)),
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     fontSize: 16,
@@ -594,8 +653,25 @@ class _WhereIsPage extends State<WhereIsPage> {
           primary: Color.fromRGBO(45, 43, 77, 1),
         ),
         onPressed: () {
-          _whereInsert(_areaTextEditController.text, date, sStartTime, sEndTime,
-              _locateTextEditController.text, selectedValue);
+          if (isUpdate) {
+            _whereInsert(
+                _areaTextEditController.text,
+                date,
+                sStartTime,
+                sEndTime,
+                _locateTextEditController.text,
+                selectedValue,
+                isUpdate);
+          } else {
+            _whereInsert(
+                _areaTextEditController.text,
+                date,
+                sStartTime,
+                sEndTime,
+                _locateTextEditController.text,
+                selectedValue,
+                isUpdate);
+          }
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

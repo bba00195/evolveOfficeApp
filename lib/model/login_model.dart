@@ -9,6 +9,7 @@ class UserResponseModel {
   final String gradeCode;
   final String gradeName;
   final String mobileTel;
+  final String imgSajin;
 
   UserResponseModel({
     this.organizationCode,
@@ -21,6 +22,7 @@ class UserResponseModel {
     this.gradeCode,
     this.gradeName,
     this.mobileTel,
+    this.imgSajin,
   });
 
   factory UserResponseModel.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,9 @@ class UserResponseModel {
       gradeCode: json['GRADE_CODE'] != null ? json['GRADE_CODE'] as String : "",
       gradeName: json['GRADE_NAME'] != null ? json['GRADE_NAME'] as String : "",
       mobileTel: json['MOBILE_TEL'] != null ? json['MOBILE_TEL'] as String : "",
+      imgSajin: json['UPLOAD_IMG_SAJIN'] != null
+          ? json['UPLOAD_IMG_SAJIN'] as String
+          : "",
     );
   }
 }

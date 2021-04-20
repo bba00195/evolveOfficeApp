@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 
+import 'dailySelect_page.dart';
 import 'daily_page.dart';
 
 class HomePageNew extends StatefulWidget {
@@ -81,6 +82,21 @@ class _HomePageNew extends State<HomePageNew> {
       );
     }
 
+    DecorationImage _memberImage() {
+      if (mem.user.imgSajin != "" && mem.user.imgSajin != null) {
+        return DecorationImage(
+          image: NetworkImage(
+              'http://211.213.24.71:8080/Upload/sajin/' + mem.user.imgSajin),
+          fit: BoxFit.cover,
+        );
+      } else {
+        return DecorationImage(
+          image: AssetImage('resource/person.png'),
+          fit: BoxFit.cover,
+        );
+      }
+    }
+
     // #region 헤더 결재관리
     Widget buildHeader = Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -109,46 +125,84 @@ class _HomePageNew extends State<HomePageNew> {
                   ),
                 ),
               ),
-              Container(
-                // height: screenHeight * 0.05,
-                child: Text(
-                  mem.user.nameKor,
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'NotoSansKR',
-                  ),
-                ),
-              ),
-              SizedBox(height: 14),
               Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        // height: screenHeight * 0.005,
-                        child: Text(
-                          "welcome Office",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w600,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          // height: screenHeight * 0.05,
+                          child: Text(
+                            mem.user.nameKor,
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontFamily: 'NotoSansKR',
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                        Date().dateWeek(null),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'NotoSansKR',
-                          fontWeight: FontWeight.w600,
+                        SizedBox(height: 14),
+                        Container(
+                          // height: screenHeight * 0.005,
+                          child: Text(
+                            "welcome Office",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'NotoSansKR',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                        textAlign: TextAlign.right,
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      width: screenHeight * 0.1,
+                      height: (screenHeight * 0.1),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(screenHeight * 0.1),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 3,
+                        ),
+                        color: Colors.red,
+                        image: _memberImage(),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 10.0,
+                            offset: const Offset(3.0, 5.0),
+                            color: Color.fromRGBO(0, 0, 0, 0.16),
+                          )
+                        ],
                       ),
                     ),
-                  ]),
+                  )
+                ],
+              ),
+              // Row(
+              //     mainAxisAlignment: MainAxisAlignment.start,
+              //     crossAxisAlignment: CrossAxisAlignment.start,
+              //     children: [
+              //       Expanded(
+              //         child:
+              //       ),
+              //       Container(
+              //         child: Text(
+              //           Date().dateWeek(null),
+              //           style: TextStyle(
+              //             fontSize: 14,
+              //             fontFamily: 'NotoSansKR',
+              //             fontWeight: FontWeight.w600,
+              //           ),
+              //           textAlign: TextAlign.right,
+              //         ),
+              //       ),
+              //     ]),
             ],
           ),
         ),
@@ -361,14 +415,11 @@ class _HomePageNew extends State<HomePageNew> {
     Widget buildManage = Container(
       // alignment: Alignment.topCenter,
       // height: 300.0,
-      margin: EdgeInsets.only(
-        left: screenWidth * 0.05,
-        right: screenWidth * 0.05,
-      ),
       child: ListView(
         shrinkWrap: true,
         padding: EdgeInsets.only(
-          top: 0,
+          left: screenWidth * 0.05,
+          right: screenWidth * 0.05,
         ),
         children: <Widget>[
           SizedBox(height: 14),
@@ -442,6 +493,76 @@ class _HomePageNew extends State<HomePageNew> {
             },
           ),
           SizedBox(height: 14),
+          // InkWell(
+          //   child: Container(
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       boxShadow: [
+          //         BoxShadow(
+          //           blurRadius: 10.0,
+          //           offset: const Offset(3.0, 5.0),
+          //           color: Color.fromRGBO(0, 0, 0, 0.16),
+          //         )
+          //       ],
+          //       borderRadius: BorderRadius.all(
+          //         Radius.circular(25.0),
+          //       ),
+          //     ),
+          //     height: screenHeight * 0.1,
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         SizedBox(width: 14),
+          //         Container(
+          //           width: screenHeight * 0.07,
+          //           height: screenHeight * 0.07,
+          //           decoration: BoxDecoration(
+          //             color: Color.fromRGBO(254, 242, 246, 1),
+          //             borderRadius: BorderRadius.circular(10),
+          //           ),
+          //           child: Icon(
+          //             Icons.calendar_today_outlined,
+          //             color: Color.fromRGBO(255, 101, 129, 1),
+          //             size: 36,
+          //           ),
+          //         ),
+          //         SizedBox(
+          //           width: 18,
+          //         ),
+          //         Expanded(
+          //           flex: 9,
+          //           child: Text(
+          //             "일일업무보고 조회",
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               fontFamily: 'NotoSansKR',
+          //               fontWeight: FontWeight.w600,
+          //             ),
+          //           ),
+          //         ),
+          //         Expanded(
+          //           flex: 3,
+          //           child: Icon(
+          //             Icons.arrow_forward_ios_outlined,
+          //             size: 30,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       CupertinoPageRoute(
+          //         builder: (context) => DailySelectPage(
+          //           id: id,
+          //           member: member,
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // ),
+          // SizedBox(height: 14),
           InkWell(
             child: Container(
               decoration: BoxDecoration(
@@ -508,6 +629,7 @@ class _HomePageNew extends State<HomePageNew> {
                     id: id,
                     pass: pass,
                     member: member,
+                    isUpdate: false,
                   ),
                 ),
               );
@@ -583,68 +705,6 @@ class _HomePageNew extends State<HomePageNew> {
                   ),
                 ),
               );
-            },
-          ),
-          SizedBox(height: 14),
-          InkWell(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 10.0,
-                    offset: const Offset(3.0, 5.0),
-                    color: Color.fromRGBO(0, 0, 0, 0.16),
-                  )
-                ],
-                borderRadius: BorderRadius.all(
-                  Radius.circular(25.0),
-                ),
-              ),
-              height: screenHeight * 0.1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  SizedBox(width: 14),
-                  Container(
-                    width: screenHeight * 0.07,
-                    height: screenHeight * 0.07,
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(254, 242, 246, 1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.directions_boat,
-                      color: Color.fromRGBO(255, 101, 129, 1),
-                      size: 36,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 18,
-                  ),
-                  Expanded(
-                    flex: 9,
-                    child: Text(
-                      "휴가원 관리",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'NotoSansKR',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Icon(
-                      Icons.arrow_forward_ios_outlined,
-                      size: 30,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            onTap: () {
-              _show("준비중입니다.");
             },
           ),
           SizedBox(height: 14),
@@ -774,7 +834,7 @@ class _HomePageNew extends State<HomePageNew> {
             children: [
               buildHeader,
               // buildSearchButton,
-              buildDashboard,
+              // buildDashboard,
               Expanded(
                 child: buildManage,
               ),

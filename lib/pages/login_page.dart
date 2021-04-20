@@ -337,6 +337,7 @@ class _LoginPageState extends State<LoginPage> {
             gradeCode: value.user.elementAt(0).gradeCode,
             gradeName: value.user.elementAt(0).gradeName,
             mobileTel: value.user.elementAt(0).mobileTel,
+            imgSajin: value.user.elementAt(0).imgSajin,
           );
           storage.write(
             key: "login",

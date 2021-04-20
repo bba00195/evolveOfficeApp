@@ -77,7 +77,7 @@ class _MenuPage extends State<MenuPage> {
       height: 90,
       child: Center(
         child: Text(
-          'Profile',
+          'Menu',
           style: TextStyle(
             color: Color.fromRGBO(121, 102, 254, 1),
             fontSize: 22,
@@ -99,33 +99,33 @@ class _MenuPage extends State<MenuPage> {
         ),
         children: <Widget>[
           SizedBox(height: 30),
-          InkWell(
-            child: Container(
-              padding: EdgeInsets.only(
-                left: screenWidth * 0.05,
-                right: screenWidth * 0.05,
-              ),
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                  color: Color.fromRGBO(121, 102, 254, 1),
-                ),
-              ),
-              height: screenHeight * 0.08,
-              child: Text(
-                "공지사항",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'NotoSansKR',
-                ),
-              ),
-            ),
-            onTap: () {
-              _show("준비중입니다.");
-            },
-          ),
-          SizedBox(height: 14),
+          // InkWell(
+          //   child: Container(
+          //     padding: EdgeInsets.only(
+          //       left: screenWidth * 0.05,
+          //       right: screenWidth * 0.05,
+          //     ),
+          //     alignment: Alignment.centerLeft,
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       border: Border.all(
+          //         color: Color.fromRGBO(121, 102, 254, 1),
+          //       ),
+          //     ),
+          //     height: screenHeight * 0.08,
+          //     child: Text(
+          //       "공지사항",
+          //       style: TextStyle(
+          //         fontSize: 16,
+          //         fontFamily: 'NotoSansKR',
+          //       ),
+          //     ),
+          //   ),
+          //   onTap: () {
+          //     _show("준비중입니다.");
+          //   },
+          // ),
+          // SizedBox(height: 14),
           InkWell(
             child: Container(
               padding: EdgeInsets.only(

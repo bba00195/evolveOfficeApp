@@ -11,7 +11,8 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Evolve Office"
-        android:icon="@mipmap/kuls_office_app">
+        android:icon="@mipmap/kuls_office_app"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

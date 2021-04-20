@@ -1,5 +1,6 @@
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/whereis_model.dart';
+import 'package:evolveofficeapp/pages/whereis_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
@@ -99,6 +100,25 @@ class _WhereManagePage extends State<WhereManagePage> {
     _getWhereIs(
       date,
     );
+  }
+
+  void _whereDelete(String sDate, String sStart, String sEnd) async {
+    setState(() {
+      APIService apiService = new APIService();
+
+      apiService
+          .whereIsDelete(member.user.organizationCode, member.user.userId,
+              sDate, sStart, sEnd)
+          .then((value) {
+        if (value.result.isNotEmpty) {
+          if (value.result.elementAt(0).rsCode == "E") {
+            _show(value.result.elementAt(0).rsMsg);
+          }
+        } else {
+          _show("삭제에 실패하였습니다.");
+        }
+      });
+    });
   }
 
   @override
@@ -286,11 +306,20 @@ class _WhereManagePage extends State<WhereManagePage> {
 
     Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
       return InkWell(
-        // onLongPress: () {
-        //   if (member.user.nameKor == whereIsValue.elementAt(index).userName) {
-        //     _showMessage("수정 또는 삭제를 선택해주세요.");
-        //   }
-        // },
+        onLongPress: () {
+          if (whereIsValue.elementAt(index).startTime != '') {
+            if (member.user.nameKor == whereIsValue.elementAt(index).userName) {
+              _showMessage(
+                "수정 또는 삭제를 선택해주세요.",
+                whereIsValue.elementAt(index).startTime,
+                whereIsValue.elementAt(index).endTime,
+                whereIsValue.elementAt(index).area,
+                whereIsValue.elementAt(index).whereIsContents,
+                whereIsValue.elementAt(index).carType,
+              );
+            }
+          }
+        },
         child: Row(
           children: <Widget>[
             rightColumnRowContent(
@@ -379,48 +408,8 @@ class _WhereManagePage extends State<WhereManagePage> {
               ),
               leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
               rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
-              // Row(
-              //   children: [
-              //     Text('이름'),
-              //     Text('시작시간'),
-              //     Text('종료시간'),
-              //     Text('지역'),
-              //     Text('행선지'),
-              //     Text('교통편'),
-              //   ],
-              // ),
-              // dataRow,
               onRefresh: () {},
             ),
-            // child: SingleChildScrollView(
-            //   scrollDirection: Axis.vertical,
-            //   child: SingleChildScrollView(
-            //     scrollDirection: Axis.horizontal,
-            //     child: DataTable(
-            //       columns: [
-            //         DataColumn(
-            //           label: Text('이름'),
-            //         ),
-            //         DataColumn(
-            //           label: Text('시작시간'),
-            //         ),
-            //         DataColumn(
-            //           label: Text('종료시간'),
-            //         ),
-            //         DataColumn(
-            //           label: Text('지역'),
-            //         ),
-            //         DataColumn(
-            //           label: Text('행선지'),
-            //         ),
-            //         DataColumn(
-            //           label: Text('교통편'),
-            //         )
-            //       ],
-            //       rows: dataRow,
-            //     ),
-            //   ),
-            // ),
           ),
         ],
       );
@@ -465,33 +454,6 @@ class _WhereManagePage extends State<WhereManagePage> {
     );
   }
 
-  String vehicle(String value) {
-    String result = '';
-    switch (value) {
-      case 'MYCAR':
-        result = "자기차량";
-        break;
-      case 'MEMBER_CAR':
-        result = "동행인차량";
-        break;
-      case 'BUS':
-        result = "버스";
-        break;
-      case 'TRAIN':
-        result = "철도";
-        break;
-      case 'AIRPLANE':
-        result = "항공";
-        break;
-      case 'COMPANY_CAR':
-        result = "회사차량";
-        break;
-      default:
-        break;
-    }
-    return result;
-  }
-
   // #endregion
   //
   _show(String sMessage) {
@@ -513,107 +475,164 @@ class _WhereManagePage extends State<WhereManagePage> {
     );
   }
 
-  // _showMessage(String sMessage) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => Material(
-  //       type: MaterialType.transparency,
-  //       child: Center(
-  //         child: Container(
-  //           height: 250,
-  //           margin: EdgeInsets.only(
-  //             left: 35,
-  //             right: 35,
-  //           ),
-  //           decoration: BoxDecoration(
-  //             color: Colors.white,
-  //             borderRadius: BorderRadius.circular(25),
-  //           ),
-  //           child: Column(
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             children: [
-  //               Container(
-  //                 height: 150,
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.white,
-  //                   borderRadius: BorderRadius.only(
-  //                     topLeft: Radius.circular(25),
-  //                     topRight: Radius.circular(25),
-  //                   ),
-  //                   image: DecorationImage(
-  //                     image: AssetImage('resource/kuls.png'),
-  //                     fit: BoxFit.contain,
-  //                   ),
-  //                 ),
-  //               ),
-  //               Container(
-  //                 height: 50,
-  //                 decoration: BoxDecoration(),
-  //                 child: Text(
-  //                   'Evolve Office를 종료하시겠습니까?',
-  //                   style: TextStyle(
-  //                     color: Colors.black,
-  //                     fontSize: 14,
-  //                     fontFamily: 'NotoSansKR',
-  //                   ),
-  //                 ),
-  //               ),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.start,
-  //                 children: [
-  //                   Expanded(
-  //                     flex: 4,
-  //                     child: Container(
-  //                       decoration: BoxDecoration(
-  //                         color: Colors.grey[400],
-  //                         borderRadius: BorderRadius.only(
-  //                           bottomLeft: Radius.circular(25),
-  //                         ),
-  //                       ),
-  //                       height: 50,
-  //                       child: TextButton(
-  //                         child: Text(
-  //                           "취소",
-  //                           style: TextStyle(
-  //                             color: Colors.white,
-  //                             fontSize: 16,
-  //                             fontFamily: 'NotoSansKR',
-  //                           ),
-  //                         ),
-  //                         onPressed: () => Navigator.pop(context, false),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                   Expanded(
-  //                     flex: 6,
-  //                     child: Container(
-  //                       decoration: BoxDecoration(
-  //                         color: Color.fromRGBO(121, 102, 254, 1.0),
-  //                         borderRadius: BorderRadius.only(
-  //                           bottomRight: Radius.circular(25),
-  //                         ),
-  //                       ),
-  //                       height: 50,
-  //                       child: TextButton(
-  //                         child: Text(
-  //                           "확인",
-  //                           style: TextStyle(
-  //                             color: Colors.white,
-  //                             fontSize: 16,
-  //                             fontFamily: 'NotoSansKR',
-  //                           ),
-  //                         ),
-  //                         onPressed: () => SystemNavigator.pop(),
-  //                       ),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  _showMessage(String sMessage, String sStartTime, String sEndTime,
+      String sArea, String sWhereIsContents, String sCarType) {
+    showDialog(
+      context: context,
+      builder: (context) => Material(
+        type: MaterialType.transparency,
+        child: Center(
+          child: Container(
+            height: 200,
+            margin: EdgeInsets.only(
+              left: 35,
+              right: 35,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(25),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 6.0,
+                  offset: const Offset(1.0, 3.0),
+                  color: Color.fromRGBO(0, 0, 0, 0.2),
+                )
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  height: 100,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Evolve Office',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 50,
+                  decoration: BoxDecoration(),
+                  child: Text(
+                    sMessage,
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontFamily: 'NotoSansKR',
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: SizedBox(),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                      ),
+                      margin: EdgeInsets.only(
+                        left: 5,
+                        right: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(25),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 6.0,
+                            offset: const Offset(1.0, 3.0),
+                            color: Color.fromRGBO(0, 0, 0, 0.2),
+                          )
+                        ],
+                      ),
+                      height: 40,
+                      child: TextButton(
+                        child: Text(
+                          "삭제",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'NotoSansKR',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onPressed: () {
+                          _whereDelete(date, sStartTime, sEndTime);
+                        },
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                      ),
+                      margin: EdgeInsets.only(
+                        left: 5,
+                        right: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(25),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 6.0,
+                            offset: const Offset(1.0, 3.0),
+                            color: Color.fromRGBO(0, 0, 0, 0.2),
+                          )
+                        ],
+                      ),
+                      height: 40,
+                      child: TextButton(
+                          child: Text(
+                            "수정",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: 'NotoSansKR',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      WhereIsPage(
+                                    id: id,
+                                    pass: pass,
+                                    member: member,
+                                    isUpdate: true,
+                                    updateDate: DateTime.parse(date),
+                                    startTime: sStartTime,
+                                    endTime: sEndTime,
+                                    area: sArea,
+                                    contents: sWhereIsContents,
+                                    carType: sCarType,
+                                  ),
+                                ),
+                                (route) => false);
+
+                            // Navigator.pop(context, false);
+                          }),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
