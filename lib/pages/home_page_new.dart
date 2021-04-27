@@ -30,6 +30,7 @@ class HomePageNew extends StatefulWidget {
 }
 
 class _HomePageNew extends State<HomePageNew> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
@@ -37,14 +38,6 @@ class _HomePageNew extends State<HomePageNew> {
   String date;
   UserManager mem;
   Future<DailyResultModel> futureAlbum;
-
-  void _report(String selectedDate) async {
-    setState(() {
-      APIService apiService = new APIService();
-      futureAlbum = apiService.report(
-          mem.user.organizationCode, mem.user.userId, selectedDate);
-    });
-  }
 
   @override
   void initState() {
@@ -61,7 +54,6 @@ class _HomePageNew extends State<HomePageNew> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     var member = mem;
-    _report(date);
 
     _show(String sMessage) {
       showDialog(
@@ -97,7 +89,6 @@ class _HomePageNew extends State<HomePageNew> {
       }
     }
 
-    print(screenHeight);
     // #region 헤더 결재관리
     Widget buildHeader = Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -110,22 +101,22 @@ class _HomePageNew extends State<HomePageNew> {
             left: screenWidth * 0.05,
             right: screenWidth * 0.05,
           ),
-          height: screenHeight * 0.2,
+          // height: screenHeight * 0.2,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                // width: screenWidth * 32,
-                height: screenHeight * 0.1,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  image: DecorationImage(
-                    image: AssetImage('resource/kuls.png'),
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
+              // Container(
+              //   // width: screenWidth * 32,
+              //   height: screenHeight * 0.1,
+              //   decoration: BoxDecoration(
+              //     color: Colors.transparent,
+              //     image: DecorationImage(
+              //       image: AssetImage('resource/kuls.png'),
+              //       fit: BoxFit.contain,
+              //     ),
+              //   ),
+              // ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -160,29 +151,25 @@ class _HomePageNew extends State<HomePageNew> {
                       ],
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(45),
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3,
-                        ),
-                        color: Colors.red,
-                        image: _memberImage(),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 10.0,
-                            offset: const Offset(3.0, 5.0),
-                            color: Color.fromRGBO(0, 0, 0, 0.16),
-                          )
-                        ],
+                  Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(45),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 3,
                       ),
+                      image: _memberImage(),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 10.0,
+                          offset: const Offset(3.0, 5.0),
+                          color: Color.fromRGBO(0, 0, 0, 0.16),
+                        )
+                      ],
                     ),
-                  )
+                  ),
                 ],
               ),
               // Row(
@@ -234,7 +221,7 @@ class _HomePageNew extends State<HomePageNew> {
     // #region 일일 업무보고
     Widget buildSearchButton = Column(
       children: [
-        SizedBox(height: 10),
+        SizedBox(height: 20),
         InkWell(
           child: Container(
             margin: EdgeInsets.only(
@@ -423,7 +410,7 @@ class _HomePageNew extends State<HomePageNew> {
           right: screenWidth * 0.05,
         ),
         children: <Widget>[
-          SizedBox(height: 14),
+          SizedBox(height: 20),
           InkWell(
             child: Container(
               decoration: BoxDecoration(
@@ -823,6 +810,14 @@ class _HomePageNew extends State<HomePageNew> {
 
     // #region Body
     return Scaffold(
+      key: _scaffoldKey,
+      appBar: KulsAppBar(
+        globalKey: _scaffoldKey,
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
       bottomNavigationBar: KulsNavigationBottomBar(
         id: id,
         pass: pass,

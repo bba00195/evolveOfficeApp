@@ -95,6 +95,28 @@ class _ProfilePage extends State<ProfilePage> {
       }
     }
 
+    final pageHead = Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Color.fromRGBO(121, 102, 254, 1),
+            width: 2.0,
+          ),
+        ),
+      ),
+      height: 90,
+      child: Center(
+        child: Text(
+          'Profile',
+          style: TextStyle(
+            color: Color.fromRGBO(121, 102, 254, 1),
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+
     final profileHead = Container(
       child: Center(
         child: Container(
@@ -214,35 +236,35 @@ class _ProfilePage extends State<ProfilePage> {
               ),
             ],
           ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Text(
-                  '비밀번호',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontFamily: 'NotoSansKR',
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  member.user.password,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontFamily: 'NotoSansKR',
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // SizedBox(height: 20),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.start,
+          //   children: [
+          //     Expanded(
+          //       flex: 1,
+          //       child: Text(
+          //         '비밀번호',
+          //         style: TextStyle(
+          //           color: Colors.black,
+          //           fontSize: 20,
+          //           fontFamily: 'NotoSansKR',
+          //         ),
+          //       ),
+          //     ),
+          //     Expanded(
+          //       flex: 2,
+          //       child: Text(
+          //         member.user.password,
+          //         style: TextStyle(
+          //           color: Colors.black,
+          //           fontSize: 20,
+          //           fontFamily: 'NotoSansKR',
+          //           fontWeight: FontWeight.w600,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -250,12 +272,12 @@ class _ProfilePage extends State<ProfilePage> {
     // #region Body
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: menuName,
+      // appBar: menuName,
       bottomNavigationBar: KulsNavigationBottomBar(
         id: id,
         pass: pass,
         member: member,
-        selectedIndex: 1,
+        selectedIndex: 2,
       ),
       body: GestureDetector(
         child: Center(
@@ -269,14 +291,12 @@ class _ProfilePage extends State<ProfilePage> {
                   topRight: Radius.circular(50),
                 ),
               ),
-              margin: EdgeInsets.only(
-                top: 15,
-              ),
               // padding: EdgeInsets.only(
               //   top: 70,
               // ),
               child: ListView(
                 children: [
+                  pageHead,
                   SizedBox(height: 30),
                   profileHead,
                   SizedBox(height: 30),

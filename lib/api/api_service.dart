@@ -261,7 +261,7 @@ class APIService {
   Future<InsertResultModel> whereIsInsert(
       String sOrganizationCode,
       String sUserId,
-      String sArea,
+      // String sArea,
       String sDate,
       String sStart,
       String sEnd,
@@ -274,8 +274,8 @@ class APIService {
           "TYPE": "INSERT",
           "QUERY":
               "INSERT INTO TB_WORK_WHEREIS (ORGANIZATION_CODE, WHEREIS_DATE,  EMPLOY_ID_NO, START_TIME, END_TIME, " +
-                  "AREA, WHEREIS_CONTENTS, CAR_TYPE, CREATED_BY, CREATION_DATE)" +
-                  "VALUES (?, ?,  ?,  ?,  ?, ?, ?, ?, ?, GETDATE())",
+                  "WHEREIS_CONTENTS, CAR_TYPE, CREATED_BY, CREATION_DATE)" +
+                  "VALUES (?, ?,  ?,  ?,  ?, ?, ?, ?, GETDATE())",
           "TOKEN": token,
           "PARAMS": [
             sOrganizationCode,
@@ -283,7 +283,7 @@ class APIService {
             sUserId,
             sStart,
             sEnd,
-            sArea,
+            // sArea,
             sLocate,
             sCarType,
             sUserId
@@ -301,10 +301,12 @@ class APIService {
   Future<InsertResultModel> whereIsUpdate(
       String sOrganizationCode,
       String sUserId,
-      String sArea,
+      // String sArea,
       String sDate,
       String sStart,
+      String sStartOrg,
       String sEnd,
+      String sEndOrg,
       String sLocate,
       String sCarType) async {
     final response = await http.post(
@@ -312,22 +314,22 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "UPDATE",
-          "QUERY": "UPDATE TB_WORK_WHEREIS SET START_TIME = (?), END_TIME = (?), AREA = (?), CAR_TYPE = (?)" +
+          "QUERY": "UPDATE TB_WORK_WHEREIS SET START_TIME = (?), END_TIME = (?), CAR_TYPE = (?)" +
               ", WHEREIS_CONTENTS = (?), LAST_UPDATED_BY=(?), LAST_UPDATE_DATE = GETDATE()" +
               " WHERE ORGANIZATION_CODE = (?) AND WHEREIS_DATE = (?) AND EMPLOY_ID_NO = (?) AND START_TIME = (?) AND END_TIME = (?)",
           "TOKEN": token,
           "PARAMS": [
             sStart,
             sEnd,
-            sArea,
+            // sArea,
             sCarType,
             sLocate,
             sUserId,
             sOrganizationCode,
             sDate,
             sUserId,
-            sStart,
-            sEnd
+            sStartOrg,
+            sEndOrg
           ]
         },
       ),

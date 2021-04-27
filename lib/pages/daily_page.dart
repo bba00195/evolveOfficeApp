@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class DailyPage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
@@ -22,6 +23,8 @@ class DailyPage extends StatefulWidget {
 }
 
 class _DailyPage extends State<DailyPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
   String pass;
@@ -124,10 +127,10 @@ class _DailyPage extends State<DailyPage> {
     if (remarkFocusNode.hasFocus) {
       _dayFocusChange(context, dayFocusNode);
       _nextFocusChange(context, nextFocusNode);
-      remarkFocusNode.unfocus();
       if (_dayTextEditController.text == "" &&
           _nextTextEditController.text == "") {
         _show("업무 내용 먼저 작성해주세요.");
+        remarkFocusNode.unfocus();
       }
     }
   }
@@ -246,36 +249,19 @@ class _DailyPage extends State<DailyPage> {
       ),
     );
 
-    final menuName = AppBar(
-      iconTheme: IconThemeData(
-        color: Colors.black, //change your color here
-      ),
-      actions: [
-        // new IconButton(
-        //   icon: Icon(
-        //     Icons.calendar_today_outlined,
-        //     color: Color.fromRGBO(121, 101, 254, 1),
-        //     size: 30,
-        //   ),
-        //   onPressed: () {
-        //     // Navigator.pop(context, false);
-        //   },
-        // )
-      ],
-      backgroundColor: Color.fromRGBO(248, 246, 255, 1),
-      centerTitle: true,
-      title: Text(
-        '일일 업무 보고',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontFamily: 'NotoSansKR',
-          fontWeight: FontWeight.w600,
+    final menuName = Container(
+      color: Color.fromRGBO(248, 246, 255, 1),
+      child: Center(
+        child: Text(
+          '일일 업무 보고',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
-      toolbarHeight: 75,
-      bottomOpacity: 0.0,
-      elevation: 0.0,
     );
 
     final selectDate = Container(
@@ -452,117 +438,8 @@ class _DailyPage extends State<DailyPage> {
                     // height: screenHeight * 0.16,
                     alignment: Alignment.topLeft,
                     child: (sType == "today") ? dayForm : nextForm,
-                    // FutureBuilder<DailyResultModel>(
-                    //   future: futureAlbum,
-                    //   builder: (context, snapshot) {
-                    //     if (snapshot.hasData) {
-                    //       if (snapshot.data.day.isNotEmpty) {
-                    //         if (sType == "today") {
-                    //           dayReport =
-                    //               snapshot.data.day.elementAt(0).dayReport;
-                    //           _dayTextEditController.text = dayReport;
-                    //           return dayForm;
-                    //         } else {
-                    //           nextReport =
-                    //               snapshot.data.day.elementAt(0).nextReport;
-                    //           _nextTextEditController.text = nextReport;
-                    //           return nextForm;
-                    //         }
-                    //       } else {
-                    //         if (sType == "today") {
-                    //           dayReport = "";
-                    //           // if (!isFocused) {
-                    //           _dayTextEditController.text = "";
-                    //           // }
-                    //         } else {
-                    //           nextReport = "";
-                    //           // if (!isFocused) {
-                    //           _nextTextEditController.text = "";
-                    //           // }
-                    //         }
-                    //       }
-                    //     }
-                    //     if (sType == "today") {
-                    //       // if (dayReport == "" &&
-                    //       //     _dayTextEditController.text == "" &&
-                    //       //     !isFocused) {
-                    //       _dayTextEditController.text = "";
-                    //       // }
-                    //       return dayForm;
-                    //     } else {
-                    //       // if (nextReport == "" &&
-                    //       //     _nextTextEditController.text == "" &&
-                    //       //     !isFocused) {
-                    //       _nextTextEditController.text = "";
-                    //       // }
-                    //       return nextForm;
-                    //     }
-                    //   },
-                    // ),
                   ),
                 ),
-                // Expanded(
-                //   flex: 2,
-                //   child: TextButton(
-                //     style: ButtonStyle(
-                //       alignment: Alignment.center,
-                //       backgroundColor: MaterialStateProperty.all<Color>(
-                //           Color.fromRGBO(255, 153, 130, 1.0)),
-                //     ),
-                //     onPressed: () {
-                //       APIService apiService = new APIService();
-                //       if (sType == "today") {
-                //         if (nextReport == "") {
-                //           //  익일 업무내용 정보가 DB에 없을 때
-                //           apiService
-                //               .dayReportDelete(member.user.organizationCode,
-                //                   member.user.userId, date)
-                //               .then((value) {
-                //             if (value.result.isNotEmpty) {
-                //             } else {}
-                //             _dayTextEditController.text = '';
-                //           });
-                //         } else {
-                //           //  익일 업무내용 정보가 DB에 있을 때
-                //           apiService
-                //               .dayReportUpdate(member.user.organizationCode,
-                //                   member.user.userId, date, "")
-                //               .then((value) {
-                //             if (value.result.isNotEmpty) {
-                //             } else {}
-                //             _dayTextEditController.text = '';
-                //           });
-                //         }
-                //       } else {
-                //         if (dayReport == "") {
-                //           //  일일 업무내용 정보가 DB에 없을 때
-                //           apiService
-                //               .dayReportDelete(member.user.organizationCode,
-                //                   member.user.userId, date)
-                //               .then((value) {
-                //             if (value.result.isNotEmpty) {
-                //             } else {}
-                //             _nextTextEditController.text = '';
-                //           });
-                //         } else {
-                //           //  일일 업무내용 정보가 DB에 있을 때
-                //           apiService
-                //               .nextReportUpdate(member.user.organizationCode,
-                //                   member.user.userId, date, "")
-                //               .then((value) {
-                //             if (value.result.isNotEmpty) {
-                //             } else {}
-                //             _nextTextEditController.text = '';
-                //           });
-                //         }
-                //       }
-                //     },
-                //     child: Icon(
-                //       Icons.delete,
-                //       color: Colors.white,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -572,8 +449,6 @@ class _DailyPage extends State<DailyPage> {
 
     _remark() {
       return Column(
-        // alignment:
-        //     AlignmentDirectional.topStart, //alignment:new Alignment(x, y)
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -592,7 +467,6 @@ class _DailyPage extends State<DailyPage> {
                 ),
               ),
             ),
-            // color: Color.fromRGBO(121, 101, 254, 1),
             child: Text(
               '특이사항',
               textAlign: TextAlign.left,
@@ -603,23 +477,6 @@ class _DailyPage extends State<DailyPage> {
               ),
             ),
           ),
-          // Container(
-          //   alignment: Alignment.center,
-          //   height: 30,
-          //   width: 100,
-          //   margin: EdgeInsets.only(
-          //     left: screenWidth * 0.1,
-          //     right: screenWidth * 0.05,
-          //   ),
-          //   color: Color.fromRGBO(121, 101, 254, 1),
-          //   child: Text(
-          //     '특이사항',
-          //     style: TextStyle(
-          //       color: Colors.white,
-          //       fontWeight: FontWeight.w700,
-          //     ),
-          //   ),
-          // ),
           Container(
             height: screenHeight * 0.14,
             margin: EdgeInsets.only(
@@ -648,58 +505,8 @@ class _DailyPage extends State<DailyPage> {
                   child: Container(
                     alignment: Alignment.topLeft,
                     child: remarkForm,
-                    // FutureBuilder<DailyResultModel>(
-                    //   future: futureAlbum,
-                    //   builder: (context, snapshot) {
-                    //     if (snapshot.hasData) {
-                    //       if (snapshot.data.day.isNotEmpty) {
-                    //         remarkReport =
-                    //             snapshot.data.day.elementAt(0).miscReport;
-                    //         _remarkTextEditController.text = remarkReport;
-                    //         return remarkForm;
-                    //       } else {
-                    //         remarkReport = "";
-                    //         // if (!isFocused) {
-                    //         _remarkTextEditController.text = "";
-                    //         // }
-                    //       }
-                    //     }
-                    //     // if (remarkReport == "" &&
-                    //     //     _remarkTextEditController.text == "" &&
-                    //     //     !isFocused) {
-                    //     _remarkTextEditController.text = "";
-                    //     // }
-                    //     return remarkForm;
-                    //   },
-                    // ),
                   ),
                 ),
-                // Expanded(
-                //   flex: 2,
-                //   child: TextButton(
-                //     style: ButtonStyle(
-                //       alignment: Alignment.center,
-                //       backgroundColor: MaterialStateProperty.all<Color>(
-                //           Color.fromRGBO(255, 153, 130, 1.0)),
-                //     ),
-                //     onPressed: () {
-                //       APIService apiService = new APIService();
-                //       //  익일 업무내용 정보가 DB에 있을 때
-                //       apiService
-                //           .remarkReportUpdate(member.user.organizationCode,
-                //               member.user.userId, date, "")
-                //           .then((value) {
-                //         if (value.result.isNotEmpty) {
-                //         } else {}
-                //         _remarkTextEditController.text = '';
-                //       });
-                //     },
-                //     child: Icon(
-                //       Icons.delete,
-                //       color: Colors.white,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -709,7 +516,21 @@ class _DailyPage extends State<DailyPage> {
 
     // #region Body
     return Scaffold(
-      appBar: menuName,
+      key: _scaffoldKey,
+      appBar: KulsAppBar(
+        globalKey: _scaffoldKey,
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
+      drawer: KulsDrawer(
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
+      // appBar: menuName,
       bottomNavigationBar: KulsNavigationBottomBar(
         id: id,
         pass: pass,
@@ -721,6 +542,8 @@ class _DailyPage extends State<DailyPage> {
           color: Color.fromRGBO(248, 246, 255, 1),
           child: ListView(
             children: [
+              SizedBox(height: 10),
+              menuName,
               selectDate,
               Container(
                 decoration: BoxDecoration(

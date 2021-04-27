@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 
 class WhereManagePage extends StatefulWidget {
@@ -23,6 +24,8 @@ class WhereManagePage extends StatefulWidget {
 }
 
 class _WhereManagePage extends State<WhereManagePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
   String pass;
@@ -113,6 +116,8 @@ class _WhereManagePage extends State<WhereManagePage> {
         if (value.result.isNotEmpty) {
           if (value.result.elementAt(0).rsCode == "E") {
             _show(value.result.elementAt(0).rsMsg);
+          } else {
+            _show("행선지가 삭제되었습니다.");
           }
         } else {
           _show("삭제에 실패하였습니다.");
@@ -144,25 +149,23 @@ class _WhereManagePage extends State<WhereManagePage> {
       _getWhereIs(date);
     }
 
-    final menuName = AppBar(
-      iconTheme: IconThemeData(
-        color: Colors.black, //change your color here
+    final menuName = Container(
+      color: Color.fromRGBO(244, 242, 255, 1),
+      padding: EdgeInsets.only(
+        top: 10,
+        bottom: 10,
       ),
-      actions: [],
-      backgroundColor: Color.fromRGBO(244, 242, 255, 1),
-      centerTitle: true,
-      title: Text(
-        '행선지 관리',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontFamily: 'NotoSansKR',
-          fontWeight: FontWeight.w600,
+      child: Center(
+        child: Text(
+          '행선지 관리',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
-      toolbarHeight: 75,
-      bottomOpacity: 0.0,
-      elevation: 0.0,
     );
 
     final selectDate = Container(
@@ -301,6 +304,18 @@ class _WhereManagePage extends State<WhereManagePage> {
         height: 50,
         padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
         alignment: sAlign,
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(
+              color: Colors.grey[100],
+              width: 1,
+            ),
+            right: BorderSide(
+              color: Colors.grey[100],
+              width: 1,
+            ),
+          ),
+        ),
       );
     }
 
@@ -336,12 +351,12 @@ class _WhereManagePage extends State<WhereManagePage> {
                         ":" +
                         whereIsValue.elementAt(index).endTime.substring(2, 4),
                 Alignment.center),
-            rightColumnRowContent(
-                whereIsValue.elementAt(index).area, Alignment.centerLeft),
+            // rightColumnRowContent(
+            //     whereIsValue.elementAt(index).area, Alignment.centerLeft),
             rightColumnRowContent(whereIsValue.elementAt(index).whereIsContents,
-                Alignment.centerLeft),
+                Alignment.center),
             rightColumnRowContent(
-                whereIsValue.elementAt(index).carType, Alignment.centerLeft),
+                whereIsValue.elementAt(index).carType, Alignment.center),
           ],
         ),
       );
@@ -388,13 +403,13 @@ class _WhereManagePage extends State<WhereManagePage> {
             ),
             child: HorizontalDataTable(
               leftHandSideColumnWidth: 100,
-              rightHandSideColumnWidth: 500,
+              rightHandSideColumnWidth: 400,
               isFixedHeader: true,
               headerWidgets: [
                 dataTableHeader('이름'),
                 dataTableHeader('시작시간'),
                 dataTableHeader('종료시간'),
-                dataTableHeader('지역'),
+                // dataTableHeader('지역'),
                 dataTableHeader('행선지'),
                 dataTableHeader('교통편'),
               ],
@@ -417,7 +432,21 @@ class _WhereManagePage extends State<WhereManagePage> {
 
     // #region Body
     return Scaffold(
-      appBar: menuName,
+      key: _scaffoldKey,
+      appBar: KulsAppBar(
+        globalKey: _scaffoldKey,
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
+      drawer: KulsDrawer(
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
+      backgroundColor: Colors.white,
       bottomNavigationBar: KulsNavigationBottomBar(
         id: id,
         pass: pass,
@@ -429,6 +458,7 @@ class _WhereManagePage extends State<WhereManagePage> {
           color: Color.fromRGBO(244, 242, 255, 1),
           child: ListView(
             children: [
+              menuName,
               selectDate,
               Container(
                 decoration: BoxDecoration(
@@ -567,6 +597,20 @@ class _WhereManagePage extends State<WhereManagePage> {
                         ),
                         onPressed: () {
                           _whereDelete(date, sStartTime, sEndTime);
+                          Navigator.of(context).pop(true);
+                          setState(() {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => super.widget,
+                                //     WhereManagePage(
+                                //   id: id,
+                                //   pass: pass,
+                                //   member: member,
+                                // ),
+                              ),
+                            );
+                          });
                         },
                       ),
                     ),
@@ -604,26 +648,23 @@ class _WhereManagePage extends State<WhereManagePage> {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      WhereIsPage(
-                                    id: id,
-                                    pass: pass,
-                                    member: member,
-                                    isUpdate: true,
-                                    updateDate: DateTime.parse(date),
-                                    startTime: sStartTime,
-                                    endTime: sEndTime,
-                                    area: sArea,
-                                    contents: sWhereIsContents,
-                                    carType: sCarType,
-                                  ),
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => WhereIsPage(
+                                  id: id,
+                                  pass: pass,
+                                  member: member,
+                                  isUpdate: true,
+                                  updateDate: DateTime.parse(date),
+                                  startTime: sStartTime,
+                                  endTime: sEndTime,
+                                  area: sArea,
+                                  contents: sWhereIsContents,
+                                  carType: sCarType,
                                 ),
-                                (route) => false);
-
-                            // Navigator.pop(context, false);
+                              ),
+                            );
                           }),
                     ),
                   ],

@@ -1,3 +1,4 @@
+import 'package:evolveofficeapp/pages/daily_page.dart';
 import 'package:evolveofficeapp/pages/dayText_page.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:evolveofficeapp/pages/home_page_new.dart';
@@ -5,57 +6,34 @@ import 'package:evolveofficeapp/pages/login_page.dart';
 import 'package:evolveofficeapp/pages/menu_page.dart';
 import 'package:evolveofficeapp/pages/profile_page.dart';
 import 'package:evolveofficeapp/pages/whereis_page.dart';
+import 'package:evolveofficeapp/pages/wheremanage_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'common.dart';
 
 class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final GlobalKey<ScaffoldState> globalKey;
   final String id;
   final String pass;
   final UserManager member;
+  final FlutterSecureStorage storage;
 
-  KulsAppBar({Key key, this.id, this.pass, this.member}) : super(key: key);
+  KulsAppBar(
+      {Key key, this.globalKey, this.id, this.pass, this.member, this.storage})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return new AppBar(
-      actions: [
-        // new IconButton(
-        //   icon: new Icon(
-        //     Icons.notifications,
-        //     color: Colors.white,
-        //     size: 30,
-        //   ),
-        //   onPressed: null,
-        // ),
-        new IconButton(
-          icon: new Icon(
-            Icons.person,
-            color: Colors.white,
-            size: 30,
-          ),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  content: Text('준비중입니다.'),
-                  actions: [
-                    TextButton(
-                      child: Text("확인"),
-                      onPressed: () {
-                        Navigator.of(context).pop(true);
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        )
-      ],
-      backgroundColor: Color.fromRGBO(101, 209, 182, 1.0),
+      actions: [],
+      backgroundColor: Colors.transparent,
+      bottomOpacity: 0.0,
+      elevation: 0.0,
       centerTitle: true,
+      leading: IconButton(
+        icon: Icon(Icons.menu),
+        onPressed: () => globalKey.currentState.openDrawer(),
+      ),
       title: SizedBox(
         height: 95,
         child: TextButton(
@@ -63,7 +41,7 @@ class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
             Navigator.pushReplacement(
               context,
               CupertinoPageRoute(
-                builder: (context) => HomePage(
+                builder: (context) => HomePageNew(
                   id: id,
                   pass: pass,
                   member: member,
@@ -72,12 +50,13 @@ class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
             );
           },
           child: Image.asset(
-            'resource/kuls_home.png',
+            'resource/kuls.png',
             fit: BoxFit.cover,
           ),
         ),
       ),
       toolbarHeight: 100,
+      iconTheme: IconThemeData(color: Colors.black),
     );
   }
 
@@ -157,7 +136,7 @@ class KulsNavigationBottomBar extends StatelessWidget
           type: BottomNavigationBarType.fixed,
           backgroundColor: Color.fromRGBO(248, 246, 255, 1),
           // backgroundColor: Colors.red,
-          selectedItemColor: Colors.black,
+          selectedItemColor: Colors.grey,
           unselectedItemColor: Colors.black,
           selectedFontSize: 14,
           unselectedFontSize: 14,
@@ -174,7 +153,7 @@ class KulsNavigationBottomBar extends StatelessWidget
                   ),
                 ),
               );
-            } else if (index == 1) {
+            } else if (_selectedIndex != index && index == 1) {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
@@ -201,7 +180,6 @@ class KulsNavigationBottomBar extends StatelessWidget
           },
           items: [
             BottomNavigationBarItem(
-              backgroundColor: Colors.red,
               label: 'Menu',
               icon: Icon(
                 Icons.menu_rounded,
@@ -236,285 +214,268 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
   final UserManager member;
   final FlutterSecureStorage storage;
 
+  DecorationImage _memberImage() {
+    if (member.user.imgSajin != "" && member.user.imgSajin != null) {
+      return DecorationImage(
+        image: NetworkImage(
+            'http://211.213.24.71:8080/Upload/sajin/' + member.user.imgSajin),
+        fit: BoxFit.cover,
+      );
+    } else {
+      return DecorationImage(
+        image: AssetImage('resource/person.png'),
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
   KulsDrawer({Key key, this.id, this.pass, this.member, this.storage})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     return new Drawer(
       child: ListView(
         children: [
           Container(
-            padding: EdgeInsets.only(left: 20),
+            padding: EdgeInsets.all(15),
             alignment: Alignment.centerLeft,
-            height: 70,
-            color: Color.fromRGBO(101, 209, 182, 1.0),
+            height: 100,
+            color: Color.fromRGBO(244, 242, 255, 1.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  flex: 6,
-                  child: Container(
-                    child: Text(
-                      "안녕하세요 " + member.user.nameKor + " 님",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontFamily: 'NotoSansKR',
-                        fontWeight: FontWeight.w600,
-                      ),
+                Container(
+                  width: 70,
+                  height: 70,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(35),
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 3,
                     ),
+                    image: _memberImage(),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 10.0,
+                        offset: const Offset(3.0, 5.0),
+                        color: Color.fromRGBO(0, 0, 0, 0.16),
+                      )
+                    ],
                   ),
                 ),
-                Expanded(
-                  flex: 4,
-                  child: Container(
-                    margin: EdgeInsets.only(
-                      left: 5,
-                      right: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Color.fromRGBO(111, 217, 191, 1.0),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(5),
-                      ),
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 1.5,
-                      ),
-                    ),
-                    height: 40,
-                    child: TextButton(
+                SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
                       child: Text(
-                        "로그아웃",
+                        member.user.nameKor + " 님",
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontFamily: 'NotoSansKR',
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Container(
+                      child: Text(
+                        "활기찬 오후를 위해 힘내세요.",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
                           fontFamily: 'NotoSansKR',
                         ),
                       ),
-                      onPressed: () {
-                        // storage.delete(key: "login");
-                        storage.deleteAll();
-                        Navigator.pushReplacement(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => LoginPage(),
-                          ),
-                        );
-                      },
                     ),
-                  ),
-                )
+                  ],
+                ),
               ],
             ),
           ),
           Container(
-            height: 40,
-            padding: EdgeInsets.only(
-              left: 10,
-            ),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              '업무관리',
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: 'NotoSansKR',
-                fontWeight: FontWeight.w600,
-              ),
+            height: screenHeight - 210,
+            padding: EdgeInsets.all(45),
+            child: ListView(
+              children: [
+                InkWell(
+                  onTap: () {
+                    Navigator.pushReplacement(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => HomePageNew(
+                          id: id,
+                          pass: pass,
+                          member: member,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 9,
+                        child: Text(
+                          'HOME',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'NotoSansKR',
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 26,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 30),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => DailyPage(
+                          id: id,
+                          member: member,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 9,
+                        child: Text(
+                          '일일 업무 보고',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'NotoSansKR',
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 26,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 30),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => WhereIsPage(
+                          id: id,
+                          pass: pass,
+                          member: member,
+                          isUpdate: false,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 9,
+                        child: Text(
+                          '행선지 등록',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'NotoSansKR',
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 26,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 30),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => WhereManagePage(
+                          id: id,
+                          pass: pass,
+                          member: member,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 9,
+                        child: Text(
+                          '행선지 관리',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'NotoSansKR',
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 26,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                flex: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: Colors.grey[400],
-                      ),
-                      right: BorderSide(
-                        color: Colors.grey[400],
-                      ),
-                      bottom: BorderSide(
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Icon(
-                            Icons.create,
-                            color: Colors.black,
-                            // size: 55.0,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 9,
-                        child: Container(
-                          child: TextButton(
-                            child: Text(
-                              '일일 업무 보고',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'NotoSansKR',
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => DailyTextPage(
-                                    id: id,
-                                    member: member,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+          InkWell(
+            onTap: () {
+              // storage.delete(key: "login");
+              storage.deleteAll();
+              Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => LoginPage(),
+                ),
+              );
+            },
+            child: Container(
+              height: 70,
+              margin: EdgeInsets.only(
+                left: 45,
+              ),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Log Out',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'NotoSansKR',
                 ),
               ),
-              Expanded(
-                flex: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(
-                        color: Colors.grey[400],
-                      ),
-                      bottom: BorderSide(
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          margin: EdgeInsets.only(left: 3),
-                          child: Icon(
-                            Icons.calendar_today_outlined,
-                            color: Colors.black,
-                            // size: 55.0,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 9,
-                        child: Container(
-                          child: TextButton(
-                            child: Text(
-                              '일일업무 기간별조회',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'NotoSansKR',
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    content: Text('준비중입니다.'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text("확인"),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(true);
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                flex: 5,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        color: Colors.grey[400],
-                      ),
-                      bottom: BorderSide(
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: Icon(
-                            Icons.location_on,
-                            color: Colors.black,
-                            // size: 55.0,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 9,
-                        child: Container(
-                          child: TextButton(
-                            child: Text(
-                              '행선지 등록',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontFamily: 'NotoSansKR',
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => WhereIsPage(
-                                    id: id,
-                                    member: member,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: Container(),
-              ),
-            ],
+            ),
           ),
         ],
       ),

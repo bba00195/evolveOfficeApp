@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class WhereIsPage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
@@ -35,6 +36,8 @@ class WhereIsPage extends StatefulWidget {
 }
 
 class _WhereIsPage extends State<WhereIsPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
   String pass;
@@ -59,7 +62,9 @@ class _WhereIsPage extends State<WhereIsPage> {
   String _selectedStart = "";
   String _selectedEnd = "";
   String sStartTime = '';
+  String sStartTimeOrg = '';
   String sEndTime = '';
+  String sEndTimeOrg = '';
 
   bool isUpdate = false;
   DateTime updateDate;
@@ -97,7 +102,9 @@ class _WhereIsPage extends State<WhereIsPage> {
       date = Date().date(_selectedTime);
       changeDate = Date().getDateString(_selectedTime);
       sStartTime = widget.startTime;
+      sStartTimeOrg = widget.startTime;
       sEndTime = widget.endTime;
+      sEndTimeOrg = widget.endTime;
       _selectedStart =
           sStartTime.substring(0, 2) + ":" + sStartTime.substring(2, 4);
       _selectedEnd = sEndTime.substring(0, 2) + ":" + sEndTime.substring(2, 4);
@@ -141,14 +148,14 @@ class _WhereIsPage extends State<WhereIsPage> {
       );
     }
 
-    void _whereInsert(String sArea, String sDate, String sStart, String sEnd,
-        String sLocate, String sCarType, bool isUpdate) async {
+    void _whereInsert(String sDate, String sStart, String sEnd, String sLocate,
+        String sCarType, bool isUpdate) async {
       areaFocusNode.unfocus();
       locateFocusNode.unfocus();
-      if (sArea == '') {
-        _show("지역을 입력해주세요.");
-        return;
-      }
+      // if (sArea == '') {
+      //   _show("지역을 입력해주세요.");
+      //   return;
+      // }
       if (sDate == '') {
         _show("날짜를 선택해주세요.");
         return;
@@ -171,8 +178,16 @@ class _WhereIsPage extends State<WhereIsPage> {
 
         if (isUpdate) {
           apiService
-              .whereIsUpdate(member.user.organizationCode, member.user.userId,
-                  sArea, sDate, sStart, sEnd, sLocate, sCarType)
+              .whereIsUpdate(
+                  member.user.organizationCode,
+                  member.user.userId,
+                  sDate,
+                  sStart,
+                  sStartTimeOrg,
+                  sEnd,
+                  sEndTimeOrg,
+                  sLocate,
+                  sCarType)
               .then((value) {
             if (value.result.isNotEmpty) {
               if (value.result.elementAt(0).rsCode == "E") {
@@ -181,6 +196,8 @@ class _WhereIsPage extends State<WhereIsPage> {
                   return;
                 }
                 _show(value.result.elementAt(0).rsMsg);
+              } else {
+                _show("행선지 등록이 완료되었습니다.");
               }
             } else {
               _show("등록에 실패하였습니다.");
@@ -189,7 +206,7 @@ class _WhereIsPage extends State<WhereIsPage> {
         } else {
           apiService
               .whereIsInsert(member.user.organizationCode, member.user.userId,
-                  sArea, sDate, sStart, sEnd, sLocate, sCarType)
+                  sDate, sStart, sEnd, sLocate, sCarType)
               .then((value) {
             if (value.result.isNotEmpty) {
               if (value.result.elementAt(0).rsCode == "E") {
@@ -198,6 +215,8 @@ class _WhereIsPage extends State<WhereIsPage> {
                   return;
                 }
                 _show(value.result.elementAt(0).rsMsg);
+              } else {
+                _show("행선지 등록이 완료되었습니다.");
               }
             } else {
               _show("등록에 실패하였습니다.");
@@ -209,25 +228,23 @@ class _WhereIsPage extends State<WhereIsPage> {
       });
     }
 
-    final menuName = AppBar(
-      iconTheme: IconThemeData(
-        color: Colors.black, //change your color here
+    final menuName = Container(
+      color: Color.fromRGBO(248, 246, 255, 1),
+      padding: EdgeInsets.only(
+        top: 10,
+        bottom: 10,
       ),
-      actions: [],
-      backgroundColor: Color.fromRGBO(248, 246, 255, 1),
-      centerTitle: true,
-      title: Text(
-        '행선지 등록',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontFamily: 'NotoSansKR',
-          fontWeight: FontWeight.w600,
+      child: Center(
+        child: Text(
+          '행선지 등록',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
-      toolbarHeight: 75,
-      bottomOpacity: 0.0,
-      elevation: 0.0,
     );
 
     final area = Container(
@@ -655,7 +672,7 @@ class _WhereIsPage extends State<WhereIsPage> {
         onPressed: () {
           if (isUpdate) {
             _whereInsert(
-                _areaTextEditController.text,
+                // _areaTextEditController.text,
                 date,
                 sStartTime,
                 sEndTime,
@@ -664,7 +681,7 @@ class _WhereIsPage extends State<WhereIsPage> {
                 isUpdate);
           } else {
             _whereInsert(
-                _areaTextEditController.text,
+                // _areaTextEditController.text,
                 date,
                 sStartTime,
                 sEndTime,
@@ -696,8 +713,21 @@ class _WhereIsPage extends State<WhereIsPage> {
 
     // #region Body
     return Scaffold(
+      key: _scaffoldKey,
+      appBar: KulsAppBar(
+        globalKey: _scaffoldKey,
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
+      drawer: KulsDrawer(
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
       backgroundColor: Colors.white,
-      appBar: menuName,
       bottomNavigationBar: KulsNavigationBottomBar(
         id: id,
         pass: pass,
@@ -706,76 +736,74 @@ class _WhereIsPage extends State<WhereIsPage> {
       ),
       body: GestureDetector(
         child: Center(
-          child: Stack(
-            alignment:
-                AlignmentDirectional.topCenter, //alignment:new Alignment(x, y)
+          child: ListView(
             children: [
-              Container(
-                color: Color.fromRGBO(248, 246, 255, 1),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50),
+              menuName,
+              Stack(
+                alignment: AlignmentDirectional
+                    .topCenter, //alignment:new Alignment(x, y)
+                children: [
+                  Container(
+                    color: Color.fromRGBO(248, 246, 255, 1),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          topRight: Radius.circular(50),
+                        ),
+                      ),
+                      margin: EdgeInsets.only(
+                        top: 30,
+                      ),
+                      // padding: EdgeInsets.only(
+                      //   top: 70,
+                      // ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 70),
+                          // area,
+                          // SizedBox(height: 20),
+                          selectDate,
+                          SizedBox(height: 30),
+                          selectTimeRow,
+                          SizedBox(height: 30),
+                          locate,
+                          SizedBox(height: 30),
+                          carType,
+                          SizedBox(height: 30),
+                          saveButton,
+                          SizedBox(height: 30),
+                        ],
+                      ),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 6.0,
-                        offset: const Offset(0.0, 3.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                      )
-                    ],
                   ),
-                  margin: EdgeInsets.only(
-                    top: 30,
+                  Container(
+                    // margin: EdgeInsets.only(
+                    //   top: 40,
+                    // ),
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(40),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 6.0,
+                            offset: const Offset(0.0, 3.0),
+                            color: Color.fromRGBO(0, 0, 0, 0.16),
+                          )
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.directions_car_sharp,
+                        size: 40,
+                        color: Color.fromRGBO(121, 102, 254, 1),
+                      ),
+                    ),
                   ),
-                  // padding: EdgeInsets.only(
-                  //   top: 70,
-                  // ),
-                  child: ListView(
-                    children: [
-                      SizedBox(height: 70),
-                      area,
-                      SizedBox(height: 20),
-                      selectDate,
-                      SizedBox(height: 30),
-                      selectTimeRow,
-                      SizedBox(height: 30),
-                      locate,
-                      SizedBox(height: 30),
-                      carType,
-                      SizedBox(height: 30),
-                      saveButton,
-                      SizedBox(height: 30),
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                // margin: EdgeInsets.only(
-                //   top: 40,
-                // ),
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(40),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 6.0,
-                        offset: const Offset(0.0, 3.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                      )
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.directions_car_sharp,
-                    size: 40,
-                    color: Color.fromRGBO(121, 102, 254, 1),
-                  ),
-                ),
+                ],
               ),
             ],
           ),

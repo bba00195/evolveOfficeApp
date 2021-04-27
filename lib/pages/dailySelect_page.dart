@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class DailySelectPage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
@@ -52,6 +53,7 @@ class _DailySelectPage extends State<DailySelectPage> {
     'CS',
   ];
   var deptValue = 'CW';
+  final _nameTextEditController = TextEditingController();
 
   void _report(String selectedDate) async {
     setState(() {});
@@ -59,6 +61,7 @@ class _DailySelectPage extends State<DailySelectPage> {
 
   @override
   void dispose() {
+    _nameTextEditController.dispose();
     super.dispose();
   }
 
@@ -118,7 +121,7 @@ class _DailySelectPage extends State<DailySelectPage> {
     Widget selectHeader = Container(
       margin: EdgeInsets.only(left: 20, right: 20),
       height: 120,
-      color: Colors.red,
+      // color: Colors.red,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -127,7 +130,13 @@ class _DailySelectPage extends State<DailySelectPage> {
             children: [
               Expanded(
                 flex: 1,
-                child: Text('사업부'),
+                child: Text(
+                  '사업부',
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
               Expanded(
                 flex: 3,
@@ -153,7 +162,13 @@ class _DailySelectPage extends State<DailySelectPage> {
               ),
               Expanded(
                 flex: 1,
-                child: Text('부서명'),
+                child: Text(
+                  '부서명',
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
               Expanded(
                 flex: 3,
@@ -179,7 +194,158 @@ class _DailySelectPage extends State<DailySelectPage> {
               ),
             ],
           ),
-          Row(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 1,
+                child: Text(
+                  '일자',
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: DropdownButtonHideUnderline(
+                  child: TextButton(
+                    style: ButtonStyle(
+                      side: MaterialStateProperty.all(
+                        BorderSide(
+                          width: 1,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      Future<DateTime> selectedDate = showDatePicker(
+                        context: context,
+                        initialDate: _selectedTime, // 초깃값
+                        firstDate: DateTime(2018), // 시작일
+                        lastDate: DateTime(2030), // 마지막일
+                        builder: (BuildContext context, Widget child) {
+                          return Theme(
+                            data: ThemeData.light(),
+                            child: child,
+                          );
+                        },
+                      );
+                      selectedDate.then((dateTime) {
+                        setState(() {
+                          isChanged = true;
+                          _selectedTime = dateTime;
+                          sDay = dateTime.difference(DateTime.now()).inDays;
+                          changeDate =
+                              DateFormat('yyyy-MM-dd').format(_selectedTime);
+                          date = Date().date(_selectedTime);
+                        });
+                      });
+                    },
+                    child: Text(
+                      isChanged
+                          ? changeDate
+                          : DateFormat('yyyy-MM-dd').format(new DateTime.now()),
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontFamily: 'NotoSansKR',
+                        // fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: DropdownButtonHideUnderline(
+                  child: TextButton(
+                    style: ButtonStyle(
+                      side: MaterialStateProperty.all(
+                        BorderSide(
+                          width: 1,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    onPressed: () {
+                      Future<DateTime> selectedDate = showDatePicker(
+                        context: context,
+                        initialDate: _selectedTime, // 초깃값
+                        firstDate: DateTime(2018), // 시작일
+                        lastDate: DateTime(2030), // 마지막일
+                        builder: (BuildContext context, Widget child) {
+                          return Theme(
+                            data: ThemeData.light(),
+                            child: child,
+                          );
+                        },
+                      );
+                      selectedDate.then((dateTime) {
+                        setState(() {
+                          isChanged = true;
+                          _selectedTime = dateTime;
+                          sDay = dateTime.difference(DateTime.now()).inDays;
+                          changeDate =
+                              DateFormat('yyyy-MM-dd').format(_selectedTime);
+                          date = Date().date(_selectedTime);
+                        });
+                      });
+                    },
+                    child: Text(
+                      isChanged
+                          ? changeDate
+                          : DateFormat('yyyy-MM-dd').format(new DateTime.now()),
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontFamily: 'NotoSansKR',
+                        // fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Text(
+                  '성명',
+                  style: TextStyle(
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: TextField(
+                  controller: _nameTextEditController,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.black,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'NotoSansKR',
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

@@ -133,6 +133,7 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
             gradeCode: value.user.elementAt(0).gradeCode,
             gradeName: value.user.elementAt(0).gradeName,
             mobileTel: value.user.elementAt(0).mobileTel,
+            imgSajin: value.user.elementAt(0).imgSajin,
           );
         }
 
