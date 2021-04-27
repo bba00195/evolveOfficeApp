@@ -154,7 +154,8 @@ class _DailyPage extends State<DailyPage> {
       isChanged = true;
       sDay--;
       changeDate = Date().getDate(sDay);
-      date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
+      // date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
+      date = Date().date(DateTime.now().add(Duration(days: sDay)));
       _report(date);
     }
 
@@ -169,7 +170,7 @@ class _DailyPage extends State<DailyPage> {
       isFocused = false;
       sDay++;
       changeDate = Date().getDate(sDay);
-      date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
+      date = Date().date(DateTime.now().add(Duration(days: sDay)));
       _report(date);
     }
 

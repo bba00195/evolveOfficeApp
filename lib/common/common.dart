@@ -48,7 +48,8 @@ class Date {
   String result; //날짜
 
   String getDate(int day) {
-    dateTime = DateTime.now().add(Duration(hours: 9, days: day));
+    // dateTime = DateTime.now().add(Duration(hours: 9, days: day));
+    dateTime = DateTime.now().add(Duration(days: day));
     return getDateString(dateTime);
   }
 
@@ -88,7 +89,8 @@ class Date {
   String date(DateTime date) {
     // ex) 20210401
     if (date == null) {
-      dateTime = DateTime.now().add(Duration(hours: 9));
+      // dateTime = DateTime.now().add(Duration(hours: 9));
+      dateTime = DateTime.now();
     } else {
       dateTime = date;
     }

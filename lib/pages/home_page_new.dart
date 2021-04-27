@@ -13,6 +13,7 @@ import 'package:evolveofficeapp/common/kulsWidget.dart';
 
 import 'dailySelect_page.dart';
 import 'daily_page.dart';
+import 'package:intl/intl.dart';
 
 class HomePageNew extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
