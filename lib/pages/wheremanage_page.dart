@@ -8,6 +8,8 @@ import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 
+//행선지 관리 수정 삭제
+
 class WhereManagePage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
   final String id;
