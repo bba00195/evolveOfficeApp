@@ -482,76 +482,76 @@ class _HomePageNew extends State<HomePageNew> {
             },
           ),
           SizedBox(height: 14),
-          // InkWell(
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //       color: Colors.white,
-          //       boxShadow: [
-          //         BoxShadow(
-          //           blurRadius: 10.0,
-          //           offset: const Offset(3.0, 5.0),
-          //           color: Color.fromRGBO(0, 0, 0, 0.16),
-          //         )
-          //       ],
-          //       borderRadius: BorderRadius.all(
-          //         Radius.circular(25.0),
-          //       ),
-          //     ),
-          //     height: screenHeight * 0.1,
-          //     child: Row(
-          //       mainAxisAlignment: MainAxisAlignment.start,
-          //       children: [
-          //         SizedBox(width: 14),
-          //         Container(
-          //           width: screenHeight * 0.07,
-          //           height: screenHeight * 0.07,
-          //           decoration: BoxDecoration(
-          //             color: Color.fromRGBO(254, 242, 246, 1),
-          //             borderRadius: BorderRadius.circular(10),
-          //           ),
-          //           child: Icon(
-          //             Icons.calendar_today_outlined,
-          //             color: Color.fromRGBO(255, 101, 129, 1),
-          //             size: 36,
-          //           ),
-          //         ),
-          //         SizedBox(
-          //           width: 18,
-          //         ),
-          //         Expanded(
-          //           flex: 9,
-          //           child: Text(
-          //             "일일업무보고 조회",
-          //             style: TextStyle(
-          //               fontSize: 18,
-          //               fontFamily: 'NotoSansKR',
-          //               fontWeight: FontWeight.w600,
-          //             ),
-          //           ),
-          //         ),
-          //         Expanded(
-          //           flex: 3,
-          //           child: Icon(
-          //             Icons.arrow_forward_ios_outlined,
-          //             size: 30,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       CupertinoPageRoute(
-          //         builder: (context) => DailySelectPage(
-          //           id: id,
-          //           member: member,
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // ),
-          // SizedBox(height: 14),
+          InkWell(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10.0,
+                    offset: const Offset(3.0, 5.0),
+                    color: Color.fromRGBO(0, 0, 0, 0.16),
+                  )
+                ],
+                borderRadius: BorderRadius.all(
+                  Radius.circular(25.0),
+                ),
+              ),
+              height: screenHeight * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 14),
+                  Container(
+                    width: screenHeight * 0.07,
+                    height: screenHeight * 0.07,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(254, 242, 246, 1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.calendar_today_outlined,
+                      color: Color.fromRGBO(255, 101, 129, 1),
+                      size: 36,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 18,
+                  ),
+                  Expanded(
+                    flex: 9,
+                    child: Text(
+                      "일일업무보고 조회",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'NotoSansKR',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Icon(
+                      Icons.arrow_forward_ios_outlined,
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => DailySelectPage(
+                    id: id,
+                    member: member,
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 14),
           InkWell(
             child: Container(
               decoration: BoxDecoration(

@@ -1,8 +1,11 @@
+import 'dart:io';
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
-import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -17,10 +20,27 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePage extends State<ProfilePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  static final storage = FlutterSecureStorage();
+  bool hidePassword = true; // Password Hide
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
   String pass;
   UserManager member;
+  GlobalKey<FormState> _telFormKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _passwordFormKey = GlobalKey<FormState>();
+  final _telTextEditController = TextEditingController();
+  final _passwordEditController = TextEditingController();
+  FocusNode telFocusNode;
+  FocusNode passwordFocusNode;
+
+  static final String uploadEndPoint =
+      'http://localhost/flutter_test/upload_image.php';
+  Future<File> file;
+  String status = '';
+  String base64Image;
+  File tmpFile;
+  String errMessage = 'Error Uploading Image';
 
   @override
   void dispose() {
@@ -33,12 +53,16 @@ class _ProfilePage extends State<ProfilePage> {
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
     member = widget.member;
+    telFocusNode = FocusNode();
+    passwordFocusNode = FocusNode();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    _telTextEditController.text = member.user.mobileTel;
+    _passwordEditController.text = member.user.password;
 
     _show(String sMessage) {
       showDialog(
@@ -142,6 +166,35 @@ class _ProfilePage extends State<ProfilePage> {
       ),
     );
 
+    chooseImage() async {
+      final picker = ImagePicker();
+      final pickedFile = await picker.getImage(source: ImageSource.gallery);
+      setState(() {
+        if (pickedFile != null) {
+          tmpFile = File(pickedFile.path);
+        } else {
+          print('No image selected.');
+        }
+      });
+    }
+
+    final uploadImage = Container(
+      child: TextButton(
+        onPressed: () async {
+          final picker = ImagePicker();
+          final pickedFile = await picker.getImage(source: ImageSource.gallery);
+          setState(() {
+            if (pickedFile != null) {
+              tmpFile = File(pickedFile.path);
+            } else {
+              print('No image selected.');
+            }
+          });
+        },
+        child: Text('Choose Image'),
+      ),
+    );
+
     final profileContent = Container(
       margin: EdgeInsets.only(
         left: screenWidth * 0.1,
@@ -150,22 +203,29 @@ class _ProfilePage extends State<ProfilePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
+          Column(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 1,
-                child: Text(
-                  '사용자명',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontFamily: 'NotoSansKR',
-                  ),
+              Text(
+                '사용자명',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontFamily: 'NotoSansKR',
                 ),
               ),
-              Expanded(
-                flex: 2,
+              Container(
+                padding: EdgeInsets.only(top: 5, bottom: 5, left: 3),
+                width: screenWidth - (screenWidth * 0.3),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      width: 1.0,
+                    ),
+                  ),
+                ),
                 child: Text(
                   member.user.nameKor,
                   style: TextStyle(
@@ -175,55 +235,34 @@ class _ProfilePage extends State<ProfilePage> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
+              )
+              // ),
             ],
           ),
           SizedBox(height: 20),
-          Row(
+          Column(
             mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 1,
-                child: Text(
-                  '전화번호',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontFamily: 'NotoSansKR',
-                  ),
+              Text(
+                'E-MAIL',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                  fontFamily: 'NotoSansKR',
                 ),
               ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  member.user.mobileTel,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontFamily: 'NotoSansKR',
-                    fontWeight: FontWeight.w600,
+              Container(
+                padding: EdgeInsets.only(top: 5, bottom: 5, left: 3),
+                width: screenWidth - (screenWidth * 0.3),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      width: 1.0,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Text(
-                  'E-MAIL',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontFamily: 'NotoSansKR',
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
                 child: Text(
                   member.user.eMail,
                   style: TextStyle(
@@ -236,30 +275,149 @@ class _ProfilePage extends State<ProfilePage> {
               ),
             ],
           ),
+          SizedBox(height: 20),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                child: Text(
+                  '전화번호',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                    fontFamily: 'NotoSansKR',
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: 5, bottom: 5, left: 3),
+                width: screenWidth - (screenWidth * 0.3),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                child: Text(
+                  member.user.mobileTel,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              // Container(
+              //   // height: 50,
+              //   width: screenWidth - (screenWidth * 0.3),
+              //   decoration: BoxDecoration(
+              //     border: Border(
+              //       bottom: BorderSide(
+              //         width: 1.0,
+              //       ),
+              //     ),
+              //   ),
+              //   child: Form(
+              //     key: _telFormKey,
+              //     child: TextField(
+              //       controller: _telTextEditController,
+              //       focusNode: telFocusNode,
+              //       decoration: InputDecoration(
+              //         contentPadding:
+              //             EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+              //         enabledBorder: OutlineInputBorder(
+              //           borderSide: BorderSide(
+              //             color: Colors.transparent,
+              //           ),
+              //         ),
+              //         focusedBorder: OutlineInputBorder(
+              //           borderSide: BorderSide(
+              //             color: Colors.transparent,
+              //           ),
+              //         ),
+              //         filled: true,
+              //         fillColor: Colors.white,
+              //       ),
+              //       style: TextStyle(
+              //         fontSize: 20,
+              //         fontFamily: 'NotoSansKR',
+              //         color: Colors.black,
+              //         fontWeight: FontWeight.w600,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ],
+          ),
           // SizedBox(height: 20),
-          // Row(
+          // Column(
           //   mainAxisAlignment: MainAxisAlignment.start,
+          //   crossAxisAlignment: CrossAxisAlignment.start,
           //   children: [
-          //     Expanded(
-          //       flex: 1,
+          //     Container(
           //       child: Text(
           //         '비밀번호',
+          //         textAlign: TextAlign.left,
           //         style: TextStyle(
-          //           color: Colors.black,
-          //           fontSize: 20,
+          //           color: Colors.grey,
+          //           fontSize: 16,
           //           fontFamily: 'NotoSansKR',
           //         ),
           //       ),
           //     ),
-          //     Expanded(
-          //       flex: 2,
-          //       child: Text(
-          //         member.user.password,
-          //         style: TextStyle(
-          //           color: Colors.black,
-          //           fontSize: 20,
-          //           fontFamily: 'NotoSansKR',
-          //           fontWeight: FontWeight.w600,
+          //     Container(
+          //       // height: 50,
+          //       width: screenWidth - (screenWidth * 0.3),
+          //       decoration: BoxDecoration(
+          //         border: Border(
+          //           bottom: BorderSide(
+          //             width: 1.0,
+          //           ),
+          //         ),
+          //       ),
+          //       child: Form(
+          //         key: _passwordFormKey,
+          //         child: TextField(
+          //           controller: _passwordEditController,
+          //           focusNode: passwordFocusNode,
+          //           decoration: InputDecoration(
+          //             contentPadding:
+          //                 EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+          //             enabledBorder: OutlineInputBorder(
+          //               borderSide: BorderSide(
+          //                 color: Colors.transparent,
+          //               ),
+          //             ),
+          //             focusedBorder: OutlineInputBorder(
+          //               borderSide: BorderSide(
+          //                 color: Colors.transparent,
+          //               ),
+          //             ),
+          //             filled: true,
+          //             fillColor: Colors.white,
+          //             suffixIcon: IconButton(
+          //               onPressed: () {
+          //                 setState(() {
+          //                   hidePassword = !hidePassword;
+          //                 });
+          //               },
+          //               color: Theme.of(context).accentColor.withOpacity(0.4),
+          //               icon: Icon(hidePassword
+          //                   ? Icons.visibility_off
+          //                   : Icons.visibility),
+          //             ),
+          //           ),
+          //           style: TextStyle(
+          //             fontSize: 20,
+          //             fontFamily: 'NotoSansKR',
+          //             color: Colors.black,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //           obscureText: hidePassword,
           //         ),
           //       ),
           //     ),
@@ -271,9 +429,17 @@ class _ProfilePage extends State<ProfilePage> {
 
     // #region Body
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.white,
       // appBar: menuName,
+      drawer: KulsDrawer(
+        id: id,
+        pass: pass,
+        member: member,
+        storage: storage,
+      ),
       bottomNavigationBar: KulsNavigationBottomBar(
+        globalKey: _scaffoldKey,
         id: id,
         pass: pass,
         member: member,
@@ -299,6 +465,8 @@ class _ProfilePage extends State<ProfilePage> {
                   pageHead,
                   SizedBox(height: 30),
                   profileHead,
+                  // SizedBox(height: 30),
+                  // uploadImage,
                   SizedBox(height: 30),
                   profileContent,
                 ],
@@ -306,7 +474,10 @@ class _ProfilePage extends State<ProfilePage> {
             ),
           ),
         ),
-        onTap: () {},
+        onTap: () {
+          telFocusNode.unfocus();
+          passwordFocusNode.unfocus();
+        },
       ),
     );
   }

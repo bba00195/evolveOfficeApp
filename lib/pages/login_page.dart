@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/login_model.dart';
+import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
@@ -251,6 +252,7 @@ class _LoginPageState extends State<LoginPage> {
 
     // #region Label
     final forgotLabel = Container(
+      alignment: Alignment.center,
       child: Text(
         ' Login to your account',
         style: TextStyle(
@@ -351,7 +353,7 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.push(
             context,
             CupertinoPageRoute(
-              builder: (context) => HomePageNew(
+              builder: (context) => HomePage(
                 id: _idTextEditController.text,
                 pass: _passwordTextEditController.text,
                 member: member,

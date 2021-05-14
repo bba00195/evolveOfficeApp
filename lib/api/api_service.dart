@@ -5,7 +5,7 @@ import '../model/login_model.dart';
 import '../model/daily_model.dart';
 
 class APIService {
-  String url = "https://www.kuls.co.kr/DBHelper.php";
+  var url = Uri.parse('https://www.kuls.co.kr/flutter/DBHelper.php');
   String token = "ba7da079703c28825269ae6d44fc7fa3";
 
   Future<ResultModel> login(String sUserId) async {
@@ -14,6 +14,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "SELECT",
+          "PROCEDURE": "N",
           "QUERY": "SELECT ORGANIZATION_CODE, " +
               "USERID, " +
               "USERNAME_KOR, " +
@@ -47,6 +48,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "SELECT",
+          "PROCEDURE": "N",
           "QUERY": "SELECT ORGANIZATION_CODE, " +
               "WORK_DATE, " +
               "EMPLOY_ID_NO, " +
@@ -78,12 +80,17 @@ class APIService {
   }
 
   Future<WhereResultModel> whereIsManage(
-      String sOrganizationCode, String sUserId, String sWorkDate) async {
+      String sOrganizationCode,
+      String sUserId,
+      String sWorkDate,
+      String sOrganValue,
+      String sDeptValue) async {
     final response = await http.post(
       url,
       body: jsonEncode(
         {
           "TYPE": "SELECT",
+          "PROCEDURE": "N",
           "QUERY": "SELECT DBO.F_GET_DEPTNAME(A.DEPT_CODE) AS DEPT_NAME, " +
               "A.USERNAME_KOR AS USER_NAME, " +
               "B.START_TIME, " +
@@ -104,11 +111,14 @@ class APIService {
               "AND A.USERID = B.EMPLOY_ID_NO , " +
               "TB_ADMIN_DEPTCODE  C " +
               "WHERE A.ORGANIZATION_CODE 	= C.ORGANIZATION_CODE " +
-              "  AND A.ORGANIZATION_CODE 	=  '" +
-              sOrganizationCode +
-              "' " +
+              "  AND A.ORGANIZATION_CODE 	LIKE  '%" +
+              sOrganValue +
+              "%' " +
               "  AND A.DEPT_CODE         		= C.DEPT_CODE " +
-              "  AND A.USE_FLAG              	= 'Y' " +
+              "  AND C.DEPT_CODE		     	LIKE '%" +
+              sDeptValue +
+              "%' "
+                  "  AND A.USE_FLAG              	= 'Y' " +
               "ORDER BY a.dept_code, A.SORT_SEQ",
           "TOKEN": token,
         },
@@ -128,6 +138,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "INSERT",
+          "PROCEDURE": "N",
           "QUERY":
               "INSERT INTO TB_WORK_DAILYREPORT (ORGANIZATION_CODE, WORK_DATE,  EMPLOY_ID_NO, DAY_REPORT, CREATED_BY, CREATION_DATE)" +
                   "VALUES (?, ?,  ?,  ?,  ?,  GETDATE())",
@@ -150,6 +161,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "UPDATE",
+          "PROCEDURE": "N",
           "QUERY":
               "UPDATE TB_WORK_DAILYREPORT SET DAY_REPORT = (?), LAST_UPDATED_BY = (?), LAST_UPDATE_DATE = GETDATE() " +
                   "WHERE ORGANIZATION_CODE = (?) AND WORK_DATE =(?) AND EMPLOY_ID_NO = (?)",
@@ -172,6 +184,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "UPDATE",
+          "PROCEDURE": "N",
           "QUERY":
               "UPDATE TB_WORK_DAILYREPORT SET MISC_REPORT = (?), LAST_UPDATED_BY = (?), LAST_UPDATE_DATE = GETDATE() " +
                   "WHERE ORGANIZATION_CODE = (?) AND WORK_DATE =(?) AND EMPLOY_ID_NO = (?)",
@@ -200,6 +213,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "DELETE",
+          "PROCEDURE": "N",
           "QUERY":
               "DELETE TB_WORK_DAILYREPORT WHERE ORGANIZATION_CODE = (?) AND WORK_DATE =(?) AND EMPLOY_ID_NO = (?)",
           "TOKEN": token,
@@ -221,6 +235,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "INSERT",
+          "PROCEDURE": "N",
           "QUERY":
               "INSERT INTO TB_WORK_DAILYREPORT (ORGANIZATION_CODE, WORK_DATE,  EMPLOY_ID_NO, NEXT_REPORT, CREATED_BY, CREATION_DATE)" +
                   "VALUES (?, ?,  ?,  ?,  ?,  GETDATE())",
@@ -243,6 +258,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "UPDATE",
+          "PROCEDURE": "N",
           "QUERY":
               "UPDATE TB_WORK_DAILYREPORT SET NEXT_REPORT = (?), LAST_UPDATED_BY = (?), LAST_UPDATE_DATE = GETDATE() " +
                   "WHERE ORGANIZATION_CODE = (?) AND WORK_DATE =(?) AND EMPLOY_ID_NO = (?)",
@@ -272,6 +288,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "INSERT",
+          "PROCEDURE": "N",
           "QUERY":
               "INSERT INTO TB_WORK_WHEREIS (ORGANIZATION_CODE, WHEREIS_DATE,  EMPLOY_ID_NO, START_TIME, END_TIME, " +
                   "WHEREIS_CONTENTS, CAR_TYPE, CREATED_BY, CREATION_DATE)" +
@@ -314,6 +331,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "UPDATE",
+          "PROCEDURE": "N",
           "QUERY": "UPDATE TB_WORK_WHEREIS SET START_TIME = (?), END_TIME = (?), CAR_TYPE = (?)" +
               ", WHEREIS_CONTENTS = (?), LAST_UPDATED_BY=(?), LAST_UPDATE_DATE = GETDATE()" +
               " WHERE ORGANIZATION_CODE = (?) AND WHEREIS_DATE = (?) AND EMPLOY_ID_NO = (?) AND START_TIME = (?) AND END_TIME = (?)",
@@ -348,6 +366,7 @@ class APIService {
       body: jsonEncode(
         {
           "TYPE": "DELETE",
+          "PROCEDURE": "N",
           "QUERY":
               "DELETE TB_WORK_WHEREIS WHERE ORGANIZATION_CODE = (?) AND WHEREIS_DATE = (?) AND EMPLOY_ID_NO = (?) AND START_TIME = (?) AND END_TIME = (?) ",
           "TOKEN": token,
@@ -358,6 +377,37 @@ class APIService {
     );
 
     return InsertResultModel.fromJson(
+      json.decode(response.body),
+    );
+  }
+
+  Future<DailySelectResultModel> dailySelect(String sStartDate, String sEndDate,
+      String sUserId, String sDeptCode, String sOrganizationCode) async {
+    final response = await http.post(
+      url,
+      body: jsonEncode(
+        {
+          "TYPE": "SELECT",
+          "PROCEDURE": "Y",
+          "QUERY": "PS_GET_DAILYMONTH_V2",
+          "TOKEN": token,
+          "PARAMS": [
+            sStartDate,
+            sEndDate,
+            "WK_DAILYMONTH",
+            sUserId,
+            "",
+            "",
+            sDeptCode,
+            "",
+            sOrganizationCode
+          ]
+        },
+      ),
+      headers: {'Content-Type': "application/json"},
+    );
+
+    return DailySelectResultModel.fromJson(
       json.decode(response.body),
     );
   }

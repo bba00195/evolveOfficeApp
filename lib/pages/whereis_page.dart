@@ -130,10 +130,10 @@ class _WhereIsPage extends State<WhereIsPage> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     _show(String sMessage) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
+          return CupertinoAlertDialog(
             content: Text(sMessage),
             actions: [
               TextButton(
@@ -356,10 +356,14 @@ class _WhereIsPage extends State<WhereIsPage> {
                   );
                   selectedDate.then((dateTime) {
                     setState(() {
-                      isUpdate = false;
-                      isChanged = true;
-                      _selectedTime = dateTime;
-                      sDay = dateTime.difference(DateTime.now()).inDays;
+                      if (dateTime != null) {
+                        isUpdate = false;
+                        isChanged = true;
+                        _selectedTime = dateTime;
+                        sDay = dateTime.difference(DateTime.now()).inDays;
+                      } else {
+                        dateTime = _selectedTime;
+                      }
                       changeDate = Date().getDateString(_selectedTime);
                       date = Date().date(_selectedTime);
                     });
@@ -447,7 +451,7 @@ class _WhereIsPage extends State<WhereIsPage> {
     );
 
     final startTime = Container(
-      height: screenWidth * 0.35,
+      height: 100,
       width: screenWidth * 0.35,
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -500,7 +504,7 @@ class _WhereIsPage extends State<WhereIsPage> {
     );
 
     final endTime = Container(
-      height: screenWidth * 0.35,
+      height: 100,
       width: screenWidth * 0.35,
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -729,6 +733,7 @@ class _WhereIsPage extends State<WhereIsPage> {
       ),
       backgroundColor: Colors.white,
       bottomNavigationBar: KulsNavigationBottomBar(
+        globalKey: _scaffoldKey,
         id: id,
         pass: pass,
         member: member,

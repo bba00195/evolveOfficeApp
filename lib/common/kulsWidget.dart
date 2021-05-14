@@ -1,3 +1,4 @@
+import 'package:evolveofficeapp/pages/dailySelect_page.dart';
 import 'package:evolveofficeapp/pages/daily_page.dart';
 import 'package:evolveofficeapp/pages/dayText_page.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
@@ -41,7 +42,7 @@ class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
             Navigator.pushReplacement(
               context,
               CupertinoPageRoute(
-                builder: (context) => HomePageNew(
+                builder: (context) => HomePage(
                   id: id,
                   pass: pass,
                   member: member,
@@ -99,13 +100,19 @@ class KulsBottomBar extends StatelessWidget implements PreferredSizeWidget {
 // ignore: must_be_immutable
 class KulsNavigationBottomBar extends StatelessWidget
     implements PreferredSizeWidget {
+  final GlobalKey<ScaffoldState> globalKey;
   final String id;
   final String pass;
   final UserManager member;
   final int selectedIndex;
 
   KulsNavigationBottomBar(
-      {Key key, this.id, this.pass, this.member, this.selectedIndex})
+      {Key key,
+      this.globalKey,
+      this.id,
+      this.pass,
+      this.member,
+      this.selectedIndex})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -143,27 +150,29 @@ class KulsNavigationBottomBar extends StatelessWidget
           currentIndex: _selectedIndex, //현재 선택된 Index
           onTap: (int index) {
             if (_selectedIndex != index && index == 0) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => MenuPage(
-                    id: id,
-                    pass: pass,
-                    member: member,
-                  ),
-                ),
-              );
+              globalKey.currentState.openDrawer();
+              // Navigator.push(
+              //   context,
+              //   CupertinoPageRoute(
+              //     builder: (context) => MenuPage(
+              //       id: id,
+              //       pass: pass,
+              //       member: member,
+              //     ),
+              //   ),
+              // );
             } else if (_selectedIndex != index && index == 1) {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => HomePageNew(
+                  builder: (context) => HomePage(
                     id: id,
                     pass: pass,
                     member: member,
                   ),
                 ),
               );
+              _selectedIndex = index;
             } else if (_selectedIndex != index && index == 2) {
               Navigator.push(
                 context,
@@ -175,8 +184,8 @@ class KulsNavigationBottomBar extends StatelessWidget
                   ),
                 ),
               );
+              _selectedIndex = index;
             }
-            _selectedIndex = index;
           },
           items: [
             BottomNavigationBarItem(
@@ -235,6 +244,32 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
+    Widget menuRow(String sMenuName) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 9,
+            child: Text(
+              sMenuName,
+              style: TextStyle(
+                fontSize: 16,
+                fontFamily: 'NotoSansKR',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 26,
+            ),
+          ),
+        ],
+      );
+    }
+
     return new Drawer(
       child: ListView(
         children: [
@@ -306,7 +341,7 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                     Navigator.pushReplacement(
                       context,
                       CupertinoPageRoute(
-                        builder: (context) => HomePageNew(
+                        builder: (context) => HomePage(
                           id: id,
                           pass: pass,
                           member: member,
@@ -314,30 +349,9 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          'HOME',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'NotoSansKR',
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 26,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: menuRow('HOME'),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 20),
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -350,30 +364,25 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          '일일 업무 보고',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'NotoSansKR',
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 26,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: menuRow('일일업무 등록'),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 20),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => DailySelectPage(
+                          id: id,
+                          pass: pass,
+                          member: member,
+                        ),
+                      ),
+                    );
+                  },
+                  child: menuRow('일일업무 조회'),
+                ),
+                SizedBox(height: 20),
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -388,30 +397,9 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          '행선지 등록',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'NotoSansKR',
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 26,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: menuRow('행선지 등록'),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 20),
                 InkWell(
                   onTap: () {
                     Navigator.push(
@@ -425,28 +413,7 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 9,
-                        child: Text(
-                          '행선지 관리',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'NotoSansKR',
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 26,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: menuRow('행선지 현황'),
                 ),
               ],
             ),

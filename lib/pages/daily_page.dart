@@ -58,6 +58,7 @@ class _DailyPage extends State<DailyPage> {
   FocusNode remarkFocusNode;
 
   bool isFocused = false;
+  bool isSaved = false;
 
   void _report(String selectedDate) async {
     setState(() {
@@ -74,10 +75,13 @@ class _DailyPage extends State<DailyPage> {
           _dayTextEditController.text = value.day.elementAt(0).dayReport;
           _nextTextEditController.text = value.day.elementAt(0).nextReport;
           _remarkTextEditController.text = value.day.elementAt(0).miscReport;
+          dayReport = value.day.elementAt(0).dayReport;
+          nextReport = value.day.elementAt(0).nextReport;
+          remarkReport = value.day.elementAt(0).miscReport;
         } else {
-          // _dayTextEditController.text = "";
-          // _nextTextEditController.text = "";
-          // _remarkTextEditController.text = "";
+          dayReport = "";
+          nextReport = "";
+          remarkReport = "";
         }
       });
     });
@@ -108,6 +112,10 @@ class _DailyPage extends State<DailyPage> {
     nextFocusNode.addListener(_onFocusChange);
     remarkFocusNode.addListener(_onFocusChange);
     _selectedTime = nowDateTime;
+
+    _report(
+      date,
+    );
   }
 
   void _onFocusChange() {
@@ -140,10 +148,6 @@ class _DailyPage extends State<DailyPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    _report(
-      date,
-    );
-
     _dayDecrease() {
       _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
       _nextFocusChange(_nextFormKey.currentContext, nextFocusNode);
@@ -174,87 +178,11 @@ class _DailyPage extends State<DailyPage> {
       _report(date);
     }
 
-    Widget dayForm = Form(
-      key: _dayFormKey,
-      child: TextFormField(
-        autofocus: false,
-        controller: _dayTextEditController,
-        focusNode: dayFocusNode,
-        maxLines: 999,
-        decoration: InputDecoration(
-          fillColor: Color.fromRGBO(228, 220, 255, 1),
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-        ),
-        style: TextStyle(
-          fontSize: 18,
-          fontFamily: 'NotoSansKR',
-        ),
-        // textInputAction: TextInputAction.next,
-        // onFieldSubmitted: (value) {
-        //   _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
-        // },
-      ),
-    );
-
-    Widget nextForm = Form(
-      key: _nextFormKey,
-      child: TextFormField(
-        autofocus: false,
-        controller: _nextTextEditController,
-        focusNode: nextFocusNode,
-        maxLines: 999,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-        ),
-        style: TextStyle(
-          fontSize: 18,
-          fontFamily: 'NotoSansKR',
-        ),
-        // textInputAction: TextInputAction.next,
-        // onFieldSubmitted: (value) {
-        //   _nextFocusChange(_nextFormKey.currentContext, nextFocusNode);
-        // },
-      ),
-    );
-
-    Widget remarkForm = Form(
-      key: _remarkFormKey,
-      child: TextFormField(
-        autofocus: false,
-        controller: _remarkTextEditController,
-        focusNode: remarkFocusNode,
-        maxLines: 999,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-        ),
-        style: TextStyle(
-          fontSize: 18,
-          fontFamily: 'NotoSansKR',
-        ),
-        // textInputAction: TextInputAction.next,
-        // onFieldSubmitted: (value) {
-        //   _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
-        // },
-      ),
-    );
-
     final menuName = Container(
       color: Color.fromRGBO(248, 246, 255, 1),
       child: Center(
         child: Text(
-          '일일 업무 보고',
+          '일일업무 등록',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -273,7 +201,7 @@ class _DailyPage extends State<DailyPage> {
       padding: EdgeInsets.only(
         left: screenWidth * 0.05,
       ),
-      height: 80,
+      height: 60,
       child: Row(
         children: [
           Expanded(
@@ -318,15 +246,17 @@ class _DailyPage extends State<DailyPage> {
                     _dayTextEditController.text = "";
                     _nextTextEditController.text = "";
                     _remarkTextEditController.text = "";
-                    isFocused = false;
-                    isChanged = true;
-                    _selectedTime = dateTime;
-                    sDay = dateTime.difference(DateTime.now()).inDays;
+                    if (dateTime != null) {
+                      isFocused = false;
+                      isChanged = true;
+                      _selectedTime = dateTime;
+                      sDay = dateTime.difference(DateTime.now()).inDays;
+                      _report(date);
+                    } else {
+                      dateTime = _selectedTime;
+                    }
                     changeDate = Date().getDateString(_selectedTime);
                     date = Date().date(_selectedTime);
-                    _report(
-                      date,
-                    );
                   });
                 });
               },
@@ -377,6 +307,90 @@ class _DailyPage extends State<DailyPage> {
       ),
     );
 
+    Widget saveButton = Container(
+      margin: EdgeInsets.only(
+        left: screenWidth * 0.05,
+        right: screenWidth * 0.05,
+      ),
+      alignment: Alignment.centerRight,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 22),
+          shape: new RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(5),
+          ),
+          primary: Colors.indigo[900],
+        ),
+        onPressed: () {
+          _doSave();
+          if (isSaved) {
+            _show("등록이 완료되었습니다.");
+          } else {
+            _show("내용을 입력하거나 수정해주세요.");
+          }
+        },
+        child: Text(
+          '등록',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+
+    Widget dayForm = Form(
+      key: _dayFormKey,
+      child: TextFormField(
+        autofocus: false,
+        controller: _dayTextEditController,
+        focusNode: dayFocusNode,
+        maxLines: 999,
+        decoration: InputDecoration(
+          fillColor: Color.fromRGBO(228, 220, 255, 1),
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+        ),
+        style: TextStyle(
+          fontSize: 14,
+          fontFamily: 'NotoSansKR',
+        ),
+        // textInputAction: TextInputAction.next,
+        // onFieldSubmitted: (value) {
+        //   _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
+        // },
+      ),
+    );
+
+    Widget nextForm = Form(
+      key: _nextFormKey,
+      child: TextFormField(
+        autofocus: false,
+        controller: _nextTextEditController,
+        focusNode: nextFocusNode,
+        maxLines: 999,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+        ),
+        style: TextStyle(
+          fontSize: 14,
+          fontFamily: 'NotoSansKR',
+        ),
+        // textInputAction: TextInputAction.next,
+        // onFieldSubmitted: (value) {
+        //   _nextFocusChange(_nextFormKey.currentContext, nextFocusNode);
+        // },
+      ),
+    );
+
     _writeReport(String sType) {
       return Column(
         // alignment:
@@ -417,9 +431,9 @@ class _DailyPage extends State<DailyPage> {
               left: screenWidth * 0.05,
               right: screenWidth * 0.05,
             ),
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.only(left: 5),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(5),
               boxShadow: [
                 BoxShadow(
                   blurRadius: 6.0,
@@ -447,6 +461,31 @@ class _DailyPage extends State<DailyPage> {
         ],
       );
     }
+
+    Widget remarkForm = Form(
+      key: _remarkFormKey,
+      child: TextFormField(
+        autofocus: false,
+        controller: _remarkTextEditController,
+        focusNode: remarkFocusNode,
+        maxLines: 999,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+        ),
+        style: TextStyle(
+          fontSize: 14,
+          fontFamily: 'NotoSansKR',
+        ),
+        // textInputAction: TextInputAction.next,
+        // onFieldSubmitted: (value) {
+        //   _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
+        // },
+      ),
+    );
 
     _remark() {
       return Column(
@@ -485,9 +524,9 @@ class _DailyPage extends State<DailyPage> {
               left: screenWidth * 0.05,
               right: screenWidth * 0.05,
             ),
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.only(left: 10),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: BorderRadius.circular(5),
               boxShadow: [
                 BoxShadow(
                   blurRadius: 6.0,
@@ -533,6 +572,7 @@ class _DailyPage extends State<DailyPage> {
       ),
       // appBar: menuName,
       bottomNavigationBar: KulsNavigationBottomBar(
+        globalKey: _scaffoldKey,
         id: id,
         pass: pass,
         member: member,
@@ -556,7 +596,8 @@ class _DailyPage extends State<DailyPage> {
                 ),
                 child: Column(
                   children: [
-                    SizedBox(height: 20),
+                    SizedBox(height: 5),
+                    saveButton,
                     _writeReport("today"),
                     SizedBox(height: 30),
                     _writeReport("next"),
@@ -570,17 +611,23 @@ class _DailyPage extends State<DailyPage> {
           ),
         ),
         onTap: () {
-          _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
-          _nextFocusChange(_nextFormKey.currentContext, nextFocusNode);
-          _remarkFocusChange(_remarkFormKey.currentContext, remarkFocusNode);
+          dayFocusNode.unfocus();
+          nextFocusNode.unfocus();
+          remarkFocusNode.unfocus();
+          // _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
+          // _nextFocusChange(_nextFormKey.currentContext, nextFocusNode);
+          // _remarkFocusChange(_remarkFormKey.currentContext, remarkFocusNode);
         },
       ),
     );
   }
   // #endregion
 
-  void _dayFocusChange(BuildContext context, FocusNode currentFocus) {
-    currentFocus.unfocus(); //현재 FocusNode의 포커스를 지운다.
+  void _doSave() {
+    isSaved = false;
+    dayFocusNode.unfocus();
+    nextFocusNode.unfocus();
+    remarkFocusNode.unfocus();
     APIService apiService = new APIService();
     if (dayReport != _dayTextEditController.text) {
       if (dayReport == "") {
@@ -616,14 +663,8 @@ class _DailyPage extends State<DailyPage> {
           } else {}
         });
       }
+      isSaved = true;
     }
-    // if (_dayTextEditController.text != "") {
-    // }
-  }
-
-  void _nextFocusChange(BuildContext context, FocusNode currentFocus) {
-    currentFocus.unfocus(); //현재 FocusNode의 포커스를 지운다.
-    APIService apiService = new APIService();
     if (nextReport != _nextTextEditController.text) {
       if (nextReport == "") {
         //  INSERT
@@ -659,28 +700,38 @@ class _DailyPage extends State<DailyPage> {
           } else {}
         });
       }
+      isSaved = true;
     }
+    if (remarkReport != _remarkTextEditController.text) {
+      apiService
+          .remarkReportUpdate(member.user.organizationCode, member.user.userId,
+              date, _remarkTextEditController.text)
+          .then((value) {
+        if (value.result.isNotEmpty) {
+          remarkReport = _remarkTextEditController.text;
+        } else {}
+      });
+      isSaved = true;
+    }
+  }
+
+  void _dayFocusChange(BuildContext context, FocusNode currentFocus) {
+    currentFocus.unfocus(); //현재 FocusNode의 포커스를 지운다.
+  }
+
+  void _nextFocusChange(BuildContext context, FocusNode currentFocus) {
+    currentFocus.unfocus(); //현재 FocusNode의 포커스를 지운다.
   }
 
   void _remarkFocusChange(BuildContext context, FocusNode currentFocus) {
     currentFocus.unfocus(); //현재 FocusNode의 포커스를 지운다.
-    APIService apiService = new APIService();
-    // if (_remarkTextEditController.text != "") {
-    apiService
-        .remarkReportUpdate(member.user.organizationCode, member.user.userId,
-            date, _remarkTextEditController.text)
-        .then((value) {
-      if (value.result.isNotEmpty) {
-      } else {}
-    });
-    // }
   }
 
   _show(String sMessage) {
-    showDialog(
+    showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           content: Text(sMessage),
           actions: [
             TextButton(

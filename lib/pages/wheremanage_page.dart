@@ -7,6 +7,7 @@ import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
+import 'package:intl/intl.dart';
 
 //행선지 관리 수정 삭제
 
@@ -48,43 +49,122 @@ class _WhereManagePage extends State<WhereManagePage> {
   String dayPrefix = "";
   String nextPrefix = "";
 
-  bool isFocused = true;
   List<WhereResponseModel> whereIsValue;
   List<bool> chkBox = [];
 
   int itemCount = 0;
+  String changeStartDate;
+  DateTime changeStartDateTime;
 
-  void _getWhereIs(String selectedDate) async {
+  bool isStartChanged = false;
+  int sStartDay = 0;
+  DateTime _selectedStartTime;
+  String startDate;
+
+  final _organizationList = [
+    'CW',
+    'SU',
+    'SW',
+    'CS',
+  ];
+  var organizationValue = 'CW';
+
+  final _deptList = [
+    '',
+    '1220',
+    '1230',
+    '1240',
+    '1270',
+    '2110',
+    '2120',
+    '2150',
+    '2160',
+    '2210',
+    '4001',
+  ];
+  var deptValue = '';
+
+  void _getWhereIs(String selectedDate, {String sOrganizationcode = ""}) async {
     APIService apiService = new APIService();
     apiService
-        .whereIsManage(
-            member.user.organizationCode, member.user.userId, selectedDate)
+        .whereIsManage(member.user.organizationCode, member.user.userId,
+            selectedDate, sOrganizationcode, deptValue)
         .then((value) {
       setState(() {
         if (value.whereIs.isNotEmpty) {
-          if (isFocused == true) {
-            whereIsValue = value.whereIs;
-            itemCount = 0;
-            for (var i = 0; i < value.whereIs.length; i++) {
-              itemCount++;
-              // chkBox[i] = false;
-              //   List<DataCell> cells = [];
-              //   List<DataCell> userNameCells = [];
-              //   userNameCells
-              //       .add(DataCell(Text(value.whereIs.elementAt(i).userName)));
-              //   cells.add(DataCell(Text(value.whereIs.elementAt(i).startTime)));
-              //   cells.add(DataCell(Text(value.whereIs.elementAt(i).endTime)));
-              //   cells.add(DataCell(Text(value.whereIs.elementAt(i).area)));
-              //   cells.add(
-              //       DataCell(Text(value.whereIs.elementAt(i).whereIsContents)));
-              //   cells.add(
-              //       DataCell(Text(vehicle(value.whereIs.elementAt(i).carType))));
-            }
-            isFocused = false;
+          whereIsValue = value.whereIs;
+          itemCount = 0;
+          for (var i = 0; i < value.whereIs.length; i++) {
+            itemCount++;
           }
-        } else {}
+        } else {
+          _show("조회된 데이터가 없습니다.");
+        }
       });
     });
+  }
+
+  String organization(String value) {
+    String result = '';
+    switch (value) {
+      case 'CW':
+        result = "부산사업본부";
+        break;
+      case 'SU':
+        result = "서울사업본부";
+        break;
+      case 'SW':
+        result = "경남사업본부";
+        break;
+      case 'CS':
+        result = "쿨스종합건설";
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
+
+  String department(String value) {
+    String result = '';
+    switch (value) {
+      case '':
+        result = "ALL";
+        break;
+      case '1220':
+        result = "S/W검증팀";
+        break;
+      case '1230':
+        result = "H/W개발팀";
+        break;
+      case '1240':
+        result = "헬스케어사업팀";
+        break;
+      case '1270':
+        result = "모바일솔루션팀";
+        break;
+      case '2110':
+        result = "솔루션컨설팅팀";
+        break;
+      case '2120':
+        result = "기술영업팀";
+        break;
+      case '2150':
+        result = "에너지솔루션팀";
+        break;
+      case '2160':
+        result = "물류영업팀";
+        break;
+      case '2210':
+        result = "경영지원팀";
+        break;
+      case '4001':
+        result = "종합건설";
+        break;
+      default:
+        break;
+    }
+    return result;
   }
 
   @override
@@ -95,16 +175,16 @@ class _WhereManagePage extends State<WhereManagePage> {
   @override
   void initState() {
     super.initState();
-    isFocused = true;
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
     member = widget.member;
     date = Date().date(null);
     _selectedTime = nowDateTime;
+    startDate = Date().date(null);
+    _selectedStartTime = nowDateTime;
+    deptValue = member.user.deptCode;
 
-    _getWhereIs(
-      date,
-    );
+    _getWhereIs(date, sOrganizationcode: member.user.organizationCode);
   }
 
   void _whereDelete(String sDate, String sStart, String sEnd) async {
@@ -133,23 +213,7 @@ class _WhereManagePage extends State<WhereManagePage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    _dayDecrease() {
-      isChanged = true;
-      isFocused = true;
-      sDay--;
-      changeDate = Date().getDate(sDay);
-      date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
-      _getWhereIs(date);
-    }
-
-    _dayIncrease() {
-      isChanged = true;
-      isFocused = true;
-      sDay++;
-      changeDate = Date().getDate(sDay);
-      date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
-      _getWhereIs(date);
-    }
+    double tableWidth = (screenWidth * 0.9) / 5;
 
     final menuName = Container(
       color: Color.fromRGBO(244, 242, 255, 1),
@@ -159,7 +223,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       ),
       child: Center(
         child: Text(
-          '행선지 관리',
+          '행선지 현황',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -170,119 +234,277 @@ class _WhereManagePage extends State<WhereManagePage> {
       ),
     );
 
-    final selectDate = Container(
-      color: Color.fromRGBO(244, 242, 255, 1),
-      // margin: EdgeInsets.only(
-      //   right: screenWidth * 0.05,
-      // ),
-      padding: EdgeInsets.only(
-        left: screenWidth * 0.05,
-      ),
-      height: 80,
-      child: Row(
+    Widget selectHeader = Container(
+      margin: EdgeInsets.only(left: 20, right: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 1,
-            child: TextButton(
-              onPressed: () {
-                setState(() {
-                  _dayDecrease();
-                });
-              },
-              child: Icon(
-                Icons.arrow_back_ios,
-                size: 28.0,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 7,
-            child: TextButton(
-              style: ButtonStyle(),
-              onPressed: () {
-                Future<DateTime> selectedDate = showDatePicker(
-                  context: context,
-                  initialDate: _selectedTime, // 초깃값
-                  firstDate: DateTime(2018), // 시작일
-                  lastDate: DateTime(2030), // 마지막일
-                  builder: (BuildContext context, Widget child) {
-                    return Theme(
-                      data: ThemeData.dark(), // 다크테마
-                      child: child,
-                    );
-                  },
-                );
-                selectedDate.then((dateTime) {
-                  setState(() {
-                    isChanged = true;
-                    isFocused = true;
-                    _selectedTime = dateTime;
-                    sDay = dateTime.difference(DateTime.now()).inDays;
-                    changeDate = Date().getDateString(_selectedTime);
-                    date = Date().date(_selectedTime);
-                    _getWhereIs(
-                      date,
-                    );
-                  });
-                });
-              },
-              child: Text(
-                isChanged ? changeDate : Date().getDate(0),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontFamily: 'NotoSansKR',
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              height: 80,
-              child: Container(
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _dayIncrease();
-                    });
-                  },
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.black,
-                    size: 28.0,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              // Expanded(
+              //   flex: 1,
+              //   child: Text(
+              //     '사업부',
+              //     style: TextStyle(
+              //       color: Colors.blueGrey[600],
+              //       fontFamily: 'NotoSansKR',
+              //       fontWeight: FontWeight.w600,
+              //     ),
+              //   ),
+              // ),
+              // Expanded(
+              //   flex: 3,
+              //   child: Container(
+              //     height: 40,
+              //     padding: EdgeInsets.only(left: 10),
+              //     margin: EdgeInsets.only(right: 10),
+              //     decoration: BoxDecoration(
+              //       color: Colors.white,
+              //       borderRadius: BorderRadius.circular(10),
+              //       boxShadow: [
+              //         BoxShadow(
+              //           blurRadius: 6.0,
+              //           offset: const Offset(0.0, 3.0),
+              //           color: Color.fromRGBO(0, 0, 0, 0.16),
+              //         )
+              //       ],
+              //     ),
+              //     child: DropdownButtonHideUnderline(
+              //       child: DropdownButton(
+              //         isExpanded: true,
+              //         value: organizationValue,
+              //         items: _organizationList.map(
+              //           (value) {
+              //             return DropdownMenuItem(
+              //               value: value,
+              //               child: Text(
+              //                 organization(value),
+              //                 style: TextStyle(
+              //                   fontSize: 14,
+              //                   fontFamily: 'NotoSansKR',
+              //                   fontWeight: FontWeight.w600,
+              //                 ),
+              //               ),
+              //             );
+              //           },
+              //         ).toList(),
+              //         onChanged: (value) {
+              //           setState(() {
+              //             organizationValue = value;
+              //           });
+              //         },
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              Expanded(
+                flex: 1,
+                child: Text(
+                  '부서명',
+                  style: TextStyle(
+                    color: Colors.blueGrey[600],
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-            ),
+              Expanded(
+                flex: 3,
+                child: Container(
+                  height: 40,
+                  margin: EdgeInsets.only(left: 5),
+                  padding: EdgeInsets.only(left: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 6.0,
+                        offset: const Offset(0.0, 3.0),
+                        color: Color.fromRGBO(0, 0, 0, 0.16),
+                      )
+                    ],
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      isExpanded: true,
+                      value: deptValue,
+                      items: _deptList.map(
+                        (value) {
+                          return DropdownMenuItem(
+                            value: value,
+                            child: Text(
+                              department(value),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'NotoSansKR',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        },
+                      ).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          deptValue = value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+
+              Expanded(
+                flex: 1,
+                child: Container(
+                  margin: EdgeInsets.only(left: 10),
+                  child: Text(
+                    '일자',
+                    style: TextStyle(
+                      color: Colors.blueGrey[600],
+                      fontFamily: 'NotoSansKR',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Container(
+                  height: 40,
+                  margin: EdgeInsets.only(left: 5, right: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        blurRadius: 6.0,
+                        offset: const Offset(0.0, 3.0),
+                        color: Color.fromRGBO(0, 0, 0, 0.16),
+                      )
+                    ],
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: TextButton(
+                      onPressed: () {
+                        Future<DateTime> selectStartDate = showDatePicker(
+                          context: context,
+                          initialDate: _selectedStartTime, // 초깃값
+                          firstDate: DateTime(2018), // 시작일
+                          lastDate: DateTime(2030), // 마지막일
+                          builder: (BuildContext context, Widget child) {
+                            return Theme(
+                              data: ThemeData.light(),
+                              child: child,
+                            );
+                          },
+                        );
+                        selectStartDate.then((dateTime) {
+                          setState(() {
+                            if (dateTime != null) {
+                              isStartChanged = true;
+                              _selectedStartTime = dateTime;
+                              sStartDay =
+                                  dateTime.difference(DateTime.now()).inDays;
+                            } else {
+                              dateTime = _selectedStartTime;
+                            }
+                            changeStartDate = DateFormat('yyyy-MM-dd')
+                                .format(_selectedStartTime);
+                            startDate = Date().date(_selectedStartTime);
+                          });
+                        });
+                      },
+                      child: Text(
+                        isStartChanged
+                            ? changeStartDate
+                            : DateFormat('yyyy-MM-dd')
+                                .format(new DateTime.now()),
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'NotoSansKR',
+                          color: Colors.black,
+                          // fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          // Expanded(
-          // Container(
-          //   width: screenWidth * 0.05,
-          //   decoration: BoxDecoration(
-          //     color: Color.fromRGBO(45, 43, 77, 1),
-          //     borderRadius: BorderRadius.only(
-          //       topLeft: Radius.circular(screenWidth * 0.05),
-          //     ),
-          //   ),
-          // ),
-          // ),
+          SizedBox(height: 15),
+          InkWell(
+            child: Container(
+              margin: EdgeInsets.only(
+                left: 45,
+                right: 10,
+              ),
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.indigo[900],
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 6.0,
+                    offset: const Offset(0.0, 3.0),
+                    color: Color.fromRGBO(0, 0, 0, 0.16),
+                  )
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Icon(
+                  //   Icons.search,
+                  //   color: Colors.white,
+                  // ),
+                  // SizedBox(width: 5),
+                  Text(
+                    '조회',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontFamily: 'NotoSansKR',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () {
+              _getWhereIs(startDate);
+              // _getDailySelect(startDate, endDate);
+            },
+          ),
         ],
       ),
     );
 
-    Widget dataTableHeader(String sColumn) {
+    Widget dataTableHeader(String sColumn, double sWidth) {
       return Container(
+        decoration: BoxDecoration(
+          border: Border(
+            left: BorderSide(
+              color: Colors.white38,
+              width: 1,
+            ),
+            right: BorderSide(
+              color: Colors.white38,
+              width: 1,
+            ),
+          ),
+          color: Colors.grey[100],
+        ),
         child: Text(
           sColumn,
           style: TextStyle(
             fontWeight: FontWeight.w600,
           ),
         ),
-        width: 100,
+        width: sWidth,
         height: 50,
         padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
         alignment: Alignment.center,
@@ -292,17 +514,18 @@ class _WhereManagePage extends State<WhereManagePage> {
     Widget _generateFirstColumnRow(BuildContext context, int index) {
       return Container(
         child: Text(whereIsValue.elementAt(index).userName),
-        width: 100,
+        width: tableWidth,
         height: 50,
         padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
         alignment: Alignment.center,
       );
     }
 
-    Widget rightColumnRowContent(String sText, Alignment sAlign) {
+    Widget rightColumnRowContent(
+        String sText, Alignment sAlign, double sWidth) {
       return Container(
         child: Text(sText),
-        width: 100,
+        width: sWidth,
         height: 50,
         padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
         alignment: sAlign,
@@ -345,20 +568,22 @@ class _WhereManagePage extends State<WhereManagePage> {
                     : whereIsValue.elementAt(index).startTime.substring(0, 2) +
                         ":" +
                         whereIsValue.elementAt(index).startTime.substring(2, 4),
-                Alignment.center),
+                Alignment.center,
+                tableWidth),
             rightColumnRowContent(
                 whereIsValue.elementAt(index).endTime == ''
                     ? ''
                     : whereIsValue.elementAt(index).endTime.substring(0, 2) +
                         ":" +
                         whereIsValue.elementAt(index).endTime.substring(2, 4),
-                Alignment.center),
+                Alignment.center,
+                tableWidth),
             // rightColumnRowContent(
             //     whereIsValue.elementAt(index).area, Alignment.centerLeft),
             rightColumnRowContent(whereIsValue.elementAt(index).whereIsContents,
-                Alignment.center),
-            rightColumnRowContent(
-                whereIsValue.elementAt(index).carType, Alignment.center),
+                Alignment.center, tableWidth),
+            rightColumnRowContent(whereIsValue.elementAt(index).carType,
+                Alignment.center, tableWidth),
           ],
         ),
       );
@@ -386,15 +611,6 @@ class _WhereManagePage extends State<WhereManagePage> {
                 ),
               ),
             ),
-            // child: Text(
-            //   '확인',
-            //   textAlign: TextAlign.left,
-            //   style: TextStyle(
-            //     color: Color.fromRGBO(86, 98, 112, 1),
-            //     fontWeight: FontWeight.w700,
-            //     fontSize: 16,
-            //   ),
-            // ),
           ),
           Container(
             color: Colors.white,
@@ -404,16 +620,15 @@ class _WhereManagePage extends State<WhereManagePage> {
               right: screenWidth * 0.05,
             ),
             child: HorizontalDataTable(
-              leftHandSideColumnWidth: 100,
-              rightHandSideColumnWidth: 400,
+              leftHandSideColumnWidth: tableWidth,
+              rightHandSideColumnWidth: tableWidth * 4,
               isFixedHeader: true,
               headerWidgets: [
-                dataTableHeader('이름'),
-                dataTableHeader('시작시간'),
-                dataTableHeader('종료시간'),
-                // dataTableHeader('지역'),
-                dataTableHeader('행선지'),
-                dataTableHeader('교통편'),
+                dataTableHeader('이름', tableWidth),
+                dataTableHeader('시작시간', tableWidth),
+                dataTableHeader('종료시간', tableWidth),
+                dataTableHeader('행선지', tableWidth),
+                dataTableHeader('교통편', tableWidth),
               ],
               leftSideItemBuilder: _generateFirstColumnRow,
               rightSideItemBuilder: _generateRightHandSideColumnRow,
@@ -450,6 +665,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       ),
       backgroundColor: Colors.white,
       bottomNavigationBar: KulsNavigationBottomBar(
+        globalKey: _scaffoldKey,
         id: id,
         pass: pass,
         member: member,
@@ -461,7 +677,7 @@ class _WhereManagePage extends State<WhereManagePage> {
           child: ListView(
             children: [
               menuName,
-              selectDate,
+              // selectDate,selectHeader
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -472,7 +688,8 @@ class _WhereManagePage extends State<WhereManagePage> {
                 ),
                 child: Column(
                   children: [
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
+                    selectHeader,
                     whereIsDataTable(),
                     SizedBox(height: 10),
                   ],
@@ -489,10 +706,10 @@ class _WhereManagePage extends State<WhereManagePage> {
   // #endregion
   //
   _show(String sMessage) {
-    showDialog(
+    showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           content: Text(sMessage),
           actions: [
             TextButton(
@@ -509,173 +726,64 @@ class _WhereManagePage extends State<WhereManagePage> {
 
   _showMessage(String sMessage, String sStartTime, String sEndTime,
       String sArea, String sWhereIsContents, String sCarType) {
-    showDialog(
+    showCupertinoDialog(
       context: context,
-      builder: (context) => Material(
-        type: MaterialType.transparency,
-        child: Center(
-          child: Container(
-            height: 200,
-            margin: EdgeInsets.only(
-              left: 35,
-              right: 35,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          // title: Text("AlertDialog"),
+          content: Text(sMessage),
+          actions: [
+            TextButton(
+              child: Text("삭제"),
+              onPressed: () {
+                _whereDelete(date, sStartTime, sEndTime);
+                Navigator.of(context).pop(true);
+                setState(() {
+                  Navigator.pushReplacement(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (BuildContext context) => super.widget,
+                      //     WhereManagePage(
+                      //   id: id,
+                      //   pass: pass,
+                      //   member: member,
+                      // ),
+                    ),
+                  );
+                });
+              },
             ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 6.0,
-                  offset: const Offset(1.0, 3.0),
-                  color: Color.fromRGBO(0, 0, 0, 0.2),
-                )
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  height: 100,
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Evolve Office',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+            TextButton(
+              child: Text("수정"),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => WhereIsPage(
+                      id: id,
+                      pass: pass,
+                      member: member,
+                      isUpdate: true,
+                      updateDate: DateTime.parse(date),
+                      startTime: sStartTime,
+                      endTime: sEndTime,
+                      area: sArea,
+                      contents: sWhereIsContents,
+                      carType: sCarType,
                     ),
                   ),
-                ),
-                Container(
-                  height: 50,
-                  decoration: BoxDecoration(),
-                  child: Text(
-                    sMessage,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontFamily: 'NotoSansKR',
-                    ),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: SizedBox(),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 10,
-                        right: 10,
-                      ),
-                      margin: EdgeInsets.only(
-                        left: 5,
-                        right: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(25),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 6.0,
-                            offset: const Offset(1.0, 3.0),
-                            color: Color.fromRGBO(0, 0, 0, 0.2),
-                          )
-                        ],
-                      ),
-                      height: 40,
-                      child: TextButton(
-                        child: Text(
-                          "삭제",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        onPressed: () {
-                          _whereDelete(date, sStartTime, sEndTime);
-                          Navigator.of(context).pop(true);
-                          setState(() {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => super.widget,
-                                //     WhereManagePage(
-                                //   id: id,
-                                //   pass: pass,
-                                //   member: member,
-                                // ),
-                              ),
-                            );
-                          });
-                        },
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 10,
-                        right: 10,
-                      ),
-                      margin: EdgeInsets.only(
-                        left: 5,
-                        right: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(25),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 6.0,
-                            offset: const Offset(1.0, 3.0),
-                            color: Color.fromRGBO(0, 0, 0, 0.2),
-                          )
-                        ],
-                      ),
-                      height: 40,
-                      child: TextButton(
-                          child: Text(
-                            "수정",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontFamily: 'NotoSansKR',
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => WhereIsPage(
-                                  id: id,
-                                  pass: pass,
-                                  member: member,
-                                  isUpdate: true,
-                                  updateDate: DateTime.parse(date),
-                                  startTime: sStartTime,
-                                  endTime: sEndTime,
-                                  area: sArea,
-                                  contents: sWhereIsContents,
-                                  carType: sCarType,
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ],
-                ),
-              ],
+                );
+              },
             ),
-          ),
-        ),
-      ),
+            TextButton(
+              child: Text("취소"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

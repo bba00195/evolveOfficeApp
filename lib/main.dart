@@ -1,3 +1,4 @@
+import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:evolveofficeapp/pages/home_page_new.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/animation.dart';
@@ -140,7 +141,7 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
         Navigator.pushReplacement(
           context,
           CupertinoPageRoute(
-            builder: (context) => HomePageNew(
+            builder: (context) => HomePage(
               id: userInfo.split(" ")[1],
               pass: userInfo.split(" ")[3],
               member: member,
