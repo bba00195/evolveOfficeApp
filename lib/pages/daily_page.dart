@@ -668,7 +668,7 @@ class _DailyPage extends State<DailyPage> {
     if (nextReport != _nextTextEditController.text) {
       if (nextReport == "") {
         //  INSERT
-        if (dayReport == "") {
+        if (dayReport == "" && _dayTextEditController.text == "") {
           //  일일 업무내용 정보가 DB에 없을 때
           apiService
               .nextReportInsert(member.user.organizationCode,
