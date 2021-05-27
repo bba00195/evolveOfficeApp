@@ -34,6 +34,9 @@ dependencies:
   datetime_picker_formfield: ^2.0.0
   date_picker_timeline: ^1.2.3
   image_picker: ^0.7.5
+  auto_size_text: ^2.1.0 
+  auto_size_text_field: ^0.1.7
+  expansion_card: ^0.1.0
 
 dev_dependencies:
   flutter_test:

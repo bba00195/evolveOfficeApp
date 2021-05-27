@@ -1,3 +1,5 @@
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,6 +29,9 @@ class _DailySelectPage extends State<DailySelectPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
+  bool _showBackToTopButton = false;
+  final ScrollController _scrollController = ScrollController();
+
   String id;
   String pass;
   UserManager member;
@@ -44,6 +49,12 @@ class _DailySelectPage extends State<DailySelectPage> {
   DateTime _selectedEndTime;
   String startDate;
   String endDate;
+
+  bool isChanged = false;
+  DateTime _selectedTime;
+  int sDay = 0;
+  String changeDate;
+  String date;
 
   Future<DailyResultModel> futureAlbum;
   FocusNode nameFocusNode;
@@ -78,35 +89,54 @@ class _DailySelectPage extends State<DailySelectPage> {
   int itemCount = 0;
 
   void _getDailySelect(String startDate) async {
-    APIService apiService = new APIService();
-    apiService
-        .dailySelect(startDate, startDate, member.user.userId, deptValue,
-            member.user.organizationCode)
-        .then((value) {
+    APIServiceNew apiServiceNew = new APIServiceNew();
+
+    List<String> sParam = [
+      startDate,
+      startDate,
+      "WK_DAILYMONTH",
+      member.user.userId,
+      "",
+      "",
+      deptValue,
+      "",
+      member.user.organizationCode
+    ];
+
+    apiServiceNew.getSelect("DAILY_S1", sParam).then((value) {
       setState(() {
+        itemCount = 0;
         if (value.dailySelect.isNotEmpty) {
           dailySelectValue = value.dailySelect;
-          itemCount = 0;
           for (var i = 0; i < value.dailySelect.length; i++) {
             itemCount++;
           }
         } else {
-          _show("조회된 데이터가 없습니다.");
+          // _show("조회된 데이터가 없습니다.");
         }
       });
     });
-  }
-
-  @override
-  void dispose() {
-    _nameTextEditController.dispose();
-    super.dispose();
+    // APIService apiService = new APIService();
+    // apiService
+    //     .dailySelect(startDate, startDate, member.user.userId, deptValue,
+    //         member.user.organizationCode)
+    //     .then((value) {
+    //   setState(() {
+    //     if (value.dailySelect.isNotEmpty) {
+    //       dailySelectValue = value.dailySelect;
+    //       itemCount = 0;
+    //       for (var i = 0; i < value.dailySelect.length; i++) {
+    //         itemCount++;
+    //       }
+    //     } else {
+    //       _show("조회된 데이터가 없습니다.");
+    //     }
+    //   });
+    // });
   }
 
   @override
   void initState() {
-    super.initState();
-
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
     member = widget.member;
@@ -116,6 +146,32 @@ class _DailySelectPage extends State<DailySelectPage> {
     _selectedStartTime = nowDateTime;
     _selectedEndTime = nowDateTime;
     nameFocusNode = FocusNode();
+
+    _scrollController.addListener(() {
+      setState(() {
+        if (_scrollController.offset >= 400) {
+          _showBackToTopButton = true; // show the back-to-top button
+        } else {
+          _showBackToTopButton = false; // hide the back-to-top button
+        }
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _nameTextEditController.dispose();
+    _scrollController.dispose(); // dispose the controller
+    super.dispose();
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(seconds: 1),
+      curve: Curves.linear,
+    );
   }
 
   @override
@@ -123,10 +179,27 @@ class _DailySelectPage extends State<DailySelectPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
+    _dayDecrease() {
+      isChanged = true;
+      sDay--;
+      changeDate = Date().getDate(sDay);
+      // date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
+      date = Date().date(DateTime.now().add(Duration(days: sDay)));
+      _getDailySelect(date);
+    }
+
+    _dayIncrease() {
+      isChanged = true;
+      sDay++;
+      changeDate = Date().getDate(sDay);
+      date = Date().date(DateTime.now().add(Duration(days: sDay)));
+      _getDailySelect(date);
+    }
+
     final menuName = Container(
       color: Color.fromRGBO(248, 246, 255, 1),
       child: Center(
-        child: Text(
+        child: AutoSizeText(
           '일일업무 조회',
           style: TextStyle(
             color: Colors.black,
@@ -138,6 +211,111 @@ class _DailySelectPage extends State<DailySelectPage> {
       ),
     );
 
+    final selectDate = Container(
+      // color: Color.fromRGBO(248, 246, 255, 1),
+      // margin: EdgeInsets.only(
+      //   right: screenWidth * 0.05,
+      // ),
+      padding: EdgeInsets.only(
+        left: screenWidth * 0.05,
+      ),
+      height: 60,
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: TextButton(
+              onPressed: () {
+                setState(() {
+                  _dayDecrease();
+                });
+              },
+              child: Icon(
+                Icons.arrow_back_ios,
+                size: 28.0,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 7,
+            child: TextButton(
+              style: ButtonStyle(),
+              onPressed: () {
+                Future<DateTime> selectedDate = showDatePicker(
+                  context: context,
+                  initialDate: _selectedTime, // 초깃값
+                  firstDate: DateTime(2018), // 시작일
+                  lastDate: DateTime(2030), // 마지막일
+                  builder: (BuildContext context, Widget child) {
+                    return Theme(
+                      data: ThemeData.dark(), // 다크테마
+                      child: child,
+                    );
+                  },
+                );
+                selectedDate.then((dateTime) {
+                  setState(() {
+                    if (dateTime != null) {
+                      isChanged = true;
+                      _selectedTime = dateTime;
+                      sDay = dateTime.difference(DateTime.now()).inDays;
+                      _getDailySelect(date);
+                    } else {
+                      dateTime = _selectedTime;
+                    }
+                    changeDate = Date().getDateString(_selectedTime);
+                    date = Date().date(_selectedTime);
+                  });
+                });
+              },
+              child: Text(
+                isChanged ? changeDate : Date().getDate(0),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontFamily: 'NotoSansKR',
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              height: 80,
+              child: Container(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _dayIncrease();
+                    });
+                  },
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black,
+                    size: 28.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          // Expanded(
+          // Container(
+          //   width: screenWidth * 0.05,
+          //   decoration: BoxDecoration(
+          //     color: Color.fromRGBO(45, 43, 77, 1),
+          //     borderRadius: BorderRadius.only(
+          //       topLeft: Radius.circular(screenWidth * 0.05),
+          //     ),
+          //   ),
+          // ),
+          // ),
+        ],
+      ),
+    );
+
     Widget selectHeader = Container(
       margin: EdgeInsets.only(left: 20, right: 20),
       child: Column(
@@ -146,75 +324,23 @@ class _DailySelectPage extends State<DailySelectPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              // Expanded(
-              //   flex: 1,
-              //   child: Text(
-              //     '사업부',
-              //     style: TextStyle(
-              //       color: Colors.blueGrey[600],
-              //       fontFamily: 'NotoSansKR',
-              //       fontWeight: FontWeight.w600,
-              //     ),
-              //   ),
-              // ),
-              // Expanded(
-              //   flex: 3,
-              //   child: Container(
-              //     height: 40,
-              //     padding: EdgeInsets.only(left: 10),
-              //     margin: EdgeInsets.only(right: 10),
-              //     decoration: BoxDecoration(
-              //       color: Colors.white,
-              //       borderRadius: BorderRadius.circular(10),
-              //       boxShadow: [
-              //         BoxShadow(
-              //           blurRadius: 6.0,
-              //           offset: const Offset(0.0, 3.0),
-              //           color: Color.fromRGBO(0, 0, 0, 0.16),
-              //         )
-              //       ],
-              //     ),
-              //     child: DropdownButtonHideUnderline(
-              //       child: DropdownButton(
-              //         isExpanded: true,
-              //         value: organizationValue,
-              //         items: _organizationList.map(
-              //           (value) {
-              //             return DropdownMenuItem(
-              //               value: value,
-              //               child: Text(
-              //                 organization(value),
-              //                 style: TextStyle(
-              //                   fontSize: 14,
-              //                   fontFamily: 'NotoSansKR',
-              //                   fontWeight: FontWeight.w600,
-              //                 ),
-              //               ),
-              //             );
-              //           },
-              //         ).toList(),
-              //         onChanged: (value) {
-              //           setState(() {
-              //             organizationValue = value;
-              //           });
-              //         },
-              //       ),
-              //     ),
-              //   ),
-              // ),
               Expanded(
-                flex: 1,
-                child: Text(
-                  '부서명',
-                  style: TextStyle(
-                    color: Colors.blueGrey[600],
-                    fontFamily: 'NotoSansKR',
-                    fontWeight: FontWeight.w600,
+                flex: 2,
+                child: Container(
+                  child: AutoSizeText(
+                    '부서',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blueGrey[600],
+                      fontFamily: 'NotoSansKR',
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxFontSize: 14,
                   ),
                 ),
               ),
               Expanded(
-                flex: 3,
+                flex: 8,
                 child: Container(
                   height: 40,
                   margin: EdgeInsets.only(left: 5),
@@ -238,13 +364,15 @@ class _DailySelectPage extends State<DailySelectPage> {
                         (value) {
                           return DropdownMenuItem(
                             value: value,
-                            child: Text(
+                            child: AutoSizeText(
                               department(value),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontFamily: 'NotoSansKR',
                                 fontWeight: FontWeight.w600,
                               ),
+                              minFontSize: 10,
+                              maxLines: 1,
                             ),
                           );
                         },
@@ -252,289 +380,138 @@ class _DailySelectPage extends State<DailySelectPage> {
                       onChanged: (value) {
                         setState(() {
                           deptValue = value;
+                          _getDailySelect(date);
                         });
                       },
                     ),
                   ),
                 ),
               ),
-
-              Expanded(
-                flex: 1,
-                child: Container(
-                  margin: EdgeInsets.only(left: 10),
-                  child: Text(
-                    '일자',
-                    style: TextStyle(
-                      color: Colors.blueGrey[600],
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 4,
-                child: Container(
-                  height: 40,
-                  margin: EdgeInsets.only(left: 5, right: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 6.0,
-                        offset: const Offset(0.0, 3.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.16),
-                      )
-                    ],
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: TextButton(
-                      onPressed: () {
-                        Future<DateTime> selectStartDate = showDatePicker(
-                          context: context,
-                          initialDate: _selectedStartTime, // 초깃값
-                          firstDate: DateTime(2018), // 시작일
-                          lastDate: DateTime(2030), // 마지막일
-                          builder: (BuildContext context, Widget child) {
-                            return Theme(
-                              data: ThemeData.light(),
-                              child: child,
-                            );
-                          },
-                        );
-                        selectStartDate.then((dateTime) {
-                          setState(() {
-                            if (dateTime != null) {
-                              isStartChanged = true;
-                              _selectedStartTime = dateTime;
-                              sStartDay =
-                                  dateTime.difference(DateTime.now()).inDays;
-                            } else {
-                              dateTime = _selectedStartTime;
-                            }
-                            changeStartDate = DateFormat('yyyy-MM-dd')
-                                .format(_selectedStartTime);
-                            startDate = Date().date(_selectedStartTime);
-                          });
-                        });
-                      },
-                      child: Text(
-                        isStartChanged
-                            ? changeStartDate
-                            : DateFormat('yyyy-MM-dd')
-                                .format(new DateTime.now()),
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'NotoSansKR',
-                          color: Colors.black,
-                          // fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // Container(
+              //   margin: EdgeInsets.only(left: 10),
+              //   child: AutoSizeText(
+              //     '일자',
+              //     style: TextStyle(
+              //       color: Colors.blueGrey[600],
+              //       fontFamily: 'NotoSansKR',
+              //       fontWeight: FontWeight.w600,
+              //     ),
+              //   ),
+              // ),
+              // Expanded(
+              //   flex: 4,
+              //   child: Container(
+              //     height: 40,
+              //     margin: EdgeInsets.only(left: 5, right: 10),
+              //     decoration: BoxDecoration(
+              //       color: Colors.white,
+              //       borderRadius: BorderRadius.circular(10),
+              //       boxShadow: [
+              //         BoxShadow(
+              //           blurRadius: 6.0,
+              //           offset: const Offset(0.0, 3.0),
+              //           color: Color.fromRGBO(0, 0, 0, 0.16),
+              //         )
+              //       ],
+              //     ),
+              //     child: DropdownButtonHideUnderline(
+              //       child: TextButton(
+              //         onPressed: () {
+              //           Future<DateTime> selectStartDate = showDatePicker(
+              //             context: context,
+              //             initialDate: _selectedStartTime, // 초깃값
+              //             firstDate: DateTime(2018), // 시작일
+              //             lastDate: DateTime(2030), // 마지막일
+              //             builder: (BuildContext context, Widget child) {
+              //               return Theme(
+              //                 data: ThemeData.light(),
+              //                 child: child,
+              //               );
+              //             },
+              //           );
+              //           selectStartDate.then((dateTime) {
+              //             setState(() {
+              //               if (dateTime != null) {
+              //                 isStartChanged = true;
+              //                 _selectedStartTime = dateTime;
+              //                 sStartDay =
+              //                     dateTime.difference(DateTime.now()).inDays;
+              //               } else {
+              //                 dateTime = _selectedStartTime;
+              //               }
+              //               changeStartDate = DateFormat('yyyy-MM-dd')
+              //                   .format(_selectedStartTime);
+              //               startDate = Date().date(_selectedStartTime);
+              //             });
+              //           });
+              //         },
+              //         child: AutoSizeText(
+              //           isStartChanged
+              //               ? changeStartDate
+              //               : DateFormat('yyyy-MM-dd')
+              //                   .format(new DateTime.now()),
+              //           textAlign: TextAlign.left,
+              //           style: TextStyle(
+              //             fontSize: 14,
+              //             fontFamily: 'NotoSansKR',
+              //             color: Colors.black,
+              //             // fontWeight: FontWeight.w600,
+              //           ),
+              //           maxFontSize: 16,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           SizedBox(height: 15),
-          InkWell(
-            child: Container(
-              margin: EdgeInsets.only(
-                left: 45,
-                right: 10,
-              ),
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.indigo[900],
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 6.0,
-                    offset: const Offset(0.0, 3.0),
-                    color: Color.fromRGBO(0, 0, 0, 0.16),
-                  )
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Icon(
-                  //   Icons.search,
-                  //   color: Colors.white,
-                  // ),
-                  // SizedBox(width: 5),
-                  Text(
-                    '조회',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            onTap: () {
-              _getDailySelect(startDate);
-            },
-          ),
+          selectDate,
+          // InkWell(
+          //   child: Container(
+          //     margin: EdgeInsets.only(
+          //       left: 45,
+          //       right: 10,
+          //     ),
+          //     height: 40,
+          //     decoration: BoxDecoration(
+          //       color: Colors.indigo[900],
+          //       borderRadius: BorderRadius.circular(10),
+          //       boxShadow: [
+          //         BoxShadow(
+          //           blurRadius: 6.0,
+          //           offset: const Offset(0.0, 3.0),
+          //           color: Color.fromRGBO(0, 0, 0, 0.16),
+          //         )
+          //       ],
+          //     ),
+          //     child: Row(
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         // Icon(
+          //         //   Icons.search,
+          //         //   color: Colors.white,
+          //         // ),
+          //         // SizedBox(width: 5),
+          //         AutoSizeText(
+          //           '조회',
+          //           style: TextStyle(
+          //             color: Colors.white,
+          //             fontSize: 20,
+          //             fontFamily: 'NotoSansKR',
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          //   onTap: () {
+          //     _getDailySelect(startDate);
+          //   },
+          // ),
         ],
       ),
     );
-
-    Widget dataTableHeader(String sColumn, double sWidth) {
-      return Container(
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              color: Colors.white38,
-              width: 1,
-            ),
-            right: BorderSide(
-              color: Colors.white38,
-              width: 1,
-            ),
-          ),
-          color: Colors.grey[100],
-        ),
-        child: Text(
-          sColumn,
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        width: sWidth,
-        height: 50,
-        padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-        alignment: Alignment.center,
-      );
-    }
-
-    Widget _generateFirstColumnRow(BuildContext context, int index) {
-      return Container(
-        child: Text(dailySelectValue.elementAt(index).userName),
-        width: 80,
-        height: 50,
-        padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-        alignment: Alignment.center,
-      );
-    }
-
-    Widget rightColumnRowContent(
-        String sText, Alignment sAlign, double sWidth) {
-      return Container(
-        child: Text(sText, overflow: TextOverflow.ellipsis),
-        width: sWidth,
-        height: 50,
-        padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-        alignment: sAlign,
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(
-              color: Colors.grey[100],
-              width: 1,
-            ),
-            right: BorderSide(
-              color: Colors.grey[100],
-              width: 1,
-            ),
-          ),
-        ),
-      );
-    }
-
-    Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
-      return InkWell(
-        onDoubleTap: () {
-          _showReport(
-            dailySelectValue.elementAt(index).userName,
-            dailySelectValue.elementAt(index).viewDate,
-            dailySelectValue.elementAt(index).deptName,
-            dailySelectValue.elementAt(index).dayReport,
-            dailySelectValue.elementAt(index).nextReport,
-            dailySelectValue.elementAt(index).miscReport,
-          );
-        },
-        child: Row(
-          children: <Widget>[
-            rightColumnRowContent(dailySelectValue.elementAt(index).viewDate,
-                Alignment.center, 80),
-            rightColumnRowContent(dailySelectValue.elementAt(index).deptName,
-                Alignment.center, 100),
-            rightColumnRowContent(dailySelectValue.elementAt(index).dayReport,
-                Alignment.centerLeft, 100),
-            rightColumnRowContent(dailySelectValue.elementAt(index).nextReport,
-                Alignment.centerLeft, 100),
-            rightColumnRowContent(dailySelectValue.elementAt(index).miscReport,
-                Alignment.centerLeft, 80),
-          ],
-        ),
-      );
-    }
-
-    dailyDataTable() {
-      return Column(
-        // alignment:
-        //     AlignmentDirectional.topStart, //alignment:new Alignment(x, y)
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            // height: 30,
-            width: screenWidth * 0.9,
-            margin: EdgeInsets.only(
-              left: screenWidth * 0.05,
-              right: screenWidth * 0.05,
-            ),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Color.fromRGBO(74, 63, 186, 1),
-                  width: 3,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            color: Colors.white,
-            height: screenHeight * 0.7,
-            margin: EdgeInsets.only(
-              left: screenWidth * 0.05,
-              right: screenWidth * 0.05,
-            ),
-            child: HorizontalDataTable(
-              leftHandSideColumnWidth: 80,
-              rightHandSideColumnWidth: 460,
-              isFixedHeader: true,
-              headerWidgets: [
-                dataTableHeader('작성자', 80),
-                dataTableHeader('일자', 80),
-                dataTableHeader('부서명', 100),
-                // dataTableHeader('지역'),
-                dataTableHeader('일일업무내용', 100),
-                dataTableHeader('익일업무내용', 100),
-                dataTableHeader('특이사항', 80),
-              ],
-              leftSideItemBuilder: _generateFirstColumnRow,
-              rightSideItemBuilder: _generateRightHandSideColumnRow,
-              itemCount: itemCount,
-              rowSeparatorWidget: const Divider(
-                color: Colors.black54,
-                height: 1.0,
-                thickness: 0.0,
-              ),
-              leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
-              rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
-              onRefresh: () {},
-            ),
-          ),
-        ],
-      );
-    }
 
     cardContentHeader(String sMenu) {
       return Container(
@@ -542,7 +519,7 @@ class _DailySelectPage extends State<DailySelectPage> {
         margin: EdgeInsets.only(
           top: 10,
         ),
-        child: Text(
+        child: AutoSizeText(
           sMenu,
           textAlign: TextAlign.left,
           style: TextStyle(
@@ -557,7 +534,7 @@ class _DailySelectPage extends State<DailySelectPage> {
     cardContent(String sContent) {
       return Container(
         padding: EdgeInsets.all(3),
-        child: Text(
+        child: AutoSizeText(
           sContent,
           style: TextStyle(
             fontSize: 14,
@@ -642,41 +619,41 @@ class _DailySelectPage extends State<DailySelectPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: Text(
-                      sUserName,
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
+                  AutoSizeText(
+                    sUserName,
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
                     ),
+                    maxFontSize: 14,
                   ),
                   Expanded(
                     flex: 4,
                     child: Container(
                       margin: EdgeInsets.only(left: 5),
-                      child: Text(
+                      child: AutoSizeText(
                         '[' + sDeptName + ']',
                         style: TextStyle(
                           color: Colors.black87,
                           // fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                          fontSize: 12,
                         ),
+                        maxFontSize: 14,
                       ),
                     ),
                   ),
                   Expanded(
-                    flex: 4,
-                    child: Text(
-                      DateFormat('yyyy년 MM월 dd일')
+                    flex: 3,
+                    child: AutoSizeText(
+                      DateFormat('yyyy. MM. dd')
                           .format(DateTime.parse(sWorkDate)),
                       textAlign: TextAlign.end,
                       style: TextStyle(
                         color: Colors.black87,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
+                      maxFontSize: 14,
                     ),
                   ),
                 ],
@@ -694,9 +671,7 @@ class _DailySelectPage extends State<DailySelectPage> {
                   cardContentHeader("금일업무 내용"),
                   cardContent(sDailyReport),
                   cardContentHeader("익일업무 내용"),
-                  cardContent(sNextReport),
-                  if (sMiscReport != "") cardContentHeader("특이사항"),
-                  cardContent(sMiscReport),
+                  cardContent(sNextReport)
                 ],
               ),
             ),
@@ -706,22 +681,26 @@ class _DailySelectPage extends State<DailySelectPage> {
     }
 
     contentTable() {
-      return SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            for (int i = 0; i < itemCount; i++)
-              cardTable(
-                  dailySelectValue.elementAt(i).userName,
-                  dailySelectValue.elementAt(i).deptName,
-                  dailySelectValue.elementAt(i).workDate,
-                  dailySelectValue.elementAt(i).dayReport,
-                  dailySelectValue.elementAt(i).nextReport,
-                  dailySelectValue.elementAt(i).miscReport),
-          ],
-        ),
-      );
+      if (itemCount > 0) {
+        return SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              for (int i = 0; i < itemCount; i++)
+                cardTable(
+                    dailySelectValue.elementAt(i).userName,
+                    dailySelectValue.elementAt(i).deptName,
+                    dailySelectValue.elementAt(i).workDate,
+                    dailySelectValue.elementAt(i).dayReport,
+                    dailySelectValue.elementAt(i).nextReport,
+                    dailySelectValue.elementAt(i).miscReport),
+            ],
+          ),
+        );
+      } else {
+        return Container();
+      }
     }
 
     // #region Body
@@ -751,40 +730,49 @@ class _DailySelectPage extends State<DailySelectPage> {
       body: GestureDetector(
         child: Container(
           color: Color.fromRGBO(248, 246, 255, 1),
-          child: ListView(
-            children: [
-              SizedBox(height: 10),
-              menuName,
-              SizedBox(height: 20),
-              Container(
-                constraints: BoxConstraints(
-                  minHeight: 500,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(screenWidth * 0.07),
-                    topRight: Radius.circular(screenWidth * 0.07),
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                menuName,
+                SizedBox(height: 20),
+                Container(
+                  constraints: BoxConstraints(
+                    minHeight: 500,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(screenWidth * 0.07),
+                      topRight: Radius.circular(screenWidth * 0.07),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      selectHeader,
+                      SizedBox(height: 20),
+                      // dailyDataTable(),
+                      contentTable(),
+                      SizedBox(height: 100),
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    selectHeader,
-                    SizedBox(height: 20),
-                    // dailyDataTable(),
-                    contentTable(),
-                    SizedBox(height: 100),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         onTap: () {
           nameFocusNode.unfocus();
         },
       ),
+      floatingActionButton: _showBackToTopButton == false
+          ? null
+          : FloatingActionButton(
+              onPressed: _scrollToTop,
+              child: Icon(Icons.arrow_upward),
+            ),
     );
   }
   // #endregion
@@ -871,218 +859,6 @@ class _DailySelectPage extends State<DailySelectPage> {
           ],
         );
       },
-    );
-  }
-
-  _showReport(String sUserName, String sViewDate, String sDeptName,
-      String sDayReport, String sNextReport, String sMiscReport) {
-    showDialog(
-      context: context,
-      builder: (context) => Material(
-        type: MaterialType.transparency,
-        child: Center(
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.8,
-            width: MediaQuery.of(context).size.width - 70,
-            padding: EdgeInsets.all(25),
-            margin: EdgeInsets.only(
-              left: 35,
-              right: 35,
-            ),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: [
-                BoxShadow(
-                  blurRadius: 6.0,
-                  offset: const Offset(1.0, 3.0),
-                  color: Color.fromRGBO(0, 0, 0, 0.2),
-                )
-              ],
-            ),
-            child: ListView(
-              children: [
-                SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      sUserName,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontFamily: 'NotoSansKR',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      sViewDate,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontFamily: 'NotoSansKR',
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 15),
-                Container(
-                  // height: 20,
-                  width: MediaQuery.of(context).size.width - 125,
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(228, 220, 255, 1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '일일 업무 내용',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 5),
-                Container(
-                  width: MediaQuery.of(context).size.width - 125,
-                  margin: EdgeInsets.only(left: 5, right: 5),
-                  padding: EdgeInsets.all(8),
-                  constraints: BoxConstraints(
-                    minHeight: 100,
-                    minWidth: double.infinity,
-                    // maxHeight: 400,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 6.0,
-                        offset: const Offset(1.0, 3.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.2),
-                      )
-                    ],
-                  ),
-                  child: Text(
-                    sDayReport,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'NotoSansKR',
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: MediaQuery.of(context).size.width - 125,
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(228, 220, 255, 1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '익일 업무 내용',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 5),
-                Container(
-                  width: MediaQuery.of(context).size.width - 125,
-                  margin: EdgeInsets.only(left: 5, right: 5),
-                  padding: EdgeInsets.all(8),
-                  constraints: BoxConstraints(
-                    minHeight: 100,
-                    minWidth: double.infinity,
-                    // maxHeight: 400,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 6.0,
-                        offset: const Offset(1.0, 3.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.2),
-                      )
-                    ],
-                  ),
-                  child: Text(
-                    sNextReport,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'NotoSansKR',
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: MediaQuery.of(context).size.width - 125,
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(228, 220, 255, 1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    '특이사항',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 14,
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 5),
-                Container(
-                  width: MediaQuery.of(context).size.width - 125,
-                  margin: EdgeInsets.only(left: 5, right: 5),
-                  padding: EdgeInsets.all(8),
-                  constraints: BoxConstraints(
-                    minHeight: 40,
-                    // minWidth: double.infinity,
-                    // maxHeight: 400,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 6.0,
-                        offset: const Offset(1.0, 3.0),
-                        color: Color.fromRGBO(0, 0, 0, 0.2),
-                      )
-                    ],
-                  ),
-                  child: Text(
-                    // sMiscReport,
-                    sMiscReport,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'NotoSansKR',
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

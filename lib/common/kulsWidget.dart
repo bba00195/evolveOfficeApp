@@ -1,10 +1,7 @@
 import 'package:evolveofficeapp/pages/dailySelect_page.dart';
 import 'package:evolveofficeapp/pages/daily_page.dart';
-import 'package:evolveofficeapp/pages/dayText_page.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
-import 'package:evolveofficeapp/pages/home_page_new.dart';
 import 'package:evolveofficeapp/pages/login_page.dart';
-import 'package:evolveofficeapp/pages/menu_page.dart';
 import 'package:evolveofficeapp/pages/profile_page.dart';
 import 'package:evolveofficeapp/pages/whereis_page.dart';
 import 'package:evolveofficeapp/pages/wheremanage_page.dart';
@@ -120,7 +117,7 @@ class KulsNavigationBottomBar extends StatelessWidget
     final screenWidth = MediaQuery.of(context).size.width;
     int _selectedIndex = selectedIndex;
     return Container(
-      height: screenHeight * 0.1,
+      height: screenHeight * 0.08,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
@@ -145,8 +142,8 @@ class KulsNavigationBottomBar extends StatelessWidget
           // backgroundColor: Colors.red,
           selectedItemColor: Colors.grey,
           unselectedItemColor: Colors.black,
-          selectedFontSize: 14,
-          unselectedFontSize: 14,
+          selectedFontSize: screenHeight * 0.02,
+          unselectedFontSize: screenHeight * 0.02,
           currentIndex: _selectedIndex, //현재 선택된 Index
           onTap: (int index) {
             if (_selectedIndex != index && index == 0) {
@@ -192,19 +189,21 @@ class KulsNavigationBottomBar extends StatelessWidget
               label: 'Menu',
               icon: Icon(
                 Icons.menu_rounded,
-                size: 26,
+                size: screenHeight * 0.033,
               ),
             ),
             BottomNavigationBarItem(
               label: 'Home',
               icon: Icon(
                 Icons.home,
+                size: screenHeight * 0.033,
               ),
             ),
             BottomNavigationBarItem(
               label: 'Profile',
               icon: Icon(
                 Icons.person_outline,
+                size: screenHeight * 0.033,
               ),
             ),
           ],

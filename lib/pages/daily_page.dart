@@ -1,3 +1,5 @@
+import 'package:auto_size_text_field/auto_size_text_field.dart';
+import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:flutter/cupertino.dart';
@@ -65,12 +67,14 @@ class _DailyPage extends State<DailyPage> {
       // APIService apiService = new APIService();
       // futureAlbum = apiService.report(
       //     member.user.organizationCode, member.user.userId, selectedDate);
+      List<String> sParam = [
+        member.user.organizationCode,
+        selectedDate,
+        member.user.userId
+      ];
 
-      APIService apiService = new APIService();
-      apiService
-          .report(
-              member.user.organizationCode, member.user.userId, selectedDate)
-          .then((value) {
+      APIServiceNew apiServiceNew = new APIServiceNew();
+      apiServiceNew.getSelect("REPORT_S1", sParam).then((value) {
         if (value.day.isNotEmpty) {
           _dayTextEditController.text = value.day.elementAt(0).dayReport;
           _nextTextEditController.text = value.day.elementAt(0).nextReport;
@@ -84,6 +88,25 @@ class _DailyPage extends State<DailyPage> {
           remarkReport = "";
         }
       });
+
+      // APIService apiService = new APIService();
+      // apiService
+      //     .report(
+      //         member.user.organizationCode, member.user.userId, selectedDate)
+      //     .then((value) {
+      //   if (value.day.isNotEmpty) {
+      //     _dayTextEditController.text = value.day.elementAt(0).dayReport;
+      //     _nextTextEditController.text = value.day.elementAt(0).nextReport;
+      //     _remarkTextEditController.text = value.day.elementAt(0).miscReport;
+      //     dayReport = value.day.elementAt(0).dayReport;
+      //     nextReport = value.day.elementAt(0).nextReport;
+      //     remarkReport = value.day.elementAt(0).miscReport;
+      //   } else {
+      //     dayReport = "";
+      //     nextReport = "";
+      //     remarkReport = "";
+      //   }
+      // });
     });
   }
 
@@ -312,7 +335,8 @@ class _DailyPage extends State<DailyPage> {
         left: screenWidth * 0.05,
         right: screenWidth * 0.05,
       ),
-      alignment: Alignment.centerRight,
+      width: screenWidth * 0.75,
+      // alignment: Alignment.centerRight,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.symmetric(horizontal: 22),
@@ -342,7 +366,7 @@ class _DailyPage extends State<DailyPage> {
 
     Widget dayForm = Form(
       key: _dayFormKey,
-      child: TextFormField(
+      child: AutoSizeTextField(
         autofocus: false,
         controller: _dayTextEditController,
         focusNode: dayFocusNode,
@@ -359,6 +383,7 @@ class _DailyPage extends State<DailyPage> {
           fontSize: 14,
           fontFamily: 'NotoSansKR',
         ),
+        minFontSize: 10,
         // textInputAction: TextInputAction.next,
         // onFieldSubmitted: (value) {
         //   _dayFocusChange(_dayFormKey.currentContext, dayFocusNode);
@@ -368,7 +393,7 @@ class _DailyPage extends State<DailyPage> {
 
     Widget nextForm = Form(
       key: _nextFormKey,
-      child: TextFormField(
+      child: AutoSizeTextField(
         autofocus: false,
         controller: _nextTextEditController,
         focusNode: nextFocusNode,
@@ -384,6 +409,7 @@ class _DailyPage extends State<DailyPage> {
           fontSize: 14,
           fontFamily: 'NotoSansKR',
         ),
+        minFontSize: 10,
         // textInputAction: TextInputAction.next,
         // onFieldSubmitted: (value) {
         //   _nextFocusChange(_nextFormKey.currentContext, nextFocusNode);
@@ -597,13 +623,14 @@ class _DailyPage extends State<DailyPage> {
                 child: Column(
                   children: [
                     SizedBox(height: 5),
-                    saveButton,
                     _writeReport("today"),
                     SizedBox(height: 30),
                     _writeReport("next"),
-                    SizedBox(height: 30),
-                    _remark(),
-                    SizedBox(height: 100),
+                    SizedBox(height: 15),
+                    saveButton,
+                    SizedBox(height: 15),
+                    // _remark(),
+                    // SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -627,37 +654,40 @@ class _DailyPage extends State<DailyPage> {
     isSaved = false;
     dayFocusNode.unfocus();
     nextFocusNode.unfocus();
-    remarkFocusNode.unfocus();
+    // remarkFocusNode.unfocus();
     APIService apiService = new APIService();
+    APIServiceNew apiServiceNew = new APIServiceNew();
+
+    List<String> sParam;
+
     if (dayReport != _dayTextEditController.text) {
+      sParam = [
+        _dayTextEditController.text,
+        member.user.userId,
+        member.user.organizationCode,
+        date,
+        member.user.userId
+      ];
+
       if (dayReport == "") {
         //  INSERT
         if (nextReport == "") {
           //  익일 업무내용 정보가 DB에 없을 때
-          apiService
-              .dayReportInsert(member.user.organizationCode, member.user.userId,
-                  date, _dayTextEditController.text)
-              .then((value) {
+          apiServiceNew.getInsert("DAYREPORT_I1", sParam).then((value) {
             if (value.result.isNotEmpty) {
               dayReport = _dayTextEditController.text;
             } else {}
           });
         } else {
           //  익일 업무내용 정보가 DB에 있을 때
-          apiService
-              .dayReportUpdate(member.user.organizationCode, member.user.userId,
-                  date, _dayTextEditController.text)
-              .then((value) {
+          apiServiceNew.getUpdate("DAYREPORT_U1", sParam).then((value) {
             if (value.result.isNotEmpty) {
               dayReport = _dayTextEditController.text;
             } else {}
           });
         }
       } else {
-        apiService
-            .dayReportUpdate(member.user.organizationCode, member.user.userId,
-                date, _dayTextEditController.text)
-            .then((value) {
+        apiServiceNew.getUpdate("DAYREPORT_U1", sParam).then((value) {
           if (value.result.isNotEmpty) {
             dayReport = _dayTextEditController.text;
           } else {}
@@ -666,24 +696,25 @@ class _DailyPage extends State<DailyPage> {
       isSaved = true;
     }
     if (nextReport != _nextTextEditController.text) {
+      sParam = [
+        _nextTextEditController.text,
+        member.user.userId,
+        member.user.organizationCode,
+        date,
+        member.user.userId
+      ];
       if (nextReport == "") {
         //  INSERT
         if (dayReport == "" && _dayTextEditController.text == "") {
           //  일일 업무내용 정보가 DB에 없을 때
-          apiService
-              .nextReportInsert(member.user.organizationCode,
-                  member.user.userId, date, _nextTextEditController.text)
-              .then((value) {
+          apiServiceNew.getInsert("NEXTREPORT_I1", sParam).then((value) {
             if (value.result.isNotEmpty) {
               nextReport = _nextTextEditController.text;
             } else {}
           });
         } else {
           //  일일 업무내용 정보가 DB에 있을 때
-          apiService
-              .nextReportUpdate(member.user.organizationCode,
-                  member.user.userId, date, _nextTextEditController.text)
-              .then((value) {
+          apiServiceNew.getUpdate("NEXTREPORT_U1", sParam).then((value) {
             if (value.result.isNotEmpty) {
               nextReport = _nextTextEditController.text;
             } else {}
@@ -691,26 +722,12 @@ class _DailyPage extends State<DailyPage> {
         }
       } else {
         //  일일 업무내용 정보가 DB에 있을 때
-        apiService
-            .nextReportUpdate(member.user.organizationCode, member.user.userId,
-                date, _nextTextEditController.text)
-            .then((value) {
+        apiServiceNew.getUpdate("NEXTREPORT_U1", sParam).then((value) {
           if (value.result.isNotEmpty) {
             nextReport = _nextTextEditController.text;
           } else {}
         });
       }
-      isSaved = true;
-    }
-    if (remarkReport != _remarkTextEditController.text) {
-      apiService
-          .remarkReportUpdate(member.user.organizationCode, member.user.userId,
-              date, _remarkTextEditController.text)
-          .then((value) {
-        if (value.result.isNotEmpty) {
-          remarkReport = _remarkTextEditController.text;
-        } else {}
-      });
       isSaved = true;
     }
   }

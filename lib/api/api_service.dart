@@ -21,12 +21,12 @@ class APIService {
               "E_MAIL, " +
               "PASSWORD, " +
               "DEPT_CODE, " +
-              "DEPT_NAME, " +
+              "(SELECT DEPT_NAME FROM TB_ADMIN_DEPTCODE WHERE DEPT_CODE = A.DEPT_CODE) AS DEPT_NAME, " +
               "GRADE_CODE, " +
               "GRADE_NAME, " +
               "MOBILE_TEL, " +
               "UPLOAD_IMG_SAJIN " +
-              "FROM tb_admin_user " +
+              "FROM tb_admin_user A " +
               "WHERE USERID = '" +
               sUserId +
               "'",

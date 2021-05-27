@@ -1,8 +1,8 @@
+import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -174,21 +174,33 @@ class _WhereIsPage extends State<WhereIsPage> {
       }
 
       setState(() {
-        APIService apiService = new APIService();
+        APIServiceNew apiServiceNew = new APIServiceNew();
+
+        List<String> sParam = [
+          member.user.organizationCode,
+          sDate,
+          member.user.userId,
+          sStart,
+          sEnd,
+          sLocate,
+          sCarType,
+          member.user.userId
+        ];
 
         if (isUpdate) {
-          apiService
-              .whereIsUpdate(
-                  member.user.organizationCode,
-                  member.user.userId,
-                  sDate,
-                  sStart,
-                  sStartTimeOrg,
-                  sEnd,
-                  sEndTimeOrg,
-                  sLocate,
-                  sCarType)
-              .then((value) {
+          sParam = [
+            sStart,
+            sEnd,
+            sCarType,
+            sLocate,
+            sDate,
+            member.user.organizationCode,
+            sDate,
+            member.user.userId,
+            sStartTimeOrg,
+            sEndTimeOrg
+          ];
+          apiServiceNew.getUpdate("WHEREIS_U1", sParam).then((value) {
             if (value.result.isNotEmpty) {
               if (value.result.elementAt(0).rsCode == "E") {
                 if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
@@ -204,10 +216,7 @@ class _WhereIsPage extends State<WhereIsPage> {
             }
           });
         } else {
-          apiService
-              .whereIsInsert(member.user.organizationCode, member.user.userId,
-                  sDate, sStart, sEnd, sLocate, sCarType)
-              .then((value) {
+          apiServiceNew.getInsert("WHEREIS_I1", sParam).then((value) {
             if (value.result.isNotEmpty) {
               if (value.result.elementAt(0).rsCode == "E") {
                 if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
@@ -226,6 +235,59 @@ class _WhereIsPage extends State<WhereIsPage> {
         _areaTextEditController.text = "";
         _locateTextEditController.text = "";
       });
+
+      //   APIService apiService = new APIService();
+
+      //   if (isUpdate) {
+      //     apiService
+      //         .whereIsUpdate(
+      //             member.user.organizationCode,
+      //             member.user.userId,
+      //             sDate,
+      //             sStart,
+      //             sStartTimeOrg,
+      //             sEnd,
+      //             sEndTimeOrg,
+      //             sLocate,
+      //             sCarType)
+      //         .then((value) {
+      //       if (value.result.isNotEmpty) {
+      //         if (value.result.elementAt(0).rsCode == "E") {
+      //           if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+      //             _show("이미 등록된 내용입니다.");
+      //             return;
+      //           }
+      //           _show(value.result.elementAt(0).rsMsg);
+      //         } else {
+      //           _show("행선지 등록이 완료되었습니다.");
+      //         }
+      //       } else {
+      //         _show("등록에 실패하였습니다.");
+      //       }
+      //     });
+      //   } else {
+      //     apiService
+      //         .whereIsInsert(member.user.organizationCode, member.user.userId,
+      //             sDate, sStart, sEnd, sLocate, sCarType)
+      //         .then((value) {
+      //       if (value.result.isNotEmpty) {
+      //         if (value.result.elementAt(0).rsCode == "E") {
+      //           if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+      //             _show("이미 등록된 내용입니다.");
+      //             return;
+      //           }
+      //           _show(value.result.elementAt(0).rsMsg);
+      //         } else {
+      //           _show("행선지 등록이 완료되었습니다.");
+      //         }
+      //       } else {
+      //         _show("등록에 실패하였습니다.");
+      //       }
+      //     });
+      //   }
+      //   _areaTextEditController.text = "";
+      //   _locateTextEditController.text = "";
+      // });
     }
 
     final menuName = Container(
