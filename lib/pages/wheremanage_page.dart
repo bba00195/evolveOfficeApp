@@ -7,7 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'package:intl/intl.dart';
 
@@ -104,21 +106,25 @@ class _WhereManagePage extends State<WhereManagePage> {
   final _deptList = [
     '',
     '1220',
-    '1230',
+    '1180',
     '1240',
     '1270',
     '2110',
     '2120',
+    '2140',
     '2150',
     '2160',
     '2210',
     '4001',
   ];
   var deptValue = '';
-  double sHeight = 0;
 
   String _selectedStart = "";
   String _selectedEnd = "";
+
+  bool isDay;
+  bool isMorning;
+  bool isAfter;
 
   void _getWhereIs(String selectedDate, {String sOrganizationcode = ""}) async {
     List<String> sParam = [
@@ -160,6 +166,120 @@ class _WhereManagePage extends State<WhereManagePage> {
     //     }
     //   });
     // });
+  }
+
+  void _whereInsert(String sDate, String sStart, String sEnd, String sLocate,
+      String sCarType, bool isUpdate, String latitude, String longitude) async {
+    // areaFocusNode.unfocus();
+    locateFocusNode.unfocus();
+    if (sDate == '') {
+      _show("날짜를 선택해주세요.");
+      return;
+    }
+    if (sStart == '') {
+      _show("시작시간을 선택해주세요.");
+      return;
+    }
+    if (sLocate == '') {
+      _show("행선지를 입력해주세요.");
+      return;
+    }
+
+    setState(() {
+      APIServiceNew apiServiceNew = new APIServiceNew();
+
+      List<String> sParam = [
+        member.user.organizationCode,
+        sDate,
+        member.user.userId,
+        sStart,
+        sEnd,
+        sLocate,
+        sCarType,
+        member.user.userId,
+        latitude,
+        longitude
+      ];
+
+      if (isUpdate) {
+        sParam = [
+          sStart,
+          sEnd,
+          sCarType,
+          sLocate,
+          sDate,
+          latitude,
+          longitude,
+          member.user.organizationCode,
+          sDate,
+          member.user.userId,
+          sStartTimeOrg,
+          sEndTimeOrg,
+        ];
+        apiServiceNew.getUpdate("WHEREIS_U1", sParam).then((value) {
+          if (value.result.isNotEmpty) {
+            if (value.result.elementAt(0).rsCode == "E") {
+              if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+                _show("이미 등록된 내용입니다.");
+                return;
+              }
+              _show(value.result.elementAt(0).rsMsg);
+            } else {
+              _show("행선지 등록이 완료되었습니다.");
+            }
+          } else {
+            _show("등록에 실패하였습니다.");
+          }
+        });
+      } else {
+        apiServiceNew.getInsert("WHEREIS_I1", sParam).then((value) {
+          if (value.result.isNotEmpty) {
+            if (value.result.elementAt(0).rsCode == "E") {
+              if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+                _show("이미 등록된 내용입니다.");
+                return;
+              }
+              _show(value.result.elementAt(0).rsMsg);
+            } else {
+              _show("행선지 등록이 완료되었습니다.");
+            }
+          } else {
+            _show("등록에 실패하였습니다.");
+          }
+        });
+      }
+      _getWhereIs(date);
+      isOpen = false;
+      isUpdate = false;
+      sIcon = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AutoSizeText(
+            '등록',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black,
+              fontFamily: 'NotoSansKR',
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+            minFontSize: 10,
+          ),
+          Icon(
+            Icons.keyboard_arrow_down_sharp,
+            size: 32,
+          ),
+        ],
+      );
+      latitude = "";
+      longitude = "";
+      sEndTime = "";
+      _selectedEnd = "";
+      _locateTextEditController.text = "";
+      isDay = false;
+      isMorning = false;
+      isAfter = false;
+    });
   }
 
   String vehicle(String value) {
@@ -219,7 +339,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       case '1220':
         result = "S/W검증팀";
         break;
-      case '1230':
+      case '1180':
         result = "H/W개발팀";
         break;
       case '1240':
@@ -233,6 +353,9 @@ class _WhereManagePage extends State<WhereManagePage> {
         break;
       case '2120':
         result = "기술영업팀";
+        break;
+      case '2140':
+        result = "CE팀";
         break;
       case '2150':
         result = "에너지솔루션팀";
@@ -252,6 +375,17 @@ class _WhereManagePage extends State<WhereManagePage> {
     return result;
   }
 
+  String latitude = "";
+  String longitude = "";
+
+  Future<void> getPosition() async {
+    var currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    latitude = currentPosition.latitude.toString();
+    longitude = currentPosition.longitude.toString();
+  }
+
   @override
   void dispose() {
     _locateTextEditController.dispose();
@@ -260,6 +394,7 @@ class _WhereManagePage extends State<WhereManagePage> {
 
   @override
   void initState() {
+    getPosition();
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
     member = widget.member;
@@ -268,6 +403,10 @@ class _WhereManagePage extends State<WhereManagePage> {
     startDate = Date().date(null);
     _selectedStartTime = nowDateTime;
     deptValue = member.user.deptCode;
+
+    isDay = false;
+    isMorning = false;
+    isAfter = false;
 
     _getWhereIs(date, sOrganizationcode: member.user.organizationCode);
 
@@ -309,10 +448,10 @@ class _WhereManagePage extends State<WhereManagePage> {
     } else {
       date = Date().date(null);
       _selectedTime = nowDateTime;
-      sStartTime = "0830";
-      sEndTime = "1800";
-      _selectedStart = "08:30";
-      _selectedEnd = "18:00";
+      sStartTime = DateFormat('HHmm').format(DateTime.now());
+      sEndTime = "";
+      _selectedStart = DateFormat('HH:mm').format(DateTime.now());
+      _selectedEnd = "";
     }
     locateFocusNode = FocusNode();
 
@@ -372,7 +511,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       ),
       child: Center(
         child: AutoSizeText(
-          '행선지 현황',
+          '행선지 관리',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -610,7 +749,6 @@ class _WhereManagePage extends State<WhereManagePage> {
                 setState(() {
                   isOpen = !isOpen;
                   if (isOpen == true) {
-                    sHeight = 180;
                     sIcon = Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -632,7 +770,6 @@ class _WhereManagePage extends State<WhereManagePage> {
                       ],
                     );
                   } else {
-                    sHeight = 0;
                     sIcon = Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -659,274 +796,373 @@ class _WhereManagePage extends State<WhereManagePage> {
               child: sIcon,
             ),
           ),
-          AnimatedContainer(
-            duration: const Duration(seconds: 1),
-            curve: Curves.linear,
-            height: sHeight,
-            decoration: BoxDecoration(
-                // color: Colors.red,
-                ),
-            margin: EdgeInsets.only(left: 20, right: 20),
-            child: Column(
-              children: [
-                SizedBox(height: 5),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.only(left: 5, right: 5),
-                        child: AutoSizeText(
-                          '시작시간',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          minFontSize: 10,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
-                        child: TextButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            elevation: MaterialStateProperty.all(
-                                6), //Defines Elevation
-                            shadowColor: MaterialStateProperty.all(
-                              Color.fromRGBO(0, 0, 0, 0.6),
-                            ),
-                          ),
-                          onPressed: () {
-                            Future<TimeOfDay> selectedTime = showTimePicker(
-                              initialTime: TimeOfDay(hour: 8, minute: 30),
-                              context: context,
-                            );
-                            selectedTime.then((timeOfDay) {
-                              setState(() {
-                                if (timeOfDay != null) {
-                                  _selectedStart =
-                                      '${timeOfDay.hour}'.padLeft(2, '0') +
-                                          ':' +
-                                          '${timeOfDay.minute}'.padLeft(2, '0');
-                                  sStartTime =
-                                      '${timeOfDay.hour}'.padLeft(2, '0') +
-                                          '${timeOfDay.minute}'.padLeft(2, '0');
-                                }
-                              });
-                            });
-                          },
-                          child: Text(
-                            _selectedStart,
+          Visibility(
+            visible: isOpen,
+            child: Container(
+              margin: EdgeInsets.only(left: 20, right: 20),
+              child: Column(
+                children: [
+                  SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          child: AutoSizeText(
+                            '시작시간',
                             style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.only(left: 5, right: 5),
-                        child: AutoSizeText(
-                          '종료시간',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontFamily: 'NotoSansKR',
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          minFontSize: 10,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
-                        child: TextButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            elevation: MaterialStateProperty.all(
-                                6), //Defines Elevation
-                            shadowColor: MaterialStateProperty.all(
-                              Color.fromRGBO(0, 0, 0, 0.6),
-                            ),
-                          ),
-                          onPressed: () {
-                            Future<TimeOfDay> selectedTime = showTimePicker(
-                              initialTime: TimeOfDay(hour: 18, minute: 0),
-                              context: context,
-                            );
-                            selectedTime.then((timeOfDay) {
-                              setState(() {
-                                if (timeOfDay != null) {
-                                  _selectedEnd =
-                                      '${timeOfDay.hour}'.padLeft(2, '0') +
-                                          ':' +
-                                          '${timeOfDay.minute}'.padLeft(2, '0');
-                                  sEndTime =
-                                      '${timeOfDay.hour}'.padLeft(2, '0') +
-                                          '${timeOfDay.minute}'.padLeft(2, '0');
-                                }
-                              });
-                            });
-                          },
-                          child: Text(
-                            _selectedEnd,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
-                        padding: EdgeInsets.only(left: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 6.0,
-                              offset: const Offset(0.0, 3.0),
-                              color: Color.fromRGBO(0, 0, 0, 0.16),
-                            )
-                          ],
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            isExpanded: true,
-                            value: selectedValue,
-                            items: _valueList.map(
-                              (value) {
-                                return DropdownMenuItem(
-                                  value: value,
-                                  child: AutoSizeText(
-                                    vehicle(value),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontFamily: 'NotoSansKR',
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    minFontSize: 10,
-                                    maxLines: 1,
-                                  ),
-                                );
-                              },
-                            ).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedValue = value;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: EdgeInsets.only(left: 5, right: 5),
-                        padding: EdgeInsets.only(left: 10),
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 6.0,
-                              offset: const Offset(0.0, 3.0),
-                              color: Color.fromRGBO(0, 0, 0, 0.16),
-                            )
-                          ],
-                        ),
-                        child: Form(
-                          key: _locateFormKey,
-                          child: TextField(
-                            controller: _locateTextEditController,
-                            focusNode: locateFocusNode,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(top: 5),
-                              enabledBorder: OutlineInputBorder(
-                                // borderRadius: BorderRadius.circular(32.0),
-                                borderSide: BorderSide(
-                                  color: Colors.transparent,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                // borderRadius: BorderRadius.circular(32.0),
-                                borderSide: BorderSide(
-                                  color: Colors.transparent,
-                                ),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintText: '행선지',
-                            ),
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
+                              fontSize: 18,
+                              color: Colors.blueGrey[600],
                               fontFamily: 'NotoSansKR',
                               fontWeight: FontWeight.w600,
                             ),
+                            maxLines: 1,
+                            minFontSize: 10,
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: screenWidth * 0.75,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 22),
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(5),
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          child: TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              elevation: MaterialStateProperty.all(
+                                  6), //Defines Elevation
+                              shadowColor: MaterialStateProperty.all(
+                                Color.fromRGBO(0, 0, 0, 0.6),
+                              ),
+                            ),
+                            onPressed: () {
+                              DatePicker.showTimePicker(
+                                context,
+                                showTitleActions: true,
+                                onConfirm: (timeOfDay) {
+                                  setState(() {
+                                    _selectedStart = '${timeOfDay.hour}'
+                                            .padLeft(2, '0') +
+                                        ':' +
+                                        '${timeOfDay.minute}'.padLeft(2, '0');
+                                    sStartTime = '${timeOfDay.hour}'
+                                            .padLeft(2, '0') +
+                                        '${timeOfDay.minute}'.padLeft(2, '0');
+                                  });
+                                },
+                                currentTime: DateTime.parse(
+                                    DateFormat('yyyy-MM-dd HH:mm:00')
+                                        .format(DateTime.now())),
+                                locale: LocaleType.ko,
+                              );
+                            },
+                            child: AutoSizeText(
+                              _selectedStart,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                              maxLines: 1,
+                              minFontSize: 14,
+                            ),
+                          ),
+                        ),
                       ),
-                      primary: Colors.indigo[900],
-                    ),
-                    onPressed: () {
-                      // _doSave();
-                      // if (isSaved) {
-                      //   _show("등록이 완료되었습니다.");
-                      // } else {
-                      //   _show("내용을 입력하거나 수정해주세요.");
-                      // }
-                    },
-                    child: Text(
-                      '등록',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          child: AutoSizeText(
+                            '종료시간',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.blueGrey[600],
+                              fontFamily: 'NotoSansKR',
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            minFontSize: 10,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          child: TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              elevation: MaterialStateProperty.all(
+                                  6), //Defines Elevation
+                              shadowColor: MaterialStateProperty.all(
+                                Color.fromRGBO(0, 0, 0, 0.6),
+                              ),
+                            ),
+                            onPressed: () {
+                              DatePicker.showTimePicker(
+                                context,
+                                showTitleActions: true,
+                                onConfirm: (timeOfDay) {
+                                  setState(() {
+                                    _selectedEnd = '${timeOfDay.hour}'
+                                            .padLeft(2, '0') +
+                                        ':' +
+                                        '${timeOfDay.minute}'.padLeft(2, '0');
+                                    sEndTime = '${timeOfDay.hour}'
+                                            .padLeft(2, '0') +
+                                        '${timeOfDay.minute}'.padLeft(2, '0');
+                                  });
+                                },
+                                currentTime: DateTime.parse(
+                                    DateFormat('yyyy-MM-dd HH:mm:00')
+                                        .format(DateTime.now())),
+                                locale: LocaleType.ko,
+                              );
+                            },
+                            child: AutoSizeText(
+                              _selectedEnd,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
+                              maxLines: 1,
+                              minFontSize: 14,
+                            ),
+                          ),
+                          // child: TextButton(
+                          //   style: ButtonStyle(
+                          //     backgroundColor:
+                          //         MaterialStateProperty.all<Color>(Colors.white),
+                          //     elevation: MaterialStateProperty.all(
+                          //         6), //Defines Elevation
+                          //     shadowColor: MaterialStateProperty.all(
+                          //       Color.fromRGBO(0, 0, 0, 0.6),
+                          //     ),
+                          //   ),
+                          //   onPressed: () {
+                          //     Future<TimeOfDay> selectedTime = showTimePicker(
+                          //       initialTime: TimeOfDay(hour: 18, minute: 0),
+                          //       context: context,
+                          //     );
+                          //     selectedTime.then((timeOfDay) {
+                          //       setState(() {
+                          //         if (timeOfDay != null) {
+                          //           _selectedEnd =
+                          //               '${timeOfDay.hour}'.padLeft(2, '0') +
+                          //                   ':' +
+                          //                   '${timeOfDay.minute}'.padLeft(2, '0');
+                          //           sEndTime =
+                          //               '${timeOfDay.hour}'.padLeft(2, '0') +
+                          //                   '${timeOfDay.minute}'.padLeft(2, '0');
+                          //         }
+                          //       });
+                          //     });
+                          //   },
+                          //   child: Text(
+                          //     _selectedEnd,
+                          //     style: TextStyle(
+                          //       color: Colors.black,
+                          //       fontSize: 20,
+                          //     ),
+                          //   ),
+                          // ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          padding: EdgeInsets.only(left: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 6.0,
+                                offset: const Offset(0.0, 3.0),
+                                color: Color.fromRGBO(0, 0, 0, 0.16),
+                              )
+                            ],
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              isExpanded: true,
+                              value: selectedValue,
+                              items: _valueList.map(
+                                (value) {
+                                  return DropdownMenuItem(
+                                    value: value,
+                                    child: AutoSizeText(
+                                      vehicle(value),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontFamily: 'NotoSansKR',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      minFontSize: 10,
+                                      maxLines: 1,
+                                    ),
+                                  );
+                                },
+                              ).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedValue = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          padding: EdgeInsets.only(left: 10),
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 6.0,
+                                offset: const Offset(0.0, 3.0),
+                                color: Color.fromRGBO(0, 0, 0, 0.16),
+                              )
+                            ],
+                          ),
+                          child: Form(
+                            key: _locateFormKey,
+                            child: TextField(
+                              controller: _locateTextEditController,
+                              focusNode: locateFocusNode,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(top: 5),
+                                enabledBorder: OutlineInputBorder(
+                                  // borderRadius: BorderRadius.circular(32.0),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  // borderRadius: BorderRadius.circular(32.0),
+                                  borderSide: BorderSide(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                hintText: '행선지',
+                              ),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontFamily: 'NotoSansKR',
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Checkbox(
+                          value: isDay,
+                          onChanged: (value) {
+                            setState(() {
+                              isDay = true;
+                              isMorning = false;
+                              isAfter = false;
+                              _selectedStart = '08:30';
+                              sStartTime = '0830';
+                              _selectedEnd = '18:00';
+                              sEndTime = '1800';
+                              _locateTextEditController.text = "내근";
+                            });
+                          }),
+                      Text("종일 내근"),
+                      Checkbox(
+                          value: isMorning,
+                          onChanged: (value) {
+                            setState(() {
+                              isDay = false;
+                              isMorning = true;
+                              isAfter = false;
+                              _selectedStart = '08:30';
+                              sStartTime = '0830';
+                              _selectedEnd = '13:00';
+                              sEndTime = '1300';
+                              _locateTextEditController.text = "내근";
+                            });
+                          }),
+                      Text("오전 내근"),
+                      Checkbox(
+                          value: isAfter,
+                          onChanged: (value) {
+                            setState(() {
+                              isDay = false;
+                              isMorning = false;
+                              isAfter = true;
+                              _selectedStart = '13:00';
+                              sStartTime = '1300';
+                              _selectedEnd = '18:00';
+                              sEndTime = '1800';
+                              _locateTextEditController.text = "내근";
+                            });
+                          }),
+                      Text("오후 내근"),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: screenWidth * 0.75,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 22),
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(5),
+                        ),
+                        primary: Colors.indigo[900],
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _whereInsert(
+                              // _areaTextEditController.text,
+                              date,
+                              sStartTime,
+                              sEndTime,
+                              _locateTextEditController.text,
+                              selectedValue,
+                              isUpdate,
+                              latitude,
+                              longitude);
+                          _getWhereIs(date);
+                        });
+                      },
+                      child: Text(
+                        '등록',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -1049,8 +1285,10 @@ class _WhereManagePage extends State<WhereManagePage> {
             //     whereIsValue.elementAt(index).area, Alignment.centerLeft),
             rightColumnRowContent(whereIsValue.elementAt(index).whereIsContents,
                 Alignment.center, tableWidth),
-            rightColumnRowContent(whereIsValue.elementAt(index).carType,
-                Alignment.center, tableWidth),
+            rightColumnRowContent(
+                vehicle(whereIsValue.elementAt(index).carType),
+                Alignment.center,
+                tableWidth),
           ],
         ),
       );
@@ -1081,7 +1319,7 @@ class _WhereManagePage extends State<WhereManagePage> {
           ),
           Container(
             color: Colors.white,
-            height: screenHeight * 0.55,
+            height: screenHeight * 0.5,
             // height: screenHeight - ((screenHeight * 0.1) + 245),
             constraints: BoxConstraints(
               minHeight: 100,
@@ -1183,10 +1421,10 @@ class _WhereManagePage extends State<WhereManagePage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          content: AutoSizeText(sMessage),
+          content: Text(sMessage),
           actions: [
             TextButton(
-              child: AutoSizeText("확인"),
+              child: Text("확인"),
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
@@ -1197,19 +1435,19 @@ class _WhereManagePage extends State<WhereManagePage> {
     );
   }
 
-  _showMessage(String sMessage, String sStartTime, String sEndTime,
-      String sArea, String sWhereIsContents, String sCarType) {
+  _showMessage(String _message, String _startTime, String _endTime,
+      String _area, String _whereIsContents, String _carType) {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
           // title: AutoSizeText("AlertDialog"),
-          content: Text(sMessage),
+          content: Text(_message),
           actions: [
             TextButton(
               child: Text("삭제"),
               onPressed: () {
-                _whereDelete(date, sStartTime, sEndTime);
+                _whereDelete(date, _startTime, _endTime);
                 Navigator.of(context).pop(true);
                 setState(() {
                   Navigator.pushReplacement(
@@ -1229,23 +1467,42 @@ class _WhereManagePage extends State<WhereManagePage> {
             TextButton(
               child: Text("수정"),
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => WhereIsPage(
-                      id: id,
-                      pass: pass,
-                      member: member,
-                      isUpdate: true,
-                      updateDate: DateTime.parse(date),
-                      startTime: sStartTime,
-                      endTime: sEndTime,
-                      area: sArea,
-                      contents: sWhereIsContents,
-                      carType: sCarType,
-                    ),
-                  ),
-                );
+                setState(() {
+                  isUpdate = true;
+                  _selectedStart = _startTime.substring(0, 2) +
+                      ":" +
+                      _startTime.substring(2, 4);
+                  sStartTime = _startTime;
+                  sStartTimeOrg = _startTime;
+                  if (_endTime != '') {
+                    _selectedEnd = _endTime.substring(0, 2) +
+                        ":" +
+                        _endTime.substring(2, 4);
+                  }
+                  sEndTime = _endTime;
+                  sEndTimeOrg = _endTime;
+                  _locateTextEditController.text = _whereIsContents;
+                  selectedValue = _carType;
+                });
+                Navigator.of(context).pop(true);
+
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (BuildContext context) => WhereIsPage(
+                //       id: id,
+                //       pass: pass,
+                //       member: member,
+                //       isUpdate: true,
+                //       startTime: _startTime,
+                //       endTime: _endTime,
+                //       area: _area,
+                //       contents: _whereIsContents,
+                //       carType: _carType,
+                //       updateDate: DateTime.parse(date),
+                //     ),
+                //   ),
+                // );
               },
             ),
             TextButton(

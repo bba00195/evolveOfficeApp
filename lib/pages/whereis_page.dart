@@ -4,7 +4,9 @@ import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/common/common.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 
 class WhereIsPage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
@@ -536,21 +538,37 @@ class _WhereIsPage extends State<WhereIsPage> {
           Expanded(
             child: TextButton(
               onPressed: () {
-                Future<TimeOfDay> selectedTime = showTimePicker(
-                  initialTime: TimeOfDay(hour: 8, minute: 30),
-                  context: context,
-                );
-                selectedTime.then((timeOfDay) {
-                  setState(() {
-                    if (timeOfDay != null) {
+                DatePicker.showTimePicker(
+                  context,
+                  showTitleActions: true,
+                  onConfirm: (timeOfDay) {
+                    setState(() {
                       _selectedStart = '${timeOfDay.hour}'.padLeft(2, '0') +
                           ':' +
                           '${timeOfDay.minute}'.padLeft(2, '0');
                       sStartTime = '${timeOfDay.hour}'.padLeft(2, '0') +
                           '${timeOfDay.minute}'.padLeft(2, '0');
-                    }
-                  });
-                });
+                    });
+                  },
+                  currentTime: DateTime.parse(
+                      DateFormat('yyyy-MM-dd HH:mm:00').format(DateTime.now())),
+                  locale: LocaleType.ko,
+                );
+                // Future<TimeOfDay> selectedTime = showTimePicker(
+                //   initialTime: TimeOfDay(hour: 8, minute: 30),
+                //   context: context,
+                // );
+                // selectedTime.then((timeOfDay) {
+                //   setState(() {
+                //     if (timeOfDay != null) {
+                //       _selectedStart = '${timeOfDay.hour}'.padLeft(2, '0') +
+                //           ':' +
+                //           '${timeOfDay.minute}'.padLeft(2, '0');
+                //       sStartTime = '${timeOfDay.hour}'.padLeft(2, '0') +
+                //           '${timeOfDay.minute}'.padLeft(2, '0');
+                //     }
+                //   });
+                // });
               },
               child: Text(
                 _selectedStart,

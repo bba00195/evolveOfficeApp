@@ -242,7 +242,7 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
+    // final screenWidth = MediaQuery.of(context).size.width;
 
     Widget menuRow(String sMenuName) {
       return Row(
@@ -350,21 +350,21 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: menuRow('HOME'),
                 ),
-                SizedBox(height: 20),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => DailyPage(
-                          id: id,
-                          member: member,
-                        ),
-                      ),
-                    );
-                  },
-                  child: menuRow('일일업무 등록'),
-                ),
+                // SizedBox(height: 20),
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       CupertinoPageRoute(
+                //         builder: (context) => DailyPage(
+                //           id: id,
+                //           member: member,
+                //         ),
+                //       ),
+                //     );
+                //   },
+                //   child: menuRow('일일업무 등록'),
+                // ),
                 SizedBox(height: 20),
                 InkWell(
                   onTap: () {
@@ -379,25 +379,25 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: menuRow('일일업무 조회'),
+                  child: menuRow('일일업무 관리'),
                 ),
-                SizedBox(height: 20),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => WhereIsPage(
-                          id: id,
-                          pass: pass,
-                          member: member,
-                          isUpdate: false,
-                        ),
-                      ),
-                    );
-                  },
-                  child: menuRow('행선지 등록'),
-                ),
+                // SizedBox(height: 20),
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       CupertinoPageRoute(
+                //         builder: (context) => WhereIsPage(
+                //           id: id,
+                //           pass: pass,
+                //           member: member,
+                //           isUpdate: false,
+                //         ),
+                //       ),
+                //     );
+                //   },
+                //   child: menuRow('행선지 등록'),
+                // ),
                 SizedBox(height: 20),
                 InkWell(
                   onTap: () {
@@ -412,7 +412,7 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: menuRow('행선지 현황'),
+                  child: menuRow('행선지 관리'),
                 ),
               ],
             ),

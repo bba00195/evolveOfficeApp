@@ -1,11 +1,14 @@
 import 'package:evolveofficeapp/api/api_service.dart';
+import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'daily_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -32,13 +35,47 @@ class _HomePage extends State<HomePage> {
   String date;
   UserManager mem;
   Future<DailyResultModel> futureAlbum;
+  List<InformationResponseModel> infoValue;
+  String sNextReport = "";
+  String sInfoText = "";
+  bool _showBackToTopButton = false;
+  final ScrollController _scrollController = ScrollController();
 
   void _report(String selectedDate) async {
+    // apiServiceNew.getSelect("REPORT_S1", sParam).then((value) {
+    //   if (value.day.isNotEmpty) {
+    //     sNextReport = value.day.elementAt(0).nextReport;
+    //   } else {
+    //     sNextReport = "";
+    //   }
+    // });
     setState(() {
       APIService apiService = new APIService();
       futureAlbum = apiService.report(
           mem.user.organizationCode, mem.user.userId, selectedDate);
     });
+  }
+
+  void _information() async {
+    APIServiceNew apiServiceNew = new APIServiceNew();
+    List<String> sParam = [
+      mem.user.organizationCode,
+    ];
+    apiServiceNew.getSelect("INFORMATION_S1", sParam).then((value) {
+      setState(() {
+        if (value.information.isNotEmpty) {
+          // infoValue = value.information;
+          sInfoText = value.information.elementAt(0).infoText;
+        } else {
+          sInfoText = "";
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -48,15 +85,34 @@ class _HomePage extends State<HomePage> {
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass; //widget.pass LogOutPage에서 전달받은 pass 의미한다.
     mem = widget.member;
+
+    // _scrollController.addListener(() {
+    //   setState(() {
+    //     if (_scrollController.offset >= 400) {
+    //       _showBackToTopButton = true; // show the back-to-top button
+    //     } else {
+    //       _showBackToTopButton = false; // hide the back-to-top button
+    //     }
+    //   });
+    // });
+    // _report(date);
+  }
+
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(seconds: 1),
+      curve: Curves.linear,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
-    var member = mem;
     _report(date);
+    _information();
+    var member = mem;
 
     _show(String sMessage) {
       showDialog(
@@ -209,6 +265,7 @@ class _HomePage extends State<HomePage> {
         ),
       ],
     );
+
     // #endregion
 
     // #region 요일
@@ -453,7 +510,6 @@ class _HomePage extends State<HomePage> {
         child: Row(
           children: [
             Expanded(
-              flex: 9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,6 +533,7 @@ class _HomePage extends State<HomePage> {
                     ),
                   ),
                   Container(
+                    height: screenHeight * 0.45,
                     color: Colors.white,
                     alignment: Alignment.topLeft,
                     padding: EdgeInsets.only(
@@ -504,6 +561,7 @@ class _HomePage extends State<HomePage> {
                         return Text('');
                       },
                     ),
+                    // child: Text(sNextReport),
                   ),
                 ],
               ),
@@ -638,18 +696,131 @@ class _HomePage extends State<HomePage> {
         selectedIndex: 1,
       ),
       body: WillPopScope(
-        child: Center(
-          child: Column(
-            children: [
-              buildHeader,
-              // buildSearchButton,
-              // buildDashboard,
-              Expanded(
-                child: buildManage,
+        child: ListView(
+          controller: _scrollController,
+          children: [
+            Container(
+              child: Column(
+                children: [
+                  Container(child: buildHeader),
+                  buildManage,
+                  Container(
+                    margin: EdgeInsets.only(
+                      top: 15.0,
+                      bottom: 25.0,
+                      left: screenWidth * 0.05,
+                      right: screenWidth * 0.05,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.only(
+                            top: 5.0,
+                            bottom: 5.0,
+                          ),
+                          alignment: Alignment.center,
+                          width: screenWidth - (screenWidth * 0.1),
+                          color: Colors.indigo[900],
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'FYI 내용',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'NotoSansKR',
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              // Icon(
+                              //   Icons.keyboard_arrow_down_rounded,
+                              //   size: 32,
+                              //   color: Colors.white,
+                              // )
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          color: Colors.white,
+                          padding: EdgeInsets.only(
+                            top: 5.0,
+                            bottom: 5.0,
+                          ),
+                          alignment: Alignment.center,
+                          child: Linkify(
+                            onOpen: (link) async {
+                              print("Clicked ${link.url}!");
+                              final url = '${link.url}';
+                              await launch(
+                                url,
+                                forceWebView: false,
+                                forceSafariVC: false,
+                              );
+                            },
+                            text: sInfoText,
+                            options: LinkifyOptions(humanize: false),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            )
+          ],
         ),
+        // Column(
+        //   children: [
+        //     Container(
+        //       child: Column(
+        //         children: [
+        //           Expanded(
+        //             flex: 3,
+        //             child: buildHeader,
+        //           ),
+        //           Expanded(
+        //             flex: 6,
+        //             child: buildManage,
+        //           ),
+        //           Expanded(
+        //             flex: 1,
+        //             child: Container(
+        //                 // child: Text(sInfoText),
+        //                 ),
+        //           ),
+        //         ],
+        //       ),
+        //       // Text(sInfoText),
+        //     ),
+        //   ],
+        // ),
+        // child: Container(
+        //   child: Column(
+        //     children: [
+        //       Expanded(
+        //         flex: 3,
+        //         child: buildHeader,
+        //       ),
+        //       Expanded(
+        //         flex: 6,
+        //         child: buildManage,
+        //       ),
+        //       Expanded(
+        //         flex: 1,
+        //         child: Container(
+        //             // child: Text(sInfoText),
+        //             ),
+        //       ),
+        //       Container(
+        //         child: Text(sInfoText),
+        //       ),
+        //     ],
+        //   ),
+        //   // Container(),
+        // ),
         onWillPop: _onBackPressed,
       ),
       drawer: KulsDrawer(
@@ -658,6 +829,12 @@ class _HomePage extends State<HomePage> {
         member: member,
         storage: storage,
       ),
+      // floatingActionButton: _showBackToTopButton == false
+      //     ? null
+      //     : FloatingActionButton(
+      //         onPressed: _scrollToTop,
+      //         child: Icon(Icons.arrow_upward),
+      //       ),
     );
   }
   // #endregion

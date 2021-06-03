@@ -5,6 +5,7 @@ class WhereResponseModel {
   final String area;
   final String whereIsContents;
   final String carType;
+  final String carTypeName;
 
   WhereResponseModel({
     this.userName,
@@ -13,6 +14,7 @@ class WhereResponseModel {
     this.area,
     this.whereIsContents,
     this.carType,
+    this.carTypeName,
   });
 
   factory WhereResponseModel.fromJson(Map<String, dynamic> json) {
@@ -24,7 +26,8 @@ class WhereResponseModel {
       whereIsContents: json['WHEREIS_CONTENTS'] != null
           ? json['WHEREIS_CONTENTS'] as String
           : "",
-      carType:
+      carType: json['CAR_TYPE'] != null ? json['CAR_TYPE'] as String : "",
+      carTypeName:
           json['CAR_TYPE_NAME'] != null ? json['CAR_TYPE_NAME'] as String : "",
     );
   }

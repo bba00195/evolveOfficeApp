@@ -35,6 +35,14 @@ class APIServiceNew {
         final response = await http.post(url, body: sBody, headers: headers);
         result = DailySelectResultModel.fromJson(json.decode(response.body));
         break;
+      case "INFORMATION_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InformationResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILYREPLY_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = ReplyResultModel.fromJson(json.decode(response.body));
+        break;
       default:
         break;
     }
@@ -61,6 +69,14 @@ class APIServiceNew {
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
       case "WHEREIS_I1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILYREPLY_I1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILYREPLY_I2":
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
@@ -97,6 +113,18 @@ class APIServiceNew {
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
+      case "DAILYLIKE_U1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
+      case "REPLYLIKE_U1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILYREPLY_U1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
       default:
         break;
     }
@@ -119,6 +147,10 @@ class APIServiceNew {
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
       case "WHEREIS_D1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILYREPLY_D1":
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
