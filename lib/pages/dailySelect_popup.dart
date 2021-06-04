@@ -92,6 +92,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     sReplyQty = widget.sReplyQty;
     sLikePerson = widget.sLikePerson;
     _getDailySelect(sDate);
+    _replySelect(sOrganizationCode, sUserId, sDate);
     replyFocusNode = FocusNode();
     replyChildFocusNode = FocusNode();
     super.initState();
@@ -158,6 +159,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getUpdate("DAILYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
+          _getDailySelect(sDate);
+          _replySelect(sOrganizationCode, sUserId, sDate);
         } else {}
       });
     });
@@ -196,6 +199,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getInsert("DAILYREPLY_I2", sParam).then((value) {
         if (value.result.isNotEmpty) {
+          _getDailySelect(sDate);
+          _replySelect(sOrganizationCode, sUserId, sDate);
           _replyChildTextEditController.text = "";
         } else {}
       });
@@ -217,6 +222,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getUpdate("DAILYREPLY_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
+          _getDailySelect(sDate);
+          _replySelect(sOrganizationCode, sUserId, sDate);
           _replyChildTextEditController.text = "";
         } else {}
       });
@@ -237,6 +244,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getDelete("DAILYREPLY_D1", sParam).then((value) {
         if (value.result.isNotEmpty) {
+          _getDailySelect(sDate);
+          _replySelect(sOrganizationCode, sUserId, sDate);
           _show("댓글이 정상적으로 삭제되었습니다.");
         } else {}
       });
@@ -257,6 +266,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getUpdate("REPLYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
+          _getDailySelect(sDate);
+          _replySelect(sOrganizationCode, sUserId, sDate);
         } else {}
       });
     });
@@ -570,7 +581,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                           ),
                         ),
                       ),
-                    if (userId == member.user.userId)
+                    if (replyId == member.user.userId)
                       Expanded(
                         flex: 1,
                         child: InkWell(
@@ -605,7 +616,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                           ),
                         ),
                       ),
-                    if (userId == member.user.userId)
+                    if (replyId == member.user.userId)
                       Expanded(
                         flex: 1,
                         child: InkWell(
@@ -869,9 +880,6 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     windowHeight = screenHeight;
     windowWidth = screenWidth;
 
-    _getDailySelect(sDate);
-    _replySelect(sOrganizationCode, sUserId, sDate);
-
     if (dailySelectValue != null) {
       sLikeQty = dailySelectValue.elementAt(0).likeQty;
       sReplyQty = dailySelectValue.elementAt(0).replyQty;
@@ -893,207 +901,224 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: ListView(
+            child: Column(
               children: [
-                Container(
-                  alignment: Alignment.centerRight,
-                  margin: EdgeInsets.only(left: 5, right: 5),
-                  child: TextButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: Icon(Icons.close, color: Colors.grey)),
-                ),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _dailySelectPage.cardColor(sDeptName),
-                    // borderRadius: BorderRadius.only(
-                    //   topLeft: Radius.circular(10),
-                    //   topRight: Radius.circular(10),
-                    // ),
+                ListTile(
+                  title: Container(
+                    alignment: Alignment.centerRight,
+                    margin: EdgeInsets.only(left: 5, right: 5),
+                    child: TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: Icon(Icons.close, color: Colors.grey)),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      AutoSizeText(
-                        sUserName,
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
-                        ),
-                        maxFontSize: 14,
+                ),
+                Expanded(
+                    child: ListView(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _dailySelectPage.cardColor(sDeptName),
+                        // borderRadius: BorderRadius.only(
+                        //   topLeft: Radius.circular(10),
+                        //   topRight: Radius.circular(10),
+                        // ),
                       ),
-                      Expanded(
-                        flex: 4,
-                        child: Container(
-                          margin: EdgeInsets.only(left: 5),
-                          child: AutoSizeText(
-                            '[' + sDeptName + ']',
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          AutoSizeText(
+                            sUserName,
                             style: TextStyle(
                               color: Colors.black87,
-                              // fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
                               fontSize: 12,
                             ),
                             maxFontSize: 14,
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: AutoSizeText(
-                          DateFormat('yyyy. MM. dd')
-                              .format(DateTime.parse(sDate)),
-                          textAlign: TextAlign.end,
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 12,
+                          Expanded(
+                            flex: 4,
+                            child: Container(
+                              margin: EdgeInsets.only(left: 5),
+                              child: AutoSizeText(
+                                '[' + sDeptName + ']',
+                                style: TextStyle(
+                                  color: Colors.black87,
+                                  // fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                                maxFontSize: 14,
+                              ),
+                            ),
                           ),
-                          maxFontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 8, right: 8, bottom: 8),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey[300],
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  constraints: BoxConstraints(
-                    minHeight: 100,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _dailySelectPage.cardContentHeader("금일업무 내용"),
-                      _dailySelectPage.cardContent(sDailyReport),
-                      _dailySelectPage.cardContentHeader("익일업무 내용"),
-                      _dailySelectPage.cardContent(sNextReport),
-                      // Divider(
-                      //   color: Colors.grey,
-                      // ),
-                      _dailySelectPage.cardLikeQty(
-                          sLikeQty, sReplyQty, sLikePerson),
-                      Divider(
-                        color: Colors.grey,
-                      ),
-                      cardLikeNReplyIn(
-                          sOrganizationCode, sUserId, sDate, sLikeFlag),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey[300],
-                        width: 1,
+                          Expanded(
+                            flex: 3,
+                            child: AutoSizeText(
+                              DateFormat('yyyy. MM. dd')
+                                  .format(DateTime.parse(sDate)),
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 12,
+                              ),
+                              maxFontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: screenWidth * 0.1,
-                        height: screenWidth * 0.1,
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(screenWidth * 0.05),
-                          border: Border.all(
+                    Container(
+                      padding: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
                             color: Colors.grey[300],
                             width: 1,
                           ),
-                          image: _memberImage(member.user.imgSajin),
                         ),
                       ),
-                      Expanded(
-                        flex: 8,
-                        child: Container(
-                          margin: EdgeInsets.only(left: 5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1,
+                      constraints: BoxConstraints(
+                        minHeight: 100,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _dailySelectPage.cardContentHeader("금일업무 내용"),
+                          _dailySelectPage.cardContent(sDailyReport),
+                          _dailySelectPage.cardContentHeader("익일업무 내용"),
+                          _dailySelectPage.cardContent(sNextReport),
+                          // Divider(
+                          //   color: Colors.grey,
+                          // ),
+                          _dailySelectPage.cardLikeQty(
+                              sOrganizationCode,
+                              sUserId,
+                              sUserName,
+                              sDeptName,
+                              sDate,
+                              sDailyReport,
+                              sNextReport,
+                              sLikeQty,
+                              sLikeFlag,
+                              sReplyQty,
+                              sLikePerson),
+                          Divider(
+                            color: Colors.grey,
+                          ),
+                          cardLikeNReplyIn(
+                              sOrganizationCode, sUserId, sDate, sLikeFlag),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey[300],
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: screenWidth * 0.1,
+                            height: screenWidth * 0.1,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.circular(screenWidth * 0.05),
+                              border: Border.all(
+                                color: Colors.grey[300],
+                                width: 1,
+                              ),
+                              image: _memberImage(member.user.imgSajin),
                             ),
                           ),
-                          height: screenWidth * 0.2,
-                          child: Form(
-                            key: _replyKey,
-                            child: TextField(
-                              autofocus: false,
-                              keyboardType: TextInputType.multiline,
-                              maxLines: null,
-                              controller: _replyTextEditController,
-                              focusNode: replyFocusNode,
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  // borderRadius: BorderRadius.circular(32.0),
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
+                          Expanded(
+                            flex: 8,
+                            child: Container(
+                              margin: EdgeInsets.only(left: 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
+                              ),
+                              height: screenWidth * 0.2,
+                              child: Form(
+                                key: _replyKey,
+                                child: TextField(
+                                  autofocus: false,
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: null,
+                                  controller: _replyTextEditController,
+                                  focusNode: replyFocusNode,
+                                  decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      // borderRadius: BorderRadius.circular(32.0),
+                                      borderSide: BorderSide(
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      // borderRadius: BorderRadius.circular(32.0),
+                                      borderSide: BorderSide(
+                                        color: Colors.transparent,
+                                      ),
+                                    ),
+                                    contentPadding:
+                                        EdgeInsets.fromLTRB(5.0, 5.0, 0.0, 5.0),
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    hintText: '댓글을 입력하세요.',
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'NotoSansKR',
                                   ),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  // borderRadius: BorderRadius.circular(32.0),
-                                  borderSide: BorderSide(
-                                    color: Colors.transparent,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              margin: EdgeInsets.only(left: 5, right: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo[800],
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: TextButton(
+                                onPressed: () {
+                                  if (_replyTextEditController.text == "") {
+                                    _show("댓글 내용을 입력해주세요.");
+                                    return;
+                                  } else {
+                                    _replyInsert(sOrganizationCode, sUserId,
+                                        sDate, _replyTextEditController.text);
+                                  }
+                                },
+                                child: Text(
+                                  '등록',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'NotoSansKR',
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                contentPadding:
-                                    EdgeInsets.fromLTRB(5.0, 5.0, 0.0, 5.0),
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: '댓글을 입력하세요.',
-                              ),
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'NotoSansKR',
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          margin: EdgeInsets.only(left: 5, right: 5),
-                          decoration: BoxDecoration(
-                            color: Colors.indigo[800],
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: TextButton(
-                            onPressed: () {
-                              if (_replyTextEditController.text == "") {
-                                _show("댓글 내용을 입력해주세요.");
-                                return;
-                              } else {
-                                _replyInsert(sOrganizationCode, sUserId, sDate,
-                                    _replyTextEditController.text);
-                              }
-                            },
-                            child: Text(
-                              '등록',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'NotoSansKR',
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                replyTable(),
+                    ),
+                    replyTable(),
+                  ],
+                )),
               ],
             ),
           ),

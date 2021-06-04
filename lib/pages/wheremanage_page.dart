@@ -471,6 +471,7 @@ class _WhereManagePage extends State<WhereManagePage> {
             _show(value.result.elementAt(0).rsMsg);
           } else {
             _show("행선지가 삭제되었습니다.");
+            _getWhereIs(date);
           }
         } else {
           _show("삭제에 실패하였습니다.");

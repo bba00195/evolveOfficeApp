@@ -80,22 +80,13 @@ class _HomePage extends State<HomePage> {
 
   @override
   void initState() {
-    super.initState();
     date = Date().date(DateTime.now().add(Duration(days: -1)));
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass; //widget.pass LogOutPage에서 전달받은 pass 의미한다.
     mem = widget.member;
 
-    // _scrollController.addListener(() {
-    //   setState(() {
-    //     if (_scrollController.offset >= 400) {
-    //       _showBackToTopButton = true; // show the back-to-top button
-    //     } else {
-    //       _showBackToTopButton = false; // hide the back-to-top button
-    //     }
-    //   });
-    // });
-    // _report(date);
+    _information();
+    super.initState();
   }
 
   void _scrollToTop() {
@@ -111,7 +102,6 @@ class _HomePage extends State<HomePage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     _report(date);
-    _information();
     var member = mem;
 
     _show(String sMessage) {

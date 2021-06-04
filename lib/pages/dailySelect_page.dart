@@ -111,25 +111,6 @@ class DailySelectPages extends State<DailySelectPage> {
           _dailyPageWrite.nextTextEditController.text = "";
         }
       });
-
-      // APIService apiService = new APIService();
-      // apiService
-      //     .report(
-      //         member.user.organizationCode, member.user.userId, selectedDate)
-      //     .then((value) {
-      //   if (value.day.isNotEmpty) {
-      //     _dayTextEditController.text = value.day.elementAt(0).dayReport;
-      //     _nextTextEditController.text = value.day.elementAt(0).nextReport;
-      //     _remarkTextEditController.text = value.day.elementAt(0).miscReport;
-      //     dayReport = value.day.elementAt(0).dayReport;
-      //     nextReport = value.day.elementAt(0).nextReport;
-      //     remarkReport = value.day.elementAt(0).miscReport;
-      //   } else {
-      //     dayReport = "";
-      //     nextReport = "";
-      //     remarkReport = "";
-      //   }
-      // });
     });
   }
 
@@ -474,7 +455,18 @@ class DailySelectPages extends State<DailySelectPage> {
     }
   }
 
-  cardLikeQty(int sLikeQty, int sReplyQty, String sLikePerson) {
+  cardLikeQty(
+      String sOrganizationCode,
+      String sUserId,
+      String sUserName,
+      String sDeptName,
+      String sDate,
+      String sDailyReport,
+      String sNextReport,
+      int sLikeQty,
+      String sLikeFlag,
+      int sReplyQty,
+      String sLikePerson) {
     return Container(
       padding: EdgeInsets.all(5),
       decoration: cardDecoration(sLikeQty, sReplyQty),
@@ -502,10 +494,32 @@ class DailySelectPages extends State<DailySelectPage> {
             ),
           if (sLikeQty == 0) Expanded(child: Container()),
           if (sReplyQty > 0) //  댓글 1개 이상있을 시 문구가 나타남
-            Container(
-              padding: EdgeInsets.only(right: 5),
-              alignment: Alignment.centerRight,
-              child: Text('댓글 ' + sReplyQty.toString() + '개'),
+            InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) {
+                    return PopUpDailyReply(
+                        member: member,
+                        sOrganizationCode: sOrganizationCode,
+                        sUserId: sUserId,
+                        sUserName: sUserName,
+                        sDeptName: sDeptName,
+                        sDate: sDate,
+                        sDailyReport: sDailyReport,
+                        sNextReport: sNextReport,
+                        sLikeQty: sLikeQty,
+                        sLikeFlag: sLikeFlag,
+                        sReplyQty: sReplyQty,
+                        sLikePerson: sLikePerson);
+                  },
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.only(right: 5),
+                alignment: Alignment.centerRight,
+                child: Text('댓글 ' + sReplyQty.toString() + '개'),
+              ),
             ),
         ],
       ),
@@ -711,7 +725,18 @@ class DailySelectPages extends State<DailySelectPage> {
                 // Divider(
                 //   color: Colors.grey,
                 // ),
-                cardLikeQty(sLikeQty, sReplyQty, sLikePerson),
+                cardLikeQty(
+                    sOrganizationCode,
+                    sUserId,
+                    sUserName,
+                    sDeptName,
+                    sWorkDate,
+                    sDailyReport,
+                    sNextReport,
+                    sLikeQty,
+                    sLikeFlag,
+                    sReplyQty,
+                    sLikePerson),
                 Divider(
                   color: Colors.grey,
                 ),
@@ -770,7 +795,7 @@ class DailySelectPages extends State<DailySelectPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    _getDailySelect(Date().date(DateTime.now().add(Duration(days: sDay))));
+    // _getDailySelect(Date().date(DateTime.now().add(Duration(days: sDay))));
 
     _dayDecrease() {
       isChanged = true;
