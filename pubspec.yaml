@@ -32,7 +32,7 @@ dependencies:
   flutter_secure_storage: ^3.3.1+2
   horizontal_data_table: ^2.5.0
   datetime_picker_formfield: ^2.0.0
-  image_picker: ^0.7.5
+  image_picker: ^0.8.0+1
   auto_size_text: ^2.1.0 
   auto_size_text_field: ^0.1.7
   expansion_card: ^0.1.0

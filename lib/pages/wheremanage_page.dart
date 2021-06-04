@@ -1093,7 +1093,12 @@ class _WhereManagePage extends State<WhereManagePage> {
                               _locateTextEditController.text = "내근";
                             });
                           }),
-                      Text("종일 내근"),
+                      AutoSizeText(
+                        "종일 내근",
+                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        minFontSize: 10,
+                      ),
                       Checkbox(
                           value: isMorning,
                           onChanged: (value) {
@@ -1108,7 +1113,12 @@ class _WhereManagePage extends State<WhereManagePage> {
                               _locateTextEditController.text = "내근";
                             });
                           }),
-                      Text("오전 내근"),
+                      AutoSizeText(
+                        "오전 내근",
+                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        minFontSize: 10,
+                      ),
                       Checkbox(
                           value: isAfter,
                           onChanged: (value) {
@@ -1123,7 +1133,12 @@ class _WhereManagePage extends State<WhereManagePage> {
                               _locateTextEditController.text = "내근";
                             });
                           }),
-                      Text("오후 내근"),
+                      AutoSizeText(
+                        "오후 내근",
+                        style: TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        minFontSize: 10,
+                      ),
                     ],
                   ),
                   SizedBox(height: 10),
