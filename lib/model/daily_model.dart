@@ -231,6 +231,43 @@ class ReplyResultModel {
   }
 }
 
+class ApprovalResponseModel {
+  final String unDecieded;
+  final String returnApr;
+  final String receive;
+  final String complete;
+
+  ApprovalResponseModel({
+    this.unDecieded,
+    this.returnApr,
+    this.receive,
+    this.complete,
+  });
+
+  factory ApprovalResponseModel.fromJson(Map<String, dynamic> json) {
+    return ApprovalResponseModel(
+      unDecieded: json['UNDECIDED'] != null ? json['UNDECIDED'] as String : "",
+      returnApr: json['RETURN_APR'] != null ? json['RETURN_APR'] as String : "",
+      receive: json['RECEIVE'] != null ? json['RECEIVE'] as String : "",
+      complete: json['COMPLETE'] != null ? json['COMPLETE'] as String : "",
+    );
+  }
+}
+
+class ApprovalResultModel {
+  List<ApprovalResponseModel> approval;
+
+  ApprovalResultModel({this.approval});
+
+  factory ApprovalResultModel.fromJson(Map<String, dynamic> json) {
+    var list = json['RESULT'] != null ? json['RESULT'] as List : [];
+    // print(list.runtimeType);
+    List<ApprovalResponseModel> approvalList =
+        list.map((i) => ApprovalResponseModel.fromJson(i)).toList();
+    return ApprovalResultModel(approval: approvalList);
+  }
+}
+
 class InformationResponseModel {
   final String infoText;
 

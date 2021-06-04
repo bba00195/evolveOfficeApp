@@ -39,6 +39,10 @@ class APIServiceNew {
         final response = await http.post(url, body: sBody, headers: headers);
         result = InformationResultModel.fromJson(json.decode(response.body));
         break;
+      case "APPROVAL_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = ApprovalResultModel.fromJson(json.decode(response.body));
+        break;
       case "DAILYREPLY_S1":
         final response = await http.post(url, body: sBody, headers: headers);
         result = ReplyResultModel.fromJson(json.decode(response.body));

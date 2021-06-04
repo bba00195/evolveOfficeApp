@@ -262,7 +262,7 @@ class DailySelectPages extends State<DailySelectPage> {
                 ],
               );
               _report(date);
-              _getDailySelect(date);
+              getDailySelect(date);
             });
           } else {
             _show("내용을 입력하거나 수정해주세요.");
@@ -280,7 +280,7 @@ class DailySelectPages extends State<DailySelectPage> {
     );
   }
 
-  void _getDailySelect(String startDate) async {
+  void getDailySelect(String startDate) async {
     List<String> sParam = [
       startDate,
       startDate,
@@ -318,6 +318,7 @@ class DailySelectPages extends State<DailySelectPage> {
 
       apiServiceNew.getUpdate("DAILYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
+          getDailySelect(date);
         } else {}
       });
     });
@@ -332,7 +333,7 @@ class DailySelectPages extends State<DailySelectPage> {
     startDate = Date().date(null);
     endDate = Date().date(null);
     _selectedTime = nowDateTime;
-
+    date = Date().date(_selectedTime);
     _dailyPageWrite.dayFocusNode = FocusNode();
     _dailyPageWrite.nextFocusNode = FocusNode();
     _dailyPageWrite.remarkFocusNode = FocusNode();
@@ -357,7 +358,13 @@ class DailySelectPages extends State<DailySelectPage> {
         ),
       ],
     );
+    getDailySelect(date);
 
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      setState(() {
+        getDailySelect(date);
+      });
+    });
     super.initState();
   }
 
@@ -590,6 +597,7 @@ class DailySelectPages extends State<DailySelectPage> {
                 ),
               ),
               onTap: () {
+                getDailySelect(date);
                 showDialog(
                   context: context,
                   builder: (_) {
@@ -795,7 +803,7 @@ class DailySelectPages extends State<DailySelectPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // _getDailySelect(Date().date(DateTime.now().add(Duration(days: sDay))));
+    // getDailySelect(Date().date(DateTime.now().add(Duration(days: sDay))));
 
     _dayDecrease() {
       isChanged = true;
@@ -804,7 +812,7 @@ class DailySelectPages extends State<DailySelectPage> {
       // date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
       date = Date().date(DateTime.now().add(Duration(days: sDay)));
       _report(date);
-      _getDailySelect(date);
+      getDailySelect(date);
     }
 
     _dayIncrease() {
@@ -813,7 +821,7 @@ class DailySelectPages extends State<DailySelectPage> {
       changeDate = Date().getDate(sDay);
       date = Date().date(DateTime.now().add(Duration(days: sDay)));
       _report(date);
-      _getDailySelect(date);
+      getDailySelect(date);
     }
 
     final menuName = Container(
@@ -875,7 +883,7 @@ class DailySelectPages extends State<DailySelectPage> {
                     sDay = dateTime.difference(DateTime.now()).inDays;
                     date = Date().date(_selectedTime);
                     _report(date);
-                    _getDailySelect(date);
+                    getDailySelect(date);
                   } else {
                     dateTime = _selectedTime;
                   }
@@ -996,7 +1004,7 @@ class DailySelectPages extends State<DailySelectPage> {
                         onChanged: (value) {
                           setState(() {
                             deptValue = value;
-                            _getDailySelect(date);
+                            getDailySelect(date);
                           });
                         },
                       ),

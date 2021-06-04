@@ -91,7 +91,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     sLikeFlag = widget.sLikeFlag;
     sReplyQty = widget.sReplyQty;
     sLikePerson = widget.sLikePerson;
-    _getDailySelect(sDate);
+    getDailySelect(sDate);
     _replySelect(sOrganizationCode, sUserId, sDate);
     replyFocusNode = FocusNode();
     replyChildFocusNode = FocusNode();
@@ -105,14 +105,14 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     super.dispose();
   }
 
-  void _getDailySelect(String startDate) async {
+  void getDailySelect(String startDate) async {
     List<String> sParam = [
       startDate,
       startDate,
       "WK_DAILYMONTH",
       member.user.userId,
       "",
-      member.user.userId,
+      sUserId,
       "",
       "",
       member.user.organizationCode
@@ -159,7 +159,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getUpdate("DAILYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
-          _getDailySelect(sDate);
+          getDailySelect(sDate);
           _replySelect(sOrganizationCode, sUserId, sDate);
         } else {}
       });
@@ -199,7 +199,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getInsert("DAILYREPLY_I2", sParam).then((value) {
         if (value.result.isNotEmpty) {
-          _getDailySelect(sDate);
+          getDailySelect(sDate);
           _replySelect(sOrganizationCode, sUserId, sDate);
           _replyChildTextEditController.text = "";
         } else {}
@@ -222,7 +222,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getUpdate("DAILYREPLY_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
-          _getDailySelect(sDate);
+          getDailySelect(sDate);
           _replySelect(sOrganizationCode, sUserId, sDate);
           _replyChildTextEditController.text = "";
         } else {}
@@ -244,7 +244,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getDelete("DAILYREPLY_D1", sParam).then((value) {
         if (value.result.isNotEmpty) {
-          _getDailySelect(sDate);
+          getDailySelect(sDate);
           _replySelect(sOrganizationCode, sUserId, sDate);
           _show("댓글이 정상적으로 삭제되었습니다.");
         } else {}
@@ -266,7 +266,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
 
       apiServiceNew.getUpdate("REPLYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
-          _getDailySelect(sDate);
+          getDailySelect(sDate);
           _replySelect(sOrganizationCode, sUserId, sDate);
         } else {}
       });
@@ -908,7 +908,9 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                     alignment: Alignment.centerRight,
                     margin: EdgeInsets.only(left: 5, right: 5),
                     child: TextButton(
-                        onPressed: () => Navigator.pop(context, true),
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
                         child: Icon(Icons.close, color: Colors.grey)),
                   ),
                 ),

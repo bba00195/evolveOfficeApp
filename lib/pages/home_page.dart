@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';
@@ -38,7 +39,11 @@ class _HomePage extends State<HomePage> {
   List<InformationResponseModel> infoValue;
   String sNextReport = "";
   String sInfoText = "";
-  bool _showBackToTopButton = false;
+
+  String unDecided = "0";
+  String returnApr = "0";
+  String receive = "0";
+  String complete = "0";
   final ScrollController _scrollController = ScrollController();
 
   void _report(String selectedDate) async {
@@ -53,6 +58,29 @@ class _HomePage extends State<HomePage> {
       APIService apiService = new APIService();
       futureAlbum = apiService.report(
           mem.user.organizationCode, mem.user.userId, selectedDate);
+    });
+  }
+
+  void approval() async {
+    APIServiceNew apiServiceNew = new APIServiceNew();
+    List<String> sParam = [
+      mem.user.organizationCode,
+      mem.user.userId,
+    ];
+    apiServiceNew.getSelect("APPROVAL_S1", sParam).then((value) {
+      setState(() {
+        if (value.approval.isNotEmpty) {
+          unDecided = value.approval.elementAt(0).unDecieded;
+          returnApr = value.approval.elementAt(0).returnApr;
+          receive = value.approval.elementAt(0).receive;
+          complete = value.approval.elementAt(0).complete;
+        } else {
+          unDecided = "0";
+          returnApr = "0";
+          receive = "0";
+          complete = "0";
+        }
+      });
     });
   }
 
@@ -84,7 +112,7 @@ class _HomePage extends State<HomePage> {
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass; //widget.pass LogOutPage에서 전달받은 pass 의미한다.
     mem = widget.member;
-
+    approval();
     _information();
     super.initState();
   }
@@ -523,7 +551,8 @@ class _HomePage extends State<HomePage> {
                     ),
                   ),
                   Container(
-                    height: screenHeight * 0.45,
+                    height: (screenHeight * 0.45),
+                    //  - (screenWidth / 4),
                     color: Colors.white,
                     alignment: Alignment.topLeft,
                     padding: EdgeInsets.only(
@@ -553,6 +582,297 @@ class _HomePage extends State<HomePage> {
                     ),
                     // child: Text(sNextReport),
                   ),
+                  // Container(
+                  //   height: screenWidth / 4,
+                  //   child: Row(
+                  //     children: [
+                  //       Expanded(
+                  //         flex: 3,
+                  //         child: Container(
+                  //           padding: EdgeInsets.all(5),
+                  //           margin: EdgeInsets.all(3),
+                  //           height: screenWidth / 4,
+                  //           decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(5),
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 blurRadius: 3.0,
+                  //                 offset: const Offset(1.0, 1.0),
+                  //                 color: Color.fromRGBO(0, 0, 0, 0.16),
+                  //               )
+                  //             ],
+                  //           ),
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.start,
+                  //                   crossAxisAlignment:
+                  //                       CrossAxisAlignment.start,
+                  //                   children: [
+                  //                     Expanded(
+                  //                       child: AutoSizeText(
+                  //                         '대기',
+                  //                         style: TextStyle(
+                  //                           fontSize: 16,
+                  //                           fontWeight: FontWeight.w600,
+                  //                         ),
+                  //                         maxLines: 1,
+                  //                         minFontSize: 14,
+                  //                       ),
+                  //                     ),
+                  //                     Expanded(
+                  //                       child: Container(
+                  //                         child: Icon(
+                  //                           Icons.description_outlined,
+                  //                           size: screenWidth * 0.1,
+                  //                           color: Color.fromRGBO(
+                  //                               129, 121, 214, 1),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Container(
+                  //                   alignment: Alignment.bottomLeft,
+                  //                   child: AutoSizeText(
+                  //                     unDecided,
+                  //                     style: TextStyle(
+                  //                       fontSize: 32,
+                  //                       fontWeight: FontWeight.w600,
+                  //                     ),
+                  //                     maxLines: 1,
+                  //                     minFontSize: 20,
+                  //                   ),
+                  //                 ),
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       Expanded(
+                  //         flex: 3,
+                  //         child: Container(
+                  //           padding: EdgeInsets.all(5),
+                  //           margin: EdgeInsets.all(3),
+                  //           height: screenWidth / 4,
+                  //           decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(5),
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 blurRadius: 3.0,
+                  //                 offset: const Offset(1.0, 1.0),
+                  //                 color: Color.fromRGBO(0, 0, 0, 0.16),
+                  //               )
+                  //             ],
+                  //           ),
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.start,
+                  //                   crossAxisAlignment:
+                  //                       CrossAxisAlignment.start,
+                  //                   children: [
+                  //                     Expanded(
+                  //                       child: AutoSizeText(
+                  //                         '수신',
+                  //                         style: TextStyle(
+                  //                           fontSize: 16,
+                  //                           fontWeight: FontWeight.w600,
+                  //                         ),
+                  //                         maxLines: 1,
+                  //                         minFontSize: 14,
+                  //                       ),
+                  //                     ),
+                  //                     Expanded(
+                  //                       child: Container(
+                  //                         child: Icon(
+                  //                           Icons.near_me_outlined,
+                  //                           size: screenWidth * 0.1,
+                  //                           color:
+                  //                               Color.fromRGBO(251, 195, 55, 1),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Container(
+                  //                   alignment: Alignment.bottomLeft,
+                  //                   child: AutoSizeText(
+                  //                     receive,
+                  //                     style: TextStyle(
+                  //                       fontSize: 32,
+                  //                       fontWeight: FontWeight.w600,
+                  //                     ),
+                  //                     maxLines: 1,
+                  //                     minFontSize: 20,
+                  //                   ),
+                  //                 ),
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       Expanded(
+                  //         flex: 3,
+                  //         child: Container(
+                  //           padding: EdgeInsets.all(5),
+                  //           margin: EdgeInsets.all(3),
+                  //           height: screenWidth / 4,
+                  //           decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(5),
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 blurRadius: 3.0,
+                  //                 offset: const Offset(1.0, 1.0),
+                  //                 color: Color.fromRGBO(0, 0, 0, 0.16),
+                  //               )
+                  //             ],
+                  //           ),
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.start,
+                  //                   crossAxisAlignment:
+                  //                       CrossAxisAlignment.start,
+                  //                   children: [
+                  //                     Expanded(
+                  //                       child: AutoSizeText(
+                  //                         '반려',
+                  //                         style: TextStyle(
+                  //                           fontSize: 16,
+                  //                           fontWeight: FontWeight.w600,
+                  //                         ),
+                  //                         maxLines: 1,
+                  //                         minFontSize: 14,
+                  //                       ),
+                  //                     ),
+                  //                     Expanded(
+                  //                       child: Container(
+                  //                         child: Icon(
+                  //                           Icons.replay,
+                  //                           size: screenWidth * 0.1,
+                  //                           color: Color.fromRGBO(
+                  //                               255, 135, 128, 1),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Container(
+                  //                   alignment: Alignment.bottomLeft,
+                  //                   child: AutoSizeText(
+                  //                     returnApr,
+                  //                     style: TextStyle(
+                  //                       fontSize: 32,
+                  //                       fontWeight: FontWeight.w600,
+                  //                     ),
+                  //                     maxLines: 1,
+                  //                     minFontSize: 20,
+                  //                   ),
+                  //                 ),
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       Expanded(
+                  //         flex: 3,
+                  //         child: Container(
+                  //           padding: EdgeInsets.all(5),
+                  //           margin: EdgeInsets.all(3),
+                  //           height: screenWidth / 4,
+                  //           decoration: BoxDecoration(
+                  //             color: Colors.white,
+                  //             borderRadius: BorderRadius.circular(5),
+                  //             boxShadow: [
+                  //               BoxShadow(
+                  //                 blurRadius: 3.0,
+                  //                 offset: const Offset(1.0, 1.0),
+                  //                 color: Color.fromRGBO(0, 0, 0, 0.16),
+                  //               )
+                  //             ],
+                  //           ),
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Row(
+                  //                   mainAxisAlignment: MainAxisAlignment.start,
+                  //                   crossAxisAlignment:
+                  //                       CrossAxisAlignment.start,
+                  //                   children: [
+                  //                     Expanded(
+                  //                       child: AutoSizeText(
+                  //                         '완료',
+                  //                         style: TextStyle(
+                  //                           fontSize: 16,
+                  //                           fontWeight: FontWeight.w600,
+                  //                         ),
+                  //                         maxLines: 1,
+                  //                         minFontSize: 14,
+                  //                       ),
+                  //                     ),
+                  //                     Expanded(
+                  //                       child: Container(
+                  //                         child: Icon(
+                  //                           Icons.folder_open_outlined,
+                  //                           size: screenWidth * 0.1,
+                  //                           color:
+                  //                               Color.fromRGBO(74, 72, 102, 1),
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                   ],
+                  //                 ),
+                  //               ),
+                  //               Expanded(
+                  //                 flex: 1,
+                  //                 child: Container(
+                  //                   alignment: Alignment.bottomLeft,
+                  //                   child: AutoSizeText(
+                  //                     complete,
+                  //                     style: TextStyle(
+                  //                       fontSize: 32,
+                  //                       fontWeight: FontWeight.w600,
+                  //                     ),
+                  //                     maxLines: 1,
+                  //                     minFontSize: 20,
+                  //                   ),
+                  //                 ),
+                  //               )
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -560,7 +880,6 @@ class _HomePage extends State<HomePage> {
         ),
       ),
     );
-
     // #region 종료버튼
     Future<bool> _onBackPressed() {
       return showDialog(
