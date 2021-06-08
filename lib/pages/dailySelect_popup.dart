@@ -751,6 +751,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                                       groupNo,
                                       workDate,
                                       _replyChildTextEditController.text);
+                                  _replySelect(
+                                      sOrganizationCode, sUserId, sDate);
                                 } else {
                                   _replyChildInsert(
                                       organizationCode,
@@ -758,6 +760,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                                       replyNo,
                                       workDate,
                                       _replyChildTextEditController.text);
+                                  _replySelect(
+                                      sOrganizationCode, sUserId, sDate);
                                 }
                                 isUpdated = false;
                                 replyChildList[replyCount] = false;
@@ -906,12 +910,14 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                 ListTile(
                   title: Container(
                     alignment: Alignment.centerRight,
-                    margin: EdgeInsets.only(left: 5, right: 5),
-                    child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
-                        child: Icon(Icons.close, color: Colors.grey)),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context, true);
+                      },
+                      child: Container(
+                        child: Icon(Icons.close, color: Colors.grey),
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -1102,6 +1108,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                                   } else {
                                     _replyInsert(sOrganizationCode, sUserId,
                                         sDate, _replyTextEditController.text);
+                                    _replySelect(
+                                        sOrganizationCode, sUserId, sDate);
                                   }
                                 },
                                 child: Text(

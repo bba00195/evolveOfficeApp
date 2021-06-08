@@ -1,9 +1,8 @@
+import 'package:evolveofficeapp/pages/aproval_page.dart';
 import 'package:evolveofficeapp/pages/dailySelect_page.dart';
-import 'package:evolveofficeapp/pages/daily_page.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:evolveofficeapp/pages/login_page.dart';
 import 'package:evolveofficeapp/pages/profile_page.dart';
-import 'package:evolveofficeapp/pages/whereis_page.dart';
 import 'package:evolveofficeapp/pages/wheremanage_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,8 +31,8 @@ class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
         icon: Icon(Icons.menu),
         onPressed: () => globalKey.currentState.openDrawer(),
       ),
-      title: SizedBox(
-        height: 95,
+      title: Container(
+        height: 70,
         child: TextButton(
           onPressed: () {
             Navigator.pushReplacement(
@@ -48,8 +47,9 @@ class KulsAppBar extends StatelessWidget implements PreferredSizeWidget {
             );
           },
           child: Image.asset(
-            'resource/kuls.png',
-            fit: BoxFit.cover,
+            'resource/office_head.png',
+            fit: BoxFit.fitHeight,
+            // fit: BoxFit.fill,
           ),
         ),
       ),
@@ -412,6 +412,22 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                     );
                   },
                   child: menuRow('행선지 관리'),
+                ),
+                SizedBox(height: 20),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => AprovalPage(
+                          id: id,
+                          pass: pass,
+                          member: member,
+                        ),
+                      ),
+                    );
+                  },
+                  child: menuRow('휴가원 관리'),
                 ),
               ],
             ),

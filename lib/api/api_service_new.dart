@@ -1,3 +1,4 @@
+import 'package:evolveofficeapp/model/main_model.dart';
 import 'package:evolveofficeapp/model/whereis_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -34,6 +35,10 @@ class APIServiceNew {
       case "DAILY_S1":
         final response = await http.post(url, body: sBody, headers: headers);
         result = DailySelectResultModel.fromJson(json.decode(response.body));
+        break;
+      case "BOARD_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = BoardResultModel.fromJson(json.decode(response.body));
         break;
       case "INFORMATION_S1":
         final response = await http.post(url, body: sBody, headers: headers);

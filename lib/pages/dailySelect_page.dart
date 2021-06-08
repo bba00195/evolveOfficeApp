@@ -156,23 +156,12 @@ class DailySelectPages extends State<DailySelectPage> {
           });
         }
       } else {
-        if (_dailyPageWrite.dayTextEditController.text == "" &&
-            _dailyPageWrite.nextTextEditController.text == "") {
-          sParam = [organizationCode, date, userId];
-          apiServiceNew.getDelete("DAYREPORT_D1", sParam).then((value) {
-            if (value.result.isNotEmpty) {
-              _dailyPageWrite.dayReport =
-                  _dailyPageWrite.dayTextEditController.text;
-            } else {}
-          });
-        } else {
-          apiServiceNew.getUpdate("DAYREPORT_U1", sParam).then((value) {
-            if (value.result.isNotEmpty) {
-              _dailyPageWrite.dayReport =
-                  _dailyPageWrite.dayTextEditController.text;
-            } else {}
-          });
-        }
+        apiServiceNew.getUpdate("DAYREPORT_U1", sParam).then((value) {
+          if (value.result.isNotEmpty) {
+            _dailyPageWrite.dayReport =
+                _dailyPageWrite.dayTextEditController.text;
+          } else {}
+        });
       }
       isSaved = true;
     }
@@ -216,6 +205,27 @@ class DailySelectPages extends State<DailySelectPage> {
       }
       isSaved = true;
     }
+  }
+
+  dailyDelete(String organizationCode, String workDate, String userId) {
+    isSaved = false;
+    _dailyPageWrite.dayFocusNode.unfocus();
+    _dailyPageWrite.nextFocusNode.unfocus();
+    // remarkFocusNode.unfocus();
+    // APIService apiService = new APIService();
+    APIServiceNew apiServiceNew = new APIServiceNew();
+
+    List<String> sParam;
+
+    sParam = [organizationCode, workDate, userId];
+    apiServiceNew.getDelete("DAYREPORT_D1", sParam).then((value) {
+      if (value.result.isNotEmpty) {
+        _dailyPageWrite.dayTextEditController.text = "";
+        _dailyPageWrite.nextTextEditController.text = "";
+        _show("일일업무 삭제가 완료되었습니다.");
+        getDailySelect(workDate);
+      } else {}
+    });
   }
 
   saveButton(double sWindowWidth, double sWindowHeight, String organizationCode,
@@ -359,12 +369,6 @@ class DailySelectPages extends State<DailySelectPage> {
       ],
     );
     getDailySelect(date);
-
-    Timer.periodic(Duration(seconds: 5), (timer) {
-      setState(() {
-        getDailySelect(date);
-      });
-    });
     super.initState();
   }
 
@@ -623,12 +627,28 @@ class DailySelectPages extends State<DailySelectPage> {
             flex: 3,
             child: Container(
               alignment: Alignment.center,
-              child: Text(''),
+              child: delete(sOrganizationCode, sDate, sUserId),
             ),
           ),
         ],
       ),
     );
+  }
+
+  delete(String sOrganizationCode, String sDate, String sUserId) {
+    if (sUserId == member.user.userId) {
+      return InkWell(
+        child: Container(
+          alignment: Alignment.center,
+          child: Text('삭제'),
+        ),
+        onTap: () {
+          _showMessage(sOrganizationCode, sDate, sUserId);
+        },
+      );
+    } else {
+      return Text('');
+    }
   }
 
   cardTable(
@@ -796,6 +816,32 @@ class DailySelectPages extends State<DailySelectPage> {
     } else {
       return Container();
     }
+  }
+
+  _showMessage(String organizationCode, String workDate, String userId) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          content: Text("일일업무보고를 삭제하시겠습니까?"),
+          actions: [
+            TextButton(
+              child: Text("취소"),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: Text("확인"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+                dailyDelete(organizationCode, workDate, userId);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

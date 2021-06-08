@@ -1465,19 +1465,7 @@ class _WhereManagePage extends State<WhereManagePage> {
               onPressed: () {
                 _whereDelete(date, _startTime, _endTime);
                 Navigator.of(context).pop(true);
-                setState(() {
-                  Navigator.pushReplacement(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (BuildContext context) => super.widget,
-                      //     WhereManagePage(
-                      //   id: id,
-                      //   pass: pass,
-                      //   member: member,
-                      // ),
-                    ),
-                  );
-                });
+                _getWhereIs(date);
               },
             ),
             TextButton(
