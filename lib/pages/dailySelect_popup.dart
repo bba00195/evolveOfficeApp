@@ -203,6 +203,8 @@ class PopUpDailyReplyState extends State<PopUpDailyReply> {
         if (value.result.isNotEmpty) {
           getDailySelect(sDate);
           replySelect(sOrganizationCode, sUserId, sDate);
+          // _dailySelectPage.getDailySelect2(
+          //     sDate, member.user.userId, member.user.organizationCode);
           _replyChildTextEditController.text = "";
         } else {}
       });
@@ -247,6 +249,8 @@ class PopUpDailyReplyState extends State<PopUpDailyReply> {
       apiServiceNew.getDelete("DAILYREPLY_D1", sParam).then((value) {
         if (value.result.isNotEmpty) {
           getDailySelect(sDate);
+          // _dailySelectPage.getDailySelect2(
+          //     sDate, member.user.userId, member.user.organizationCode);
           replySelect(sOrganizationCode, sUserId, sDate);
           show("댓글이 정상적으로 삭제되었습니다.");
         } else {}
@@ -1112,6 +1116,10 @@ class PopUpDailyReplyState extends State<PopUpDailyReply> {
                                         sDate, _replyTextEditController.text);
                                     replySelect(
                                         sOrganizationCode, sUserId, sDate);
+                                    // _dailySelectPage.getDailySelect2(
+                                    //     sDate,
+                                    //     member.user.userId,
+                                    //     member.user.organizationCode);
                                   }
                                 },
                                 child: Text(

@@ -226,7 +226,8 @@ class DailySelectPages extends State<DailySelectPage> {
         _dailyPageWrite.dayTextEditController.text = "";
         _dailyPageWrite.nextTextEditController.text = "";
         _show("일일업무 삭제가 완료되었습니다.");
-        getDailySelect(workDate);
+        getDailySelect(
+            workDate, member.user.userId, member.user.organizationCode);
       } else {}
     });
   }
@@ -275,7 +276,8 @@ class DailySelectPages extends State<DailySelectPage> {
                 ],
               );
               _report(date);
-              getDailySelect(date);
+              getDailySelect(
+                  date, member.user.userId, member.user.organizationCode);
             });
           } else {
             _show("내용을 입력하거나 수정해주세요.");
@@ -293,21 +295,50 @@ class DailySelectPages extends State<DailySelectPage> {
     );
   }
 
-  void getDailySelect(String startDate) async {
+  void getDailySelect(
+      String startDate, String sUserId, String sOrganizationCode) async {
     List<String> sParam = [
       startDate,
       startDate,
       "WK_DAILYMONTH",
-      member.user.userId,
+      sUserId,
       "",
       "",
       deptValue,
       "",
-      member.user.organizationCode
+      sOrganizationCode
     ];
 
     apiServiceNew.getSelect("DAILY_S1", sParam).then((value) {
       setState(() {
+        itemCount = 0;
+        if (value.dailySelect.isNotEmpty) {
+          dailySelectValue = value.dailySelect;
+          itemCount = dailySelectValue.length;
+        } else {
+          itemCount = 0;
+          // _show("조회된 데이터가 없습니다.");
+        }
+      });
+    });
+  }
+
+  void getDailySelect2(
+      String startDate, String sUserId, String sOrganizationCode) async {
+    setState(() {
+      List<String> sParam = [
+        startDate,
+        startDate,
+        "WK_DAILYMONTH",
+        sUserId,
+        "",
+        "",
+        deptValue,
+        "",
+        sOrganizationCode
+      ];
+
+      apiServiceNew.getSelect("DAILY_S1", sParam).then((value) {
         itemCount = 0;
         if (value.dailySelect.isNotEmpty) {
           dailySelectValue = value.dailySelect;
@@ -331,7 +362,8 @@ class DailySelectPages extends State<DailySelectPage> {
 
       apiServiceNew.getUpdate("DAILYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
-          getDailySelect(date);
+          getDailySelect(
+              date, member.user.userId, member.user.organizationCode);
         } else {}
       });
     });
@@ -371,7 +403,7 @@ class DailySelectPages extends State<DailySelectPage> {
         ),
       ],
     );
-    getDailySelect(date);
+    getDailySelect(date, member.user.userId, member.user.organizationCode);
     super.initState();
   }
 
@@ -604,7 +636,8 @@ class DailySelectPages extends State<DailySelectPage> {
                 ),
               ),
               onTap: () {
-                getDailySelect(date);
+                getDailySelect(
+                    date, member.user.userId, member.user.organizationCode);
                 showDialog(
                   context: context,
                   builder: (_) {
@@ -861,7 +894,7 @@ class DailySelectPages extends State<DailySelectPage> {
       // date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
       date = Date().date(DateTime.now().add(Duration(days: sDay)));
       _report(date);
-      getDailySelect(date);
+      getDailySelect(date, member.user.userId, member.user.organizationCode);
     }
 
     _dayIncrease() {
@@ -870,7 +903,7 @@ class DailySelectPages extends State<DailySelectPage> {
       changeDate = Date().getDate(sDay);
       date = Date().date(DateTime.now().add(Duration(days: sDay)));
       _report(date);
-      getDailySelect(date);
+      getDailySelect(date, member.user.userId, member.user.organizationCode);
     }
 
     final menuName = Container(
@@ -932,7 +965,8 @@ class DailySelectPages extends State<DailySelectPage> {
                     sDay = dateTime.difference(DateTime.now()).inDays;
                     date = Date().date(_selectedTime);
                     _report(date);
-                    getDailySelect(date);
+                    getDailySelect(
+                        date, member.user.userId, member.user.organizationCode);
                   } else {
                     dateTime = _selectedTime;
                   }
@@ -1053,7 +1087,8 @@ class DailySelectPages extends State<DailySelectPage> {
                         onChanged: (value) {
                           setState(() {
                             deptValue = value;
-                            getDailySelect(date);
+                            getDailySelect(date, member.user.userId,
+                                member.user.organizationCode);
                           });
                         },
                       ),
@@ -1180,7 +1215,8 @@ class DailySelectPages extends State<DailySelectPage> {
         controller: _refreshController,
         onRefresh: () {
           _report(date);
-          getDailySelect(date);
+          getDailySelect(
+              date, member.user.userId, member.user.organizationCode);
           _refreshController.refreshCompleted();
           _refreshController.loadComplete();
         },
