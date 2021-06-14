@@ -6,6 +6,7 @@ import 'package:evolveofficeapp/pages/profile_page.dart';
 import 'package:evolveofficeapp/pages/wheremanage_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'common.dart';
 
@@ -118,7 +119,7 @@ class KulsNavigationBottomBar extends StatelessWidget
     int _selectedIndex = selectedIndex;
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
+        // borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.16),
@@ -127,22 +128,23 @@ class KulsNavigationBottomBar extends StatelessWidget
           ),
         ],
       ),
-      margin: EdgeInsets.only(
-        left: screenWidth * 0.05,
-        right: screenWidth * 0.05,
-        top: screenHeight * 0.01,
-        bottom: screenHeight * 0.02,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
+      // margin: EdgeInsets.only(
+      //   left: screenWidth * 0.05,
+      //   right: screenWidth * 0.05,
+      //   top: screenHeight * 0.01,
+      //   bottom: screenHeight * 0.02,
+      // ),
+      child: Container(
+        height: 40,
+        // borderRadius: BorderRadius.circular(15),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           backgroundColor: Color.fromRGBO(248, 246, 255, 1),
           // backgroundColor: Colors.red,
           selectedItemColor: Colors.grey,
           unselectedItemColor: Colors.black,
-          selectedFontSize: screenHeight * 0.02,
-          unselectedFontSize: screenHeight * 0.02,
+          selectedFontSize: 10,
+          unselectedFontSize: 10,
           currentIndex: _selectedIndex, //현재 선택된 Index
           onTap: (int index) {
             if (_selectedIndex != index && index == 0) {
@@ -188,21 +190,21 @@ class KulsNavigationBottomBar extends StatelessWidget
               label: 'Menu',
               icon: Icon(
                 Icons.menu_rounded,
-                size: screenHeight * 0.03,
+                size: 16,
               ),
             ),
             BottomNavigationBarItem(
               label: 'Home',
               icon: Icon(
                 Icons.home,
-                size: screenHeight * 0.03,
+                size: 16,
               ),
             ),
             BottomNavigationBarItem(
               label: 'Profile',
               icon: Icon(
                 Icons.person_outline,
-                size: screenHeight * 0.03,
+                size: 16,
               ),
             ),
           ],
@@ -326,6 +328,27 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ],
                 ),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: TextButton(
+                      onPressed: () {
+                        storage.deleteAll();
+                        Navigator.pushReplacement(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => LoginPage(),
+                          ),
+                        );
+                      },
+                      child: Icon(
+                        Entypo.log_out,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
           ),
@@ -413,51 +436,51 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: menuRow('행선지 관리'),
                 ),
-                SizedBox(height: 20),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => AprovalPage(
-                          id: id,
-                          pass: pass,
-                          member: member,
-                        ),
-                      ),
-                    );
-                  },
-                  child: menuRow('휴가원 관리'),
-                ),
+                // SizedBox(height: 20),
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       CupertinoPageRoute(
+                //         builder: (context) => AprovalPage(
+                //           id: id,
+                //           pass: pass,
+                //           member: member,
+                //         ),
+                //       ),
+                //     );
+                //   },
+                //   child: menuRow('휴가원 관리'),
+                // ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () {
-              // storage.delete(key: "login");
-              storage.deleteAll();
-              Navigator.pushReplacement(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => LoginPage(),
-                ),
-              );
-            },
-            child: Container(
-              height: 70,
-              margin: EdgeInsets.only(
-                left: 45,
-              ),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Log Out',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'NotoSansKR',
-                ),
-              ),
-            ),
-          ),
+          // InkWell(
+          //   onTap: () {
+          //     // storage.delete(key: "login");
+          //     storage.deleteAll();
+          //     Navigator.pushReplacement(
+          //       context,
+          //       CupertinoPageRoute(
+          //         builder: (context) => LoginPage(),
+          //       ),
+          //     );
+          //   },
+          //   child: Container(
+          //     height: 70,
+          //     margin: EdgeInsets.only(
+          //       left: 45,
+          //     ),
+          //     alignment: Alignment.centerLeft,
+          //     child: Text(
+          //       'Log Out',
+          //       style: TextStyle(
+          //         fontSize: 18,
+          //         fontFamily: 'NotoSansKR',
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

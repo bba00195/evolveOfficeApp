@@ -37,10 +37,10 @@ class PopUpDailyReply extends StatefulWidget {
       this.sReplyQty,
       this.sLikePerson});
   @override
-  _PopUpDailyReplyState createState() => new _PopUpDailyReplyState();
+  PopUpDailyReplyState createState() => new PopUpDailyReplyState();
 }
 
-class _PopUpDailyReplyState extends State<PopUpDailyReply> {
+class PopUpDailyReplyState extends State<PopUpDailyReply> {
   DailySelectPages _dailySelectPage = DailySelectPages();
   APIServiceNew apiServiceNew = new APIServiceNew();
 
@@ -91,8 +91,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     sLikeFlag = widget.sLikeFlag;
     sReplyQty = widget.sReplyQty;
     sLikePerson = widget.sLikePerson;
+    replySelect(sOrganizationCode, sUserId, sDate);
     getDailySelect(sDate);
-    _replySelect(sOrganizationCode, sUserId, sDate);
     replyFocusNode = FocusNode();
     replyChildFocusNode = FocusNode();
     super.initState();
@@ -127,7 +127,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     });
   }
 
-  void _replySelect(String sOrganizationCode, String sUserId, String date) {
+  void replySelect(String sOrganizationCode, String sUserId, String date) {
     List<String> sParam = [
       sOrganizationCode,
       date,
@@ -148,7 +148,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     });
   }
 
-  void _dailyLike(String sOrganizationCode, String sUserId, String date) {
+  void dailyLike(String sOrganizationCode, String sUserId, String date) {
     setState(() {
       List<String> sParam = [
         sOrganizationCode,
@@ -160,13 +160,13 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
       apiServiceNew.getUpdate("DAILYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
           getDailySelect(sDate);
-          _replySelect(sOrganizationCode, sUserId, sDate);
+          replySelect(sOrganizationCode, sUserId, sDate);
         } else {}
       });
     });
   }
 
-  void _replyInsert(String sOrganizationCode, String sUserId, String date,
+  void replyInsert(String sOrganizationCode, String sUserId, String date,
       String sReplyContents) {
     setState(() {
       List<String> sParam = [
@@ -185,7 +185,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     });
   }
 
-  void _replyChildInsert(String sOrganizationCode, String sUserId, int sReplyNo,
+  void replyChildInsert(String sOrganizationCode, String sUserId, int sReplyNo,
       String date, String sReplyContents) {
     setState(() {
       List<String> sParam = [
@@ -200,14 +200,14 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
       apiServiceNew.getInsert("DAILYREPLY_I2", sParam).then((value) {
         if (value.result.isNotEmpty) {
           getDailySelect(sDate);
-          _replySelect(sOrganizationCode, sUserId, sDate);
+          replySelect(sOrganizationCode, sUserId, sDate);
           _replyChildTextEditController.text = "";
         } else {}
       });
     });
   }
 
-  void _replyChildUpdate(String sOrganizationCode, String sUserId, int sReplyNo,
+  void replyChildUpdate(String sOrganizationCode, String sUserId, int sReplyNo,
       int sGroupNo, String date, String sReplyContents) {
     setState(() {
       List<String> sParam = [
@@ -223,14 +223,14 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
       apiServiceNew.getUpdate("DAILYREPLY_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
           getDailySelect(sDate);
-          _replySelect(sOrganizationCode, sUserId, sDate);
+          replySelect(sOrganizationCode, sUserId, sDate);
           _replyChildTextEditController.text = "";
         } else {}
       });
     });
   }
 
-  void _replyDelete(String sOrganizationCode, String date, String sUserId,
+  void replyDelete(String sOrganizationCode, String date, String sUserId,
       int sReplyNo, int sGroupNo) {
     setState(() {
       List<String> sParam = [
@@ -245,8 +245,8 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
       apiServiceNew.getDelete("DAILYREPLY_D1", sParam).then((value) {
         if (value.result.isNotEmpty) {
           getDailySelect(sDate);
-          _replySelect(sOrganizationCode, sUserId, sDate);
-          _show("댓글이 정상적으로 삭제되었습니다.");
+          replySelect(sOrganizationCode, sUserId, sDate);
+          show("댓글이 정상적으로 삭제되었습니다.");
         } else {}
       });
     });
@@ -267,7 +267,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
       apiServiceNew.getUpdate("REPLYLIKE_U1", sParam).then((value) {
         if (value.result.isNotEmpty) {
           getDailySelect(sDate);
-          _replySelect(sOrganizationCode, sUserId, sDate);
+          replySelect(sOrganizationCode, sUserId, sDate);
         } else {}
       });
     });
@@ -301,7 +301,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                 ),
               ),
               onTap: () {
-                _dailyLike(sOrganizationCode, sUserId, sDate);
+                dailyLike(sOrganizationCode, sUserId, sDate);
               },
             ),
           ),
@@ -343,7 +343,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     );
   }
 
-  DecorationImage _memberImage(String sUserImg) {
+  DecorationImage memberImage(String sUserImg) {
     if (sUserImg != "" && sUserImg != null) {
       return DecorationImage(
         image:
@@ -427,7 +427,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                           color: Colors.grey[300],
                           width: 1,
                         ),
-                        image: _memberImage(uploadImgSajin),
+                        image: memberImage(uploadImgSajin),
                       ),
                     ),
                     Container(
@@ -621,7 +621,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                         flex: 1,
                         child: InkWell(
                           onTap: () {
-                            _showMessage(organizationCode, workDate, userId,
+                            showMessage(organizationCode, workDate, userId,
                                 replyNo, groupNo);
                           },
                           child: AutoSizeText(
@@ -680,7 +680,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                             color: Colors.grey[300],
                             width: 1,
                           ),
-                          image: _memberImage(member.user.imgSajin),
+                          image: memberImage(member.user.imgSajin),
                         ),
                       ),
                       Expanded(
@@ -740,27 +740,27 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                           child: TextButton(
                             onPressed: () {
                               if (_replyChildTextEditController.text == "") {
-                                _show("댓글 내용을 입력해주세요.");
+                                show("댓글 내용을 입력해주세요.");
                                 return;
                               } else {
                                 if (isUpdated) {
-                                  _replyChildUpdate(
+                                  replyChildUpdate(
                                       organizationCode,
                                       userId,
                                       replyNo,
                                       groupNo,
                                       workDate,
                                       _replyChildTextEditController.text);
-                                  _replySelect(
+                                  replySelect(
                                       sOrganizationCode, sUserId, sDate);
                                 } else {
-                                  _replyChildInsert(
+                                  replyChildInsert(
                                       organizationCode,
                                       userId,
                                       replyNo,
                                       workDate,
                                       _replyChildTextEditController.text);
-                                  _replySelect(
+                                  replySelect(
                                       sOrganizationCode, sUserId, sDate);
                                 }
                                 isUpdated = false;
@@ -825,7 +825,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     );
   }
 
-  _show(String sMessage) {
+  show(String sMessage) {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
@@ -844,7 +844,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
     );
   }
 
-  _showMessage(
+  showMessage(
     String organizationCode,
     String workDate,
     String userId,
@@ -867,7 +867,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
               child: Text("확인"),
               onPressed: () {
                 Navigator.of(context).pop(true);
-                _replyDelete(
+                replyDelete(
                     organizationCode, workDate, userId, replyNo, groupNo);
               },
             ),
@@ -1042,7 +1042,7 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                                 color: Colors.grey[300],
                                 width: 1,
                               ),
-                              image: _memberImage(member.user.imgSajin),
+                              image: memberImage(member.user.imgSajin),
                             ),
                           ),
                           Expanded(
@@ -1103,12 +1103,12 @@ class _PopUpDailyReplyState extends State<PopUpDailyReply> {
                               child: TextButton(
                                 onPressed: () {
                                   if (_replyTextEditController.text == "") {
-                                    _show("댓글 내용을 입력해주세요.");
+                                    show("댓글 내용을 입력해주세요.");
                                     return;
                                   } else {
-                                    _replyInsert(sOrganizationCode, sUserId,
+                                    replyInsert(sOrganizationCode, sUserId,
                                         sDate, _replyTextEditController.text);
-                                    _replySelect(
+                                    replySelect(
                                         sOrganizationCode, sUserId, sDate);
                                   }
                                 },

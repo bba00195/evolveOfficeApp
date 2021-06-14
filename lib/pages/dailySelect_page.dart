@@ -10,6 +10,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:horizontal_data_table/refresh/pull_to_refresh/src/smart_refresher.dart';
 import 'package:intl/intl.dart';
 
 class DailySelectPage extends StatefulWidget {
@@ -32,6 +33,8 @@ class DailySelectPages extends State<DailySelectPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   APIServiceNew apiServiceNew = new APIServiceNew();
 
   String id;
@@ -1171,43 +1174,54 @@ class DailySelectPages extends State<DailySelectPage> {
         member: member,
         selectedIndex: 1,
       ),
-      body: GestureDetector(
-        onTap: () {
-          _dailyPageWrite.dayFocusNode.unfocus();
-          _dailyPageWrite.nextFocusNode.unfocus();
-          _dailyPageWrite.remarkFocusNode.unfocus();
+      body: SmartRefresher(
+        enablePullDown: true,
+        // enablePullUp: true,
+        controller: _refreshController,
+        onRefresh: () {
+          _report(date);
+          getDailySelect(date);
+          _refreshController.refreshCompleted();
+          _refreshController.loadComplete();
         },
-        child: Container(
-          color: Color.fromRGBO(248, 246, 255, 1),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: 10),
-                menuName,
-                SizedBox(height: 20),
-                Container(
-                  constraints: BoxConstraints(
-                    minHeight: 500,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(screenWidth * 0.07),
-                      topRight: Radius.circular(screenWidth * 0.07),
+        child: GestureDetector(
+          onTap: () {
+            _dailyPageWrite.dayFocusNode.unfocus();
+            _dailyPageWrite.nextFocusNode.unfocus();
+            _dailyPageWrite.remarkFocusNode.unfocus();
+          },
+          child: Container(
+            color: Color.fromRGBO(248, 246, 255, 1),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+                  menuName,
+                  SizedBox(height: 20),
+                  Container(
+                    constraints: BoxConstraints(
+                      minHeight: 500,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(screenWidth * 0.07),
+                        topRight: Radius.circular(screenWidth * 0.07),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10),
+                        selectHeader,
+                        SizedBox(height: 20),
+                        // dailyDataTable(),
+                        contentTable(),
+                        SizedBox(height: 100),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 10),
-                      selectHeader,
-                      SizedBox(height: 20),
-                      // dailyDataTable(),
-                      contentTable(),
-                      SizedBox(height: 100),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

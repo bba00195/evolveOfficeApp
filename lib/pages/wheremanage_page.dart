@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/whereis_model.dart';
-import 'package:evolveofficeapp/pages/whereis_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
@@ -27,6 +26,7 @@ class WhereManagePage extends StatefulWidget {
   final String area;
   final String contents;
   final String carType;
+  final String attribute;
 
   WhereManagePage({
     this.id,
@@ -39,6 +39,7 @@ class WhereManagePage extends StatefulWidget {
     this.area,
     this.contents,
     this.carType,
+    this.attribute,
   });
   @override
   _WhereManagePage createState() => new _WhereManagePage();
@@ -85,8 +86,11 @@ class _WhereManagePage extends State<WhereManagePage> {
   String sEndTime = '';
   String sEndTimeOrg = '';
   final _locateTextEditController = TextEditingController();
+  final _attributeTextEditController = TextEditingController();
   GlobalKey<FormState> _locateFormKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _attributeFormKey = GlobalKey<FormState>();
   FocusNode locateFocusNode;
+  FocusNode attributeFocusNode;
   bool isUpdate = false;
   DateTime updateDate;
   String area;
@@ -168,10 +172,19 @@ class _WhereManagePage extends State<WhereManagePage> {
     // });
   }
 
-  void _whereInsert(String sDate, String sStart, String sEnd, String sLocate,
-      String sCarType, bool isUpdate, String latitude, String longitude) async {
+  void _whereInsert(
+      String sDate,
+      String sStart,
+      String sEnd,
+      String sLocate,
+      String sCarType,
+      bool isUpdate,
+      String latitude,
+      String longitude,
+      String attribute) async {
     // areaFocusNode.unfocus();
     locateFocusNode.unfocus();
+    attributeFocusNode.unfocus();
     if (sDate == '') {
       _show("날짜를 선택해주세요.");
       return;
@@ -198,7 +211,8 @@ class _WhereManagePage extends State<WhereManagePage> {
         sCarType,
         member.user.userId,
         latitude,
-        longitude
+        longitude,
+        attribute
       ];
 
       if (isUpdate) {
@@ -210,13 +224,14 @@ class _WhereManagePage extends State<WhereManagePage> {
           sDate,
           latitude,
           longitude,
+          attribute,
           member.user.organizationCode,
           sDate,
           member.user.userId,
           sStartTimeOrg,
           sEndTimeOrg,
         ];
-        apiServiceNew.getUpdate("WHEREIS_U1", sParam).then((value) {
+        apiServiceNew.getUpdate("WHEREIS_U2", sParam).then((value) {
           if (value.result.isNotEmpty) {
             if (value.result.elementAt(0).rsCode == "E") {
               if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
@@ -232,7 +247,7 @@ class _WhereManagePage extends State<WhereManagePage> {
           }
         });
       } else {
-        apiServiceNew.getInsert("WHEREIS_I1", sParam).then((value) {
+        apiServiceNew.getInsert("WHEREIS_I2", sParam).then((value) {
           if (value.result.isNotEmpty) {
             if (value.result.elementAt(0).rsCode == "E") {
               if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
@@ -276,6 +291,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       sEndTime = "";
       _selectedEnd = "";
       _locateTextEditController.text = "";
+      _attributeTextEditController.text = "";
       isDay = false;
       isMorning = false;
       isAfter = false;
@@ -389,6 +405,7 @@ class _WhereManagePage extends State<WhereManagePage> {
   @override
   void dispose() {
     _locateTextEditController.dispose();
+    _attributeTextEditController.dispose();
     super.dispose();
   }
 
@@ -444,6 +461,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       _selectedEnd = sEndTime.substring(0, 2) + ":" + sEndTime.substring(2, 4);
       // _areaTextEditController.text = widget.area;
       _locateTextEditController.text = widget.contents;
+      _attributeTextEditController.text = widget.attribute;
       carType = widget.carType;
     } else {
       date = Date().date(null);
@@ -454,6 +472,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       _selectedEnd = "";
     }
     locateFocusNode = FocusNode();
+    attributeFocusNode = FocusNode();
 
     super.initState();
   }
@@ -934,43 +953,6 @@ class _WhereManagePage extends State<WhereManagePage> {
                               minFontSize: 14,
                             ),
                           ),
-                          // child: TextButton(
-                          //   style: ButtonStyle(
-                          //     backgroundColor:
-                          //         MaterialStateProperty.all<Color>(Colors.white),
-                          //     elevation: MaterialStateProperty.all(
-                          //         6), //Defines Elevation
-                          //     shadowColor: MaterialStateProperty.all(
-                          //       Color.fromRGBO(0, 0, 0, 0.6),
-                          //     ),
-                          //   ),
-                          //   onPressed: () {
-                          //     Future<TimeOfDay> selectedTime = showTimePicker(
-                          //       initialTime: TimeOfDay(hour: 18, minute: 0),
-                          //       context: context,
-                          //     );
-                          //     selectedTime.then((timeOfDay) {
-                          //       setState(() {
-                          //         if (timeOfDay != null) {
-                          //           _selectedEnd =
-                          //               '${timeOfDay.hour}'.padLeft(2, '0') +
-                          //                   ':' +
-                          //                   '${timeOfDay.minute}'.padLeft(2, '0');
-                          //           sEndTime =
-                          //               '${timeOfDay.hour}'.padLeft(2, '0') +
-                          //                   '${timeOfDay.minute}'.padLeft(2, '0');
-                          //         }
-                          //       });
-                          //     });
-                          //   },
-                          //   child: Text(
-                          //     _selectedEnd,
-                          //     style: TextStyle(
-                          //       color: Colors.black,
-                          //       fontSize: 20,
-                          //     ),
-                          //   ),
-                          // ),
                         ),
                       ),
                     ],
@@ -1076,7 +1058,55 @@ class _WhereManagePage extends State<WhereManagePage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 5),
+                  Container(
+                    margin: EdgeInsets.only(left: 5, right: 5),
+                    padding: EdgeInsets.only(left: 10),
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 6.0,
+                          offset: const Offset(0.0, 3.0),
+                          color: Color.fromRGBO(0, 0, 0, 0.16),
+                        )
+                      ],
+                    ),
+                    child: Form(
+                      key: _attributeFormKey,
+                      child: TextField(
+                        controller: _attributeTextEditController,
+                        focusNode: attributeFocusNode,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(top: 5),
+                          enabledBorder: OutlineInputBorder(
+                            // borderRadius: BorderRadius.circular(32.0),
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            // borderRadius: BorderRadius.circular(32.0),
+                            borderSide: BorderSide(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: '목적',
+                        ),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontFamily: 'NotoSansKR',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 5),
                   Row(
                     children: [
                       Checkbox(
@@ -1090,7 +1120,8 @@ class _WhereManagePage extends State<WhereManagePage> {
                               sStartTime = '0830';
                               _selectedEnd = '18:00';
                               sEndTime = '1800';
-                              _locateTextEditController.text = "내근";
+                              _locateTextEditController.text = "사무실";
+                              _attributeTextEditController.text = "내근";
                             });
                           }),
                       AutoSizeText(
@@ -1110,7 +1141,8 @@ class _WhereManagePage extends State<WhereManagePage> {
                               sStartTime = '0830';
                               _selectedEnd = '13:00';
                               sEndTime = '1300';
-                              _locateTextEditController.text = "내근";
+                              _locateTextEditController.text = "사무실";
+                              _attributeTextEditController.text = "내근";
                             });
                           }),
                       AutoSizeText(
@@ -1130,7 +1162,8 @@ class _WhereManagePage extends State<WhereManagePage> {
                               sStartTime = '1300';
                               _selectedEnd = '18:00';
                               sEndTime = '1800';
-                              _locateTextEditController.text = "내근";
+                              _locateTextEditController.text = "사무실";
+                              _attributeTextEditController.text = "내근";
                             });
                           }),
                       AutoSizeText(
@@ -1141,7 +1174,6 @@ class _WhereManagePage extends State<WhereManagePage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
                   Container(
                     width: screenWidth * 0.75,
                     child: ElevatedButton(
@@ -1163,7 +1195,8 @@ class _WhereManagePage extends State<WhereManagePage> {
                               selectedValue,
                               isUpdate,
                               latitude,
-                              longitude);
+                              longitude,
+                              _attributeTextEditController.text);
                           _getWhereIs(date);
                         });
                       },
@@ -1425,6 +1458,7 @@ class _WhereManagePage extends State<WhereManagePage> {
         ),
         onTap: () {
           locateFocusNode.unfocus();
+          attributeFocusNode.unfocus();
         },
       ),
     );

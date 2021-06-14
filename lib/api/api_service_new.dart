@@ -52,6 +52,10 @@ class APIServiceNew {
         final response = await http.post(url, body: sBody, headers: headers);
         result = ReplyResultModel.fromJson(json.decode(response.body));
         break;
+      case "DAILYREPLY_S2":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = ReplyResultModel.fromJson(json.decode(response.body));
+        break;
       default:
         break;
     }
@@ -73,11 +77,19 @@ class APIServiceNew {
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
+      case "DAYREPORT_I2":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
       case "NEXTREPORT_I1":
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
       case "WHEREIS_I1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
+      case "WHEREIS_I2":
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
@@ -115,6 +127,10 @@ class APIServiceNew {
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
       case "WHEREIS_U1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
+      case "WHEREIS_U2":
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
