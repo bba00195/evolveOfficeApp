@@ -414,57 +414,57 @@ class _LeaveManagePage extends State<LeaveManagePage> {
     );
     // #캘린더
     final calendar = Container(
-      child: TableCalendar(
-          rowHeight: 35,
-          focusedDay: focusedDay,
-          firstDay: DateTime(1990),
-          lastDay: DateTime(2050),
-          calendarFormat: format,
-          onFormatChanged: (CalendarFormat _format) {
-            setState(() {
-              format = _format;
-            });
-          },
-          startingDayOfWeek: StartingDayOfWeek.sunday,
-          daysOfWeekVisible: true,
+        // child: TableCalendar(
+        //     rowHeight: 35,
+        //     focusedDay: focusedDay,
+        //     firstDay: DateTime(1990),
+        //     lastDay: DateTime(2050),
+        //     calendarFormat: format,
+        //     onFormatChanged: (CalendarFormat _format) {
+        //       setState(() {
+        //         format = _format;
+        //       });
+        //     },
+        //     startingDayOfWeek: StartingDayOfWeek.sunday,
+        //     daysOfWeekVisible: true,
 
-          // 날짜 변경
-          onDaySelected: (DateTime selectDay, DateTime focusDay) {
-            setState(() {
-              selectedDay = selectDay;
-              focusedDay = focusDay;
-            });
-            print(focusDay);
-          },
-          selectedDayPredicate: (DateTime date) {
-            return isSameDay(selectedDay, date);
-          },
+        //     // 날짜 변경
+        //     onDaySelected: (DateTime selectDay, DateTime focusDay) {
+        //       setState(() {
+        //         selectedDay = selectDay;
+        //         focusedDay = focusDay;
+        //       });
+        //       print(focusDay);
+        //     },
+        //     selectedDayPredicate: (DateTime date) {
+        //       return isSameDay(selectedDay, date);
+        //     },
 
-          // 스타일
-          calendarStyle: CalendarStyle(
-              weekendTextStyle: TextStyle().copyWith(color: Colors.red),
-              holidayTextStyle: TextStyle().copyWith(color: Colors.blue[800]),
-              isTodayHighlighted: true,
-              selectedDecoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              selectedTextStyle: TextStyle(color: Colors.white),
-              todayDecoration: BoxDecoration(
-                color: Colors.purpleAccent,
-                shape: BoxShape.circle,
-              )),
-          headerStyle: HeaderStyle(
-              formatButtonVisible: true,
-              titleCentered: true,
-              formatButtonShowsNext: false,
-              formatButtonDecoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              formatButtonTextStyle: TextStyle(
-                color: Colors.white,
-              ))),
-    );
+        //     // 스타일
+        //     calendarStyle: CalendarStyle(
+        //         weekendTextStyle: TextStyle().copyWith(color: Colors.red),
+        //         holidayTextStyle: TextStyle().copyWith(color: Colors.blue[800]),
+        //         isTodayHighlighted: true,
+        //         selectedDecoration: BoxDecoration(
+        //           color: Colors.blue,
+        //           shape: BoxShape.circle,
+        //         ),
+        //         selectedTextStyle: TextStyle(color: Colors.white),
+        //         todayDecoration: BoxDecoration(
+        //           color: Colors.purpleAccent,
+        //           shape: BoxShape.circle,
+        //         )),
+        //     headerStyle: HeaderStyle(
+        //         formatButtonVisible: true,
+        //         titleCentered: true,
+        //         formatButtonShowsNext: false,
+        //         formatButtonDecoration: BoxDecoration(
+        //           color: Colors.blue,
+        //         ),
+        //         formatButtonTextStyle: TextStyle(
+        //           color: Colors.white,
+        //         ))),
+        );
 
     // #region Body
     return Scaffold(

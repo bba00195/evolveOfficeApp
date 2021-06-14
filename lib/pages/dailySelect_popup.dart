@@ -136,15 +136,17 @@ class PopUpDailyReplyState extends State<PopUpDailyReply> {
     ];
 
     apiServiceNew.getSelect("DAILYREPLY_S1", sParam).then((value) {
-      if (value.reply.isNotEmpty) {
-        replyValue = value.reply;
-        for (int i = 0; i < replyValue.length; i++) {
-          if (replyChildList.length < replyValue.length) {
-            replyChildList.add(false);
-            replyChildUpdateList.add(false);
+      setState(() {
+        if (value.reply.isNotEmpty) {
+          replyValue = value.reply;
+          for (int i = 0; i < replyValue.length; i++) {
+            if (replyChildList.length < replyValue.length) {
+              replyChildList.add(false);
+              replyChildUpdateList.add(false);
+            }
           }
-        }
-      } else {}
+        } else {}
+      });
     });
   }
 
