@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,23 +42,23 @@ class _AprovalPage extends State<AprovalPage> {
   String pass;
   UserManager member;
 
-  void _getDailySelect() async {
-    APIServiceNew apiServiceNew = new APIServiceNew();
+  // void _getDailySelect() async {
+  //   APIServiceNew apiServiceNew = new APIServiceNew();
 
-    List<String> sParam = [];
+  //   List<String> sParam = [];
 
-    apiServiceNew.getSelect("DAILY_S1", sParam).then((value) {
-      setState(() {
-        // itemCount = 0;
-        // if (value.dailySelect.isNotEmpty) {
-        //   dailySelectValue = value.dailySelect;
-        //   for (var i = 0; i < value.dailySelect.length; i++) {
-        //     itemCount++;
-        //   }
-        // } else {}
-      });
-    });
-  }
+  //   apiServiceNew.getSelect("DAILY_S1", sParam).then((value) {
+  //     setState(() {
+  //       // itemCount = 0;
+  //       // if (value.dailySelect.isNotEmpty) {
+  //       //   dailySelectValue = value.dailySelect;
+  //       //   for (var i = 0; i < value.dailySelect.length; i++) {
+  //       //     itemCount++;
+  //       //   }
+  //       // } else {}
+  //     });
+  //   });
+  // }
 
   @override
   void dispose() {
@@ -166,9 +165,6 @@ class _AprovalPage extends State<AprovalPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-
     // #region Body
     return Scaffold(
       key: _scaffoldKey,
@@ -192,6 +188,7 @@ class _AprovalPage extends State<AprovalPage> {
         pass: pass,
         member: member,
         selectedIndex: 1,
+        pageName: "",
       ),
       body: GestureDetector(
         // 포커싱 제거
