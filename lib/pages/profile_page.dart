@@ -29,7 +29,6 @@ class _ProfilePage extends State<ProfilePage> {
   String id;
   String pass;
   UserManager member;
-  GlobalKey<FormState> _telFormKey = GlobalKey<FormState>();
   GlobalKey<FormState> _passwordFormKey = GlobalKey<FormState>();
   final _telTextEditController = TextEditingController();
   final _passwordEditController = TextEditingController();
@@ -118,31 +117,40 @@ class _ProfilePage extends State<ProfilePage> {
     });
   }
 
+  final menuName = AppBar(
+    iconTheme: IconThemeData(
+      color: Colors.black, //change your color here
+    ),
+    actions: [],
+    backgroundColor: Color.fromRGBO(248, 246, 255, 1),
+    centerTitle: true,
+    title: Text(
+      'Profile',
+      style: TextStyle(
+        color: Colors.black,
+        fontSize: 20,
+        fontFamily: 'NotoSansKR',
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    toolbarHeight: 75,
+    bottomOpacity: 0.0,
+    elevation: 0.0,
+  );
+
+  showImage() {
+    return Image(
+      image: NetworkImage(
+          'http://211.213.24.71:8080/Upload/sajin/' + member.user.imgSajin),
+      fit: BoxFit.cover,
+      key: ValueKey(new Random().nextInt(100)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-
-    final menuName = AppBar(
-      iconTheme: IconThemeData(
-        color: Colors.black, //change your color here
-      ),
-      actions: [],
-      backgroundColor: Color.fromRGBO(248, 246, 255, 1),
-      centerTitle: true,
-      title: Text(
-        'Profile',
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontFamily: 'NotoSansKR',
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      toolbarHeight: 75,
-      bottomOpacity: 0.0,
-      elevation: 0.0,
-    );
 
     final pageHead = Container(
       decoration: BoxDecoration(
@@ -166,7 +174,7 @@ class _ProfilePage extends State<ProfilePage> {
       ),
     );
 
-    DecorationImage _memberImage() {
+    _memberImage() {
       if (_isChoosed) {
         if (tmpFile != null) {
           return DecorationImage(
@@ -225,17 +233,6 @@ class _ProfilePage extends State<ProfilePage> {
         // _show("정보가 수정되었습니다.");
       }
     }
-
-    // upload(String fileName) {
-    //   http.post(Uri.parse(uploadEndPoint), body: {
-    //     "filename1": tmpFile,
-    //     // "name": '/sajin' + fileName,
-    //   }).then((result) {
-    //     setStatus(result.statusCode == 200 ? result.body : errMessage);
-    //   }).catchError((error) {
-    //     setStatus(error);
-    //   });
-    // }
 
     startUpload() {
       setStatus('Uploading Image...');
@@ -316,26 +313,6 @@ class _ProfilePage extends State<ProfilePage> {
         ],
       ),
     );
-
-    Widget showImage() {
-      // return Container(
-      //   width: 100,
-      //   height: 100,
-      //   decoration: BoxDecoration(
-      //     image: DecorationImage(
-      //       image: NetworkImage('http://211.213.24.71:8080/Upload/sajin/' +
-      //           member.user.imgSajin),
-      //       fit: BoxFit.cover,
-      //     ),
-      //   ),
-      // );
-      return Image(
-        image: NetworkImage(
-            'http://211.213.24.71:8080/Upload/sajin/' + member.user.imgSajin),
-        fit: BoxFit.cover,
-        key: ValueKey(new Random().nextInt(100)),
-      );
-    }
 
     final profileContent = Container(
       margin: EdgeInsets.only(
@@ -648,6 +625,7 @@ class _ProfilePage extends State<ProfilePage> {
         pass: pass,
         member: member,
         selectedIndex: 2,
+        pageName: "",
       ),
       body: GestureDetector(
         child: Center(

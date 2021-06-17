@@ -68,21 +68,7 @@ class DailySelectPages extends State<DailySelectPage> {
 
   List<String> deptCodeList = [];
   List<String> deptNameList = [];
-
-  final _deptList = [
-    '',
-    '1220',
-    '1230',
-    '1240',
-    '1270',
-    '2110',
-    '2120',
-    '2140',
-    '2150',
-    '2160',
-    '2210',
-    '4001',
-  ];
+  List<String> deptColorList = [];
   var deptValue = '';
 
   List<DailySelectResponseModel> dailySelectValue;
@@ -92,9 +78,6 @@ class DailySelectPages extends State<DailySelectPage> {
 
   void _report(String selectedDate) async {
     setState(() {
-      // APIService apiService = new APIService();
-      // futureAlbum = apiService.report(
-      //     member.user.organizationCode, member.user.userId, selectedDate);
       List<String> sParam = [
         member.user.organizationCode,
         selectedDate,
@@ -108,11 +91,7 @@ class DailySelectPages extends State<DailySelectPage> {
               value.day.elementAt(0).dayReport;
           _dailyPageWrite.nextTextEditController.text =
               value.day.elementAt(0).nextReport;
-          _dailyPageWrite.dayReport = value.day.elementAt(0).dayReport;
-          _dailyPageWrite.nextReport = value.day.elementAt(0).nextReport;
         } else {
-          _dailyPageWrite.dayReport = "";
-          _dailyPageWrite.nextReport = "";
           _dailyPageWrite.dayTextEditController.text = "";
           _dailyPageWrite.nextTextEditController.text = "";
         }
@@ -126,90 +105,55 @@ class DailySelectPages extends State<DailySelectPage> {
     isSaved = false;
     _dailyPageWrite.dayFocusNode.unfocus();
     _dailyPageWrite.nextFocusNode.unfocus();
-    // remarkFocusNode.unfocus();
-    // APIService apiService = new APIService();
     APIServiceNew apiServiceNew = new APIServiceNew();
 
     List<String> sParam;
+    sParam = [
+      organizationCode,
+      date,
+      userId,
+      _dailyPageWrite.dayTextEditController.text,
+      _dailyPageWrite.nextTextEditController.text
+    ];
 
-    if (_dailyPageWrite.dayReport !=
-        _dailyPageWrite.dayTextEditController.text) {
-      sParam = [
-        _dailyPageWrite.dayTextEditController.text,
-        userId,
-        organizationCode,
-        date,
-        userId
-      ];
-
-      if (_dailyPageWrite.dayReport == "") {
-        //  INSERT
-        if (_dailyPageWrite.nextReport == "") {
-          //  익일 업무내용 정보가 DB에 없을 때
-          apiServiceNew.getInsert("DAYREPORT_I1", sParam).then((value) {
-            if (value.result.isNotEmpty) {
-              _dailyPageWrite.dayReport =
-                  _dailyPageWrite.dayTextEditController.text;
-            } else {}
-          });
-        } else {
-          //  익일 업무내용 정보가 DB에 있을 때
-          apiServiceNew.getUpdate("DAYREPORT_U1", sParam).then((value) {
-            if (value.result.isNotEmpty) {
-              _dailyPageWrite.dayReport =
-                  _dailyPageWrite.dayTextEditController.text;
-            } else {}
-          });
-        }
-      } else {
-        apiServiceNew.getUpdate("DAYREPORT_U1", sParam).then((value) {
+    if (_dailyPageWrite.dayTextEditController.text != "" ||
+        _dailyPageWrite.nextTextEditController.text != "") {
+      apiServiceNew.getInsert("DAYREPORT_I2", sParam).then((value) {
+        setState(() {
           if (value.result.isNotEmpty) {
-            _dailyPageWrite.dayReport =
-                _dailyPageWrite.dayTextEditController.text;
-          } else {}
+            _show("등록이 완료되었습니다.");
+            isOpen = false;
+            sIcon = Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AutoSizeText(
+                  '등록',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.black,
+                    fontFamily: 'NotoSansKR',
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  minFontSize: 10,
+                ),
+                Icon(
+                  Icons.keyboard_arrow_down_sharp,
+                  size: 32,
+                ),
+              ],
+            );
+            _report(date);
+            getDailySelect(
+                date, member.user.userId, member.user.organizationCode);
+          } else {
+            isSaved = false;
+          }
         });
-      }
-      isSaved = true;
-    }
-    if (_dailyPageWrite.nextReport !=
-        _dailyPageWrite.nextTextEditController.text) {
-      sParam = [
-        _dailyPageWrite.nextTextEditController.text,
-        userId,
-        organizationCode,
-        date,
-        userId
-      ];
-      if (_dailyPageWrite.nextReport == "") {
-        //  INSERT
-        if (_dailyPageWrite.dayReport == "" &&
-            _dailyPageWrite.dayTextEditController.text == "") {
-          //  일일 업무내용 정보가 DB에 없을 때
-          apiServiceNew.getInsert("NEXTREPORT_I1", sParam).then((value) {
-            if (value.result.isNotEmpty) {
-              _dailyPageWrite.nextReport =
-                  _dailyPageWrite.nextTextEditController.text;
-            } else {}
-          });
-        } else {
-          //  일일 업무내용 정보가 DB에 있을 때
-          apiServiceNew.getUpdate("NEXTREPORT_U1", sParam).then((value) {
-            if (value.result.isNotEmpty) {
-              _dailyPageWrite.nextReport =
-                  _dailyPageWrite.nextTextEditController.text;
-            } else {}
-          });
-        }
-      } else {
-        //  일일 업무내용 정보가 DB에 있을 때
-        apiServiceNew.getUpdate("NEXTREPORT_U1", sParam).then((value) {
-          if (value.result.isNotEmpty) {
-            _dailyPageWrite.nextReport =
-                _dailyPageWrite.nextTextEditController.text;
-          } else {}
-        });
-      }
-      isSaved = true;
+      });
+    } else {
+      isSaved = false;
+      _show("내용을 입력하거나 수정해주세요.");
     }
   }
 
@@ -222,9 +166,11 @@ class DailySelectPages extends State<DailySelectPage> {
         if (value.dept.isNotEmpty) {
           deptCodeList.add('');
           deptNameList.add('ALL');
+          deptColorList.add('0xFF000000');
           for (int i = 0; i < value.dept.length; i++) {
             deptCodeList.add(value.dept.elementAt(i).deptCode);
             deptNameList.add(value.dept.elementAt(i).deptName);
+            deptColorList.add(value.dept.elementAt(i).deptColor);
           }
         } else {
           _show("조회된 데이터가 없습니다.");
@@ -233,10 +179,18 @@ class DailySelectPages extends State<DailySelectPage> {
     });
   }
 
-  String department(String value) {
+  department(String value) {
     for (int i = 0; i < deptNameList.length; i++) {
       if (deptCodeList[i] == value) {
         return deptNameList[i];
+      }
+    }
+  }
+
+  cardColor(String value) {
+    for (int i = 0; i < deptNameList.length; i++) {
+      if (deptNameList[i] == value) {
+        return Color(int.parse(deptColorList[i]));
       }
     }
   }
@@ -245,8 +199,6 @@ class DailySelectPages extends State<DailySelectPage> {
     isSaved = false;
     _dailyPageWrite.dayFocusNode.unfocus();
     _dailyPageWrite.nextFocusNode.unfocus();
-    // remarkFocusNode.unfocus();
-    // APIService apiService = new APIService();
     APIServiceNew apiServiceNew = new APIServiceNew();
 
     List<String> sParam;
@@ -271,7 +223,6 @@ class DailySelectPages extends State<DailySelectPage> {
         right: sWindowWidth * 0.05,
       ),
       width: sWindowWidth * 0.75,
-      // alignment: Alignment.centerRight,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.symmetric(horizontal: 22),
@@ -282,37 +233,6 @@ class DailySelectPages extends State<DailySelectPage> {
         ),
         onPressed: () {
           doSave(organizationCode, userId);
-          if (isSaved) {
-            setState(() {
-              _show("등록이 완료되었습니다.");
-              isOpen = false;
-              sIcon = Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AutoSizeText(
-                    '등록',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black,
-                      fontFamily: 'NotoSansKR',
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    minFontSize: 10,
-                  ),
-                  Icon(
-                    Icons.keyboard_arrow_down_sharp,
-                    size: 32,
-                  ),
-                ],
-              );
-              _report(date);
-              getDailySelect(
-                  date, member.user.userId, member.user.organizationCode);
-            });
-          } else {
-            _show("내용을 입력하거나 수정해주세요.");
-          }
         },
         child: Text(
           '등록',
@@ -348,7 +268,6 @@ class DailySelectPages extends State<DailySelectPage> {
           itemCount = dailySelectValue.length;
         } else {
           itemCount = 0;
-          // _show("조회된 데이터가 없습니다.");
         }
       });
     });
@@ -376,7 +295,6 @@ class DailySelectPages extends State<DailySelectPage> {
           itemCount = dailySelectValue.length;
         } else {
           itemCount = 0;
-          // _show("조회된 데이터가 없습니다.");
         }
       });
     });
@@ -442,50 +360,6 @@ class DailySelectPages extends State<DailySelectPage> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  Color cardColor(String sDeptName) {
-    Color result;
-    switch (sDeptName) {
-      case 'S/W검증팀':
-        result = Colors.cyan[100];
-        break;
-      case 'H/W개발팀':
-        result = Colors.teal[100];
-        break;
-      case '헬스케어사업팀':
-        result = Colors.lime[100];
-        break;
-      case '모바일솔루션팀':
-        result = Colors.brown[100];
-        break;
-      case '솔루션컨설팅팀':
-        result = Colors.blue[100];
-        // .fromRGBO(232, 228, 255, 1);
-        break;
-      case '기술영업':
-        result = Colors.purple[100];
-        break;
-      case 'CE팀':
-        result = Colors.green[200];
-        break;
-      case '에너지솔루션팀':
-        result = Colors.green[200];
-        break;
-      case '물류솔루션팀':
-        result = Colors.amber[100];
-        break;
-      case '경영지원팀':
-        result = Colors.red[100];
-        break;
-      case '종합건설':
-        result = Colors.lightGreen[100];
-        break;
-      default:
-        result = Colors.white;
-        break;
-    }
-    return result;
   }
 
   cardContentHeader(String sMenu) {
@@ -917,13 +791,10 @@ class DailySelectPages extends State<DailySelectPage> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // getDailySelect(Date().date(DateTime.now().add(Duration(days: sDay))));
-
     _dayDecrease() {
       isChanged = true;
       sDay--;
       changeDate = Date().getDate(sDay);
-      // date = Date().date(DateTime.now().add(Duration(hours: 9, days: sDay)));
       date = Date().date(DateTime.now().add(Duration(days: sDay)));
       _report(date);
       getDailySelect(date, member.user.userId, member.user.organizationCode);
@@ -1240,6 +1111,7 @@ class DailySelectPages extends State<DailySelectPage> {
         pass: pass,
         member: member,
         selectedIndex: 1,
+        pageName: "",
       ),
       body: SmartRefresher(
         enablePullDown: true,
@@ -1296,32 +1168,8 @@ class DailySelectPages extends State<DailySelectPage> {
       ),
     );
   }
+
   // #endregion
-  //
-  //
-  //
-
-  String organization(String value) {
-    String result = '';
-    switch (value) {
-      case 'CW':
-        result = "부산사업본부";
-        break;
-      case 'SU':
-        result = "서울사업본부";
-        break;
-      case 'SW':
-        result = "경남사업본부";
-        break;
-      case 'CS':
-        result = "쿨스종합건설";
-        break;
-      default:
-        break;
-    }
-    return result;
-  }
-
   _show(String sMessage) {
     showCupertinoDialog(
       context: context,

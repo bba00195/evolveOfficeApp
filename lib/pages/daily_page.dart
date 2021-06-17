@@ -607,6 +607,7 @@ class DailyPageWrite extends State<DailyPage> {
         pass: pass,
         member: member,
         selectedIndex: 1,
+        pageName: "",
       ),
       body: GestureDetector(
         child: Container(

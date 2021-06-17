@@ -37,7 +37,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  GlobalKey<FormState> _passwordFormKey = GlobalKey<FormState>();
   static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
@@ -180,25 +179,6 @@ class _HomePage extends State<HomePage> {
       } catch (e) {
         print(e);
       }
-    }
-
-    _show(String sMessage) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text(sMessage),
-            actions: [
-              TextButton(
-                child: Text("확인"),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              ),
-            ],
-          );
-        },
-      );
     }
 
     Image _memberImage() {
@@ -429,35 +409,14 @@ class _HomePage extends State<HomePage> {
         left: screenWidth * 0.05,
         right: screenWidth * 0.05,
       ),
-      // padding: EdgeInsets.only(
-      //   left: 15.0,
-      //   right: 15.0,
-      // ),
       decoration: BoxDecoration(
-        // boxShadow: [
-        //   BoxShadow(
-        //     blurRadius: 6.0,
-        //     offset: const Offset(0.0, 3.0),
-        //     color: Color.fromRGBO(0, 0, 0, 0.16),
-        //   )
-        // ],
         color: Colors.white,
         borderRadius: BorderRadius.all(
           Radius.circular(5.0),
         ),
       ),
       child: InkWell(
-        onTap: () {
-          // Navigator.push(
-          //   context,
-          //   CupertinoPageRoute(
-          //     builder: (context) => DailyPage(
-          //       id: id,
-          //       member: member,
-          //     ),
-          //   ),
-          // );
-        },
+        onTap: () {},
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -534,7 +493,7 @@ class _HomePage extends State<HomePage> {
                             child: Container(
                               alignment: Alignment.bottomLeft,
                               child: AutoSizeText(
-                                '일일업무',
+                                '오늘 내 고민',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -616,7 +575,7 @@ class _HomePage extends State<HomePage> {
                             child: Container(
                               alignment: Alignment.bottomLeft,
                               child: AutoSizeText(
-                                '행선지',
+                                '너 어디니',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -1173,6 +1132,7 @@ class _HomePage extends State<HomePage> {
         pass: pass,
         member: member,
         selectedIndex: 1,
+        pageName: 'home',
       ),
       body: WillPopScope(
         child: ListView(

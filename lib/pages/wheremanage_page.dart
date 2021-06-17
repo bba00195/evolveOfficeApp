@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
@@ -50,7 +49,9 @@ class _WhereManagePage extends State<WhereManagePage> {
   static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
 
-  void _showPicker(BuildContext ctx) {
+  void _showPicker(BuildContext ctx, bool startType) {
+    DateTime selectTime =
+        DateTime.now().add(Duration(minutes: 0 - DateTime.now().minute % 10));
     showCupertinoModalPopup(
       context: ctx,
       builder: (_) => Container(
@@ -75,6 +76,22 @@ class _WhereManagePage extends State<WhereManagePage> {
                   child: Text('등록'),
                   onPressed: () {
                     Navigator.pop(context);
+                    setState(() {
+                      if (startType == true) {
+                        // 시작시간일 경우
+                        _selectedStart = '${selectTime.hour}'.padLeft(2, '0') +
+                            ':' +
+                            '${selectTime.minute}'.padLeft(2, '0');
+                        sStartTime = '${selectTime.hour}'.padLeft(2, '0') +
+                            '${selectTime.minute}'.padLeft(2, '0');
+                      } else {
+                        _selectedEnd = '${selectTime.hour}'.padLeft(2, '0') +
+                            ':' +
+                            '${selectTime.minute}'.padLeft(2, '0');
+                        sEndTime = '${selectTime.hour}'.padLeft(2, '0') +
+                            '${selectTime.minute}'.padLeft(2, '0');
+                      }
+                    });
                   },
                 ),
               ],
@@ -83,11 +100,14 @@ class _WhereManagePage extends State<WhereManagePage> {
               child: CupertinoDatePicker(
                 mode: CupertinoDatePickerMode.time,
                 minuteInterval: 10,
-                initialDateTime: DateTime.now()
-                    .add(Duration(minutes: 0 - DateTime.now().minute % 10)),
-                onDateTimeChanged: (startTime) {
+                initialDateTime: (startType == true)
+                    ? DateTime.parse(date + " " + _selectedStart)
+                    : (_selectedEnd == "")
+                        ? DateTime.parse(date + " 18:00")
+                        : DateTime.parse(date + " " + _selectedEnd),
+                onDateTimeChanged: (valueTime) {
                   setState(() {
-                    // _currentHour = startTime;
+                    selectTime = valueTime;
                   });
                 },
               ),
@@ -128,7 +148,7 @@ class _WhereManagePage extends State<WhereManagePage> {
 
   bool isStartChanged = false;
   int sStartDay = 0;
-  DateTime _selectedStartTime;
+  DateTime selectedStartTime;
   String startDate;
   String sStartTime = '';
   String sStartTimeOrg = '';
@@ -146,19 +166,12 @@ class _WhereManagePage extends State<WhereManagePage> {
   String contents;
   String carType;
 
-  final _valueList = [
-    'MYCAR',
-    'MEMBER_CAR',
-    'BUS',
-    'TRAIN',
-    'AIRPLANE',
-    'COMPANY_CAR'
-  ];
-  var selectedValue = 'MYCAR';
+  List<String> carTypeCodeList = [];
+  List<String> carTypeNameList = [];
+  var carTypeValue = 'MYCAR';
 
   List<String> deptCodeList = [];
   List<String> deptNameList = [];
-
   var deptValue = '';
 
   String _selectedStart = "";
@@ -168,7 +181,7 @@ class _WhereManagePage extends State<WhereManagePage> {
   bool isMorning;
   bool isAfter;
 
-  void _getWhereIs(String selectedDate, {String sOrganizationcode = ""}) async {
+  void _getWhereIs(String selectedDate, {String sOrganizationcode = ""}) {
     List<String> sParam = [
       selectedDate,
       member.user.organizationCode,
@@ -192,7 +205,42 @@ class _WhereManagePage extends State<WhereManagePage> {
     });
   }
 
-  void _whereInsert(
+  void whereIsInit() {
+    _getWhereIs(date);
+    isUpdate = false;
+    isOpen = false;
+    isDay = false;
+    isMorning = false;
+    isAfter = false;
+    sIcon = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AutoSizeText(
+          '등록',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+            fontFamily: 'NotoSansKR',
+            fontWeight: FontWeight.w500,
+          ),
+          maxLines: 1,
+          minFontSize: 10,
+        ),
+        Icon(
+          Icons.keyboard_arrow_down_sharp,
+          size: 32,
+        ),
+      ],
+    );
+    latitude = "";
+    longitude = "";
+    sEndTime = "";
+    _selectedEnd = "";
+    _locateTextEditController.text = "";
+    _attributeTextEditController.text = "";
+  }
+
+  void whereInsert(
       String sDate,
       String sStart,
       String sEnd,
@@ -201,8 +249,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       bool isUpdate,
       String latitude,
       String longitude,
-      String attribute) async {
-    // areaFocusNode.unfocus();
+      String attribute) {
     locateFocusNode.unfocus();
     attributeFocusNode.unfocus();
     if (sDate == '') {
@@ -218,107 +265,124 @@ class _WhereManagePage extends State<WhereManagePage> {
       return;
     }
 
-    setState(() {
-      APIServiceNew apiServiceNew = new APIServiceNew();
+    APIServiceNew apiServiceNew = new APIServiceNew();
 
-      List<String> sParam = [
-        member.user.organizationCode,
-        sDate,
-        member.user.userId,
-        sStart,
-        sEnd,
-        sLocate,
-        sCarType,
-        member.user.userId,
-        latitude,
-        longitude,
-        attribute
-      ];
-
-      if (isUpdate) {
-        sParam = [
-          sStart,
-          sEnd,
-          sCarType,
-          sLocate,
-          sDate,
-          latitude,
-          longitude,
-          attribute,
-          member.user.organizationCode,
-          sDate,
-          member.user.userId,
-          sStartTimeOrg,
-          sEndTimeOrg,
-        ];
-        apiServiceNew.getUpdate("WHEREIS_U2", sParam).then((value) {
-          if (value.result.isNotEmpty) {
-            if (value.result.elementAt(0).rsCode == "E") {
-              if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
-                _show("이미 등록된 내용입니다.");
-                return;
-              }
-              _show(value.result.elementAt(0).rsMsg);
-            } else {
-              _show("행선지 등록이 완료되었습니다.");
+    List<String> sParam = [
+      member.user.organizationCode,
+      sDate,
+      member.user.userId,
+      sStart,
+      sEnd,
+      sLocate,
+      sCarType,
+      member.user.userId,
+      latitude,
+      longitude,
+      attribute
+    ];
+    apiServiceNew.getInsert("WHEREIS_I2", sParam).then((value) {
+      setState(() {
+        if (value.result.isNotEmpty) {
+          if (value.result.elementAt(0).rsCode == "E") {
+            if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+              _show("이미 등록된 내용입니다.");
+              return;
             }
+            _show(value.result.elementAt(0).rsMsg);
           } else {
-            _show("등록에 실패하였습니다.");
+            _show("행선지 등록이 완료되었습니다.");
           }
-        });
-      } else {
-        apiServiceNew.getInsert("WHEREIS_I2", sParam).then((value) {
-          if (value.result.isNotEmpty) {
-            if (value.result.elementAt(0).rsCode == "E") {
-              if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
-                _show("이미 등록된 내용입니다.");
-                return;
-              }
-              _show(value.result.elementAt(0).rsMsg);
-            } else {
-              _show("행선지 등록이 완료되었습니다.");
-            }
-          } else {
-            _show("등록에 실패하였습니다.");
-          }
-        });
-      }
-      _getWhereIs(date);
-      isOpen = false;
-      isUpdate = false;
-      sIcon = Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          AutoSizeText(
-            '등록',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-              fontFamily: 'NotoSansKR',
-              fontWeight: FontWeight.w500,
-            ),
-            maxLines: 1,
-            minFontSize: 10,
-          ),
-          Icon(
-            Icons.keyboard_arrow_down_sharp,
-            size: 32,
-          ),
-        ],
-      );
-      latitude = "";
-      longitude = "";
-      sEndTime = "";
-      _selectedEnd = "";
-      _locateTextEditController.text = "";
-      _attributeTextEditController.text = "";
-      isDay = false;
-      isMorning = false;
-      isAfter = false;
+        } else {
+          _show("등록에 실패하였습니다.");
+        }
+        whereIsInit();
+      });
     });
   }
 
-  void deptList() async {
+  void whereUpdate(
+      String sDate,
+      String sStart,
+      String sEnd,
+      String sLocate,
+      String sCarType,
+      bool isUpdate,
+      String latitude,
+      String longitude,
+      String attribute) {
+    locateFocusNode.unfocus();
+    attributeFocusNode.unfocus();
+    if (sDate == '') {
+      _show("날짜를 선택해주세요.");
+      return;
+    }
+    if (sStart == '') {
+      _show("시작시간을 선택해주세요.");
+      return;
+    }
+    if (sLocate == '') {
+      _show("행선지를 입력해주세요.");
+      return;
+    }
+
+    APIServiceNew apiServiceNew = new APIServiceNew();
+
+    List<String> sParam = [
+      sStart,
+      sEnd,
+      sCarType,
+      sLocate,
+      sDate,
+      latitude,
+      longitude,
+      attribute,
+      member.user.organizationCode,
+      sDate,
+      member.user.userId,
+      sStartTimeOrg,
+      sEndTimeOrg,
+    ];
+    apiServiceNew.getUpdate("WHEREIS_U2", sParam).then((value) {
+      setState(() {
+        if (value.result.isNotEmpty) {
+          if (value.result.elementAt(0).rsCode == "E") {
+            if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+              _show("이미 등록된 내용입니다.");
+              return;
+            }
+            _show(value.result.elementAt(0).rsMsg);
+          } else {
+            _show("행선지 등록이 완료되었습니다.");
+          }
+        } else {
+          _show("등록에 실패하였습니다.");
+        }
+        whereIsInit();
+      });
+    });
+  }
+
+  void carTypeList() {
+    List<String> sParam = ['CW'];
+
+    APIServiceNew apiServiceNew = new APIServiceNew();
+    apiServiceNew.getSelect("CARTYPE_S1", sParam).then((value) {
+      setState(() {
+        if (value.carType.isNotEmpty) {
+          carTypeCodeList.add('');
+          carTypeNameList.add('');
+          for (int i = 0; i < value.carType.length; i++) {
+            carTypeCodeList.add(value.carType.elementAt(i).codeName);
+            carTypeNameList.add(value.carType.elementAt(i).codeValue);
+          }
+        } else {
+          _show("조회된 데이터가 없습니다.");
+        }
+      });
+    });
+  }
+
+  void deptList() {
     List<String> sParam = [];
 
     APIServiceNew apiServiceNew = new APIServiceNew();
@@ -338,55 +402,15 @@ class _WhereManagePage extends State<WhereManagePage> {
     });
   }
 
-  String vehicle(String value) {
-    String result = '';
-    switch (value) {
-      case 'MYCAR':
-        result = "자기차량";
-        break;
-      case 'MEMBER_CAR':
-        result = "동행인차량";
-        break;
-      case 'BUS':
-        result = "버스";
-        break;
-      case 'TRAIN':
-        result = "철도";
-        break;
-      case 'AIRPLANE':
-        result = "항공";
-        break;
-      case 'COMPANY_CAR':
-        result = "회사차량";
-        break;
-      default:
-        break;
+  vehicle(String value) {
+    for (int i = 0; i < carTypeNameList.length; i++) {
+      if (carTypeCodeList[i] == value) {
+        return carTypeNameList[i];
+      }
     }
-    return result;
   }
 
-  String organization(String value) {
-    String result = '';
-    switch (value) {
-      case 'CW':
-        result = "부산사업본부";
-        break;
-      case 'SU':
-        result = "서울사업본부";
-        break;
-      case 'SW':
-        result = "경남사업본부";
-        break;
-      case 'CS':
-        result = "쿨스종합건설";
-        break;
-      default:
-        break;
-    }
-    return result;
-  }
-
-  String department(String value) {
+  department(String value) {
     for (int i = 0; i < deptNameList.length; i++) {
       if (deptCodeList[i] == value) {
         return deptNameList[i];
@@ -415,6 +439,7 @@ class _WhereManagePage extends State<WhereManagePage> {
   @override
   void initState() {
     getPosition();
+    carTypeList();
     deptList();
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
@@ -422,7 +447,7 @@ class _WhereManagePage extends State<WhereManagePage> {
     date = Date().date(null);
     _selectedTime = nowDateTime;
     startDate = Date().date(null);
-    _selectedStartTime = nowDateTime;
+    selectedStartTime = nowDateTime;
     deptValue = member.user.deptCode;
 
     isDay = false;
@@ -483,7 +508,7 @@ class _WhereManagePage extends State<WhereManagePage> {
     super.initState();
   }
 
-  void _whereDelete(String sDate, String sStart, String sEnd) async {
+  void _whereDelete(String sDate, String sStart, String sEnd) {
     setState(() {
       APIService apiService = new APIService();
 
@@ -638,34 +663,9 @@ class _WhereManagePage extends State<WhereManagePage> {
               ),
             ),
           ),
-          // Expanded(
-          // Container(
-          //   width: screenWidth * 0.05,
-          //   decoration: BoxDecoration(
-          //     color: Color.fromRGBO(45, 43, 77, 1),
-          //     borderRadius: BorderRadius.only(
-          //       topLeft: Radius.circular(screenWidth * 0.05),
-          //     ),
-          //   ),
-          // ),
-          // ),
         ],
       ),
     );
-
-    // Icon sIcon(bool sOpen) {
-    //   if (sOpen == true) {
-    //     return Icon(
-    //       Icons.keyboard_arrow_down_sharp,
-    //       size: 32,
-    //     );
-    //   } else {
-    //     return Icon(
-    //       Icons.keyboard_arrow_up_sharp,
-    //       size: 32,
-    //     );
-    //   }
-    // }
 
     Widget selectHeader = Container(
       margin: EdgeInsets.only(left: 20, right: 20),
@@ -864,27 +864,7 @@ class _WhereManagePage extends State<WhereManagePage> {
                               ),
                             ),
                             onPressed: () {
-                              _showPicker(context);
-                              // DatePicker.showTimePicker(
-                              //   context,
-                              //   showTitleActions: true,
-                              //   showSecondsColumn: true,
-                              //   onConfirm: (timeOfDay) {
-                              //     setState(() {
-                              //       _selectedStart = '${timeOfDay.hour}'
-                              //               .padLeft(2, '0') +
-                              //           ':' +
-                              //           '${timeOfDay.minute}'.padLeft(2, '0');
-                              //       sStartTime = '${timeOfDay.hour}'
-                              //               .padLeft(2, '0') +
-                              //           '${timeOfDay.minute}'.padLeft(2, '0');
-                              //     });
-                              //   },
-                              //   currentTime: DateTime.parse(
-                              //       DateFormat('yyyy-MM-dd HH')
-                              //           .format(DateTime.now())),
-                              //   locale: LocaleType.ko,
-                              // );
+                              _showPicker(context, true);
                             },
                             child: AutoSizeText(
                               _selectedStart,
@@ -931,25 +911,7 @@ class _WhereManagePage extends State<WhereManagePage> {
                               ),
                             ),
                             onPressed: () {
-                              DatePicker.showTimePicker(
-                                context,
-                                showTitleActions: true,
-                                onConfirm: (timeOfDay) {
-                                  setState(() {
-                                    _selectedEnd = '${timeOfDay.hour}'
-                                            .padLeft(2, '0') +
-                                        ':' +
-                                        '${timeOfDay.minute}'.padLeft(2, '0');
-                                    sEndTime = '${timeOfDay.hour}'
-                                            .padLeft(2, '0') +
-                                        '${timeOfDay.minute}'.padLeft(2, '0');
-                                  });
-                                },
-                                currentTime: DateTime.parse(
-                                    DateFormat('yyyy-MM-dd HH:mm:00')
-                                        .format(DateTime.now())),
-                                locale: LocaleType.ko,
-                              );
+                              _showPicker(context, false);
                             },
                             child: AutoSizeText(
                               _selectedEnd,
@@ -987,8 +949,8 @@ class _WhereManagePage extends State<WhereManagePage> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
                               isExpanded: true,
-                              value: selectedValue,
-                              items: _valueList.map(
+                              value: carTypeValue,
+                              items: carTypeCodeList.map(
                                 (value) {
                                   return DropdownMenuItem(
                                     value: value,
@@ -1007,7 +969,7 @@ class _WhereManagePage extends State<WhereManagePage> {
                               ).toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  selectedValue = value;
+                                  carTypeValue = value;
                                 });
                               },
                             ),
@@ -1039,13 +1001,11 @@ class _WhereManagePage extends State<WhereManagePage> {
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(top: 5),
                                 enabledBorder: OutlineInputBorder(
-                                  // borderRadius: BorderRadius.circular(32.0),
                                   borderSide: BorderSide(
                                     color: Colors.transparent,
                                   ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  // borderRadius: BorderRadius.circular(32.0),
                                   borderSide: BorderSide(
                                     color: Colors.transparent,
                                   ),
@@ -1090,13 +1050,11 @@ class _WhereManagePage extends State<WhereManagePage> {
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.only(top: 5),
                           enabledBorder: OutlineInputBorder(
-                            // borderRadius: BorderRadius.circular(32.0),
                             borderSide: BorderSide(
                               color: Colors.transparent,
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            // borderRadius: BorderRadius.circular(32.0),
                             borderSide: BorderSide(
                               color: Colors.transparent,
                             ),
@@ -1121,6 +1079,7 @@ class _WhereManagePage extends State<WhereManagePage> {
                           value: isDay,
                           onChanged: (value) {
                             setState(() {
+                              isUpdate = false;
                               isDay = true;
                               isMorning = false;
                               isAfter = false;
@@ -1142,6 +1101,7 @@ class _WhereManagePage extends State<WhereManagePage> {
                           value: isMorning,
                           onChanged: (value) {
                             setState(() {
+                              isUpdate = false;
                               isDay = false;
                               isMorning = true;
                               isAfter = false;
@@ -1163,6 +1123,7 @@ class _WhereManagePage extends State<WhereManagePage> {
                           value: isAfter,
                           onChanged: (value) {
                             setState(() {
+                              isUpdate = false;
                               isDay = false;
                               isMorning = false;
                               isAfter = true;
@@ -1192,22 +1153,6 @@ class _WhereManagePage extends State<WhereManagePage> {
                         ),
                         primary: Colors.indigo[900],
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _whereInsert(
-                              // _areaTextEditController.text,
-                              date,
-                              sStartTime,
-                              sEndTime,
-                              _locateTextEditController.text,
-                              selectedValue,
-                              isUpdate,
-                              latitude,
-                              longitude,
-                              _attributeTextEditController.text);
-                          _getWhereIs(date);
-                        });
-                      },
                       child: Text(
                         '등록',
                         style: TextStyle(
@@ -1216,6 +1161,31 @@ class _WhereManagePage extends State<WhereManagePage> {
                           fontSize: 16,
                         ),
                       ),
+                      onPressed: () {
+                        if (isUpdate) {
+                          whereUpdate(
+                              date,
+                              sStartTime,
+                              sEndTime,
+                              _locateTextEditController.text,
+                              carTypeValue,
+                              isUpdate,
+                              latitude,
+                              longitude,
+                              _attributeTextEditController.text);
+                        } else {
+                          whereInsert(
+                              date,
+                              sStartTime,
+                              sEndTime,
+                              _locateTextEditController.text,
+                              carTypeValue,
+                              isUpdate,
+                              latitude,
+                              longitude,
+                              _attributeTextEditController.text);
+                        }
+                      },
                     ),
                   ),
                 ],
@@ -1338,8 +1308,6 @@ class _WhereManagePage extends State<WhereManagePage> {
                         whereIsValue.elementAt(index).endTime.substring(2, 4),
                 Alignment.center,
                 tableWidth),
-            // rightColumnRowContent(
-            //     whereIsValue.elementAt(index).area, Alignment.centerLeft),
             rightColumnRowContent(whereIsValue.elementAt(index).whereIsContents,
                 Alignment.center, tableWidth),
             rightColumnRowContent(
@@ -1353,8 +1321,6 @@ class _WhereManagePage extends State<WhereManagePage> {
 
     whereIsDataTable() {
       return Column(
-        // alignment:
-        //     AlignmentDirectional.topStart, //alignment:new Alignment(x, y)
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1377,7 +1343,6 @@ class _WhereManagePage extends State<WhereManagePage> {
           Container(
             color: Colors.white,
             height: screenHeight * 0.5,
-            // height: screenHeight - ((screenHeight * 0.1) + 245),
             constraints: BoxConstraints(
               minHeight: 100,
             ),
@@ -1436,6 +1401,7 @@ class _WhereManagePage extends State<WhereManagePage> {
         pass: pass,
         member: member,
         selectedIndex: 1,
+        pageName: "",
       ),
       body: GestureDetector(
         child: Container(
@@ -1499,7 +1465,6 @@ class _WhereManagePage extends State<WhereManagePage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          // title: AutoSizeText("AlertDialog"),
           content: Text(_message),
           actions: [
             TextButton(
@@ -1514,6 +1479,7 @@ class _WhereManagePage extends State<WhereManagePage> {
               child: Text("수정"),
               onPressed: () {
                 setState(() {
+                  isOpen = true;
                   isUpdate = true;
                   _selectedStart = _startTime.substring(0, 2) +
                       ":" +
@@ -1528,27 +1494,9 @@ class _WhereManagePage extends State<WhereManagePage> {
                   sEndTime = _endTime;
                   sEndTimeOrg = _endTime;
                   _locateTextEditController.text = _whereIsContents;
-                  selectedValue = _carType;
+                  carTypeValue = _carType;
                 });
                 Navigator.of(context).pop(true);
-
-                // Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (BuildContext context) => WhereIsPage(
-                //       id: id,
-                //       pass: pass,
-                //       member: member,
-                //       isUpdate: true,
-                //       startTime: _startTime,
-                //       endTime: _endTime,
-                //       area: _area,
-                //       contents: _whereIsContents,
-                //       carType: _carType,
-                //       updateDate: DateTime.parse(date),
-                //     ),
-                //   ),
-                // );
               },
             ),
             TextButton(

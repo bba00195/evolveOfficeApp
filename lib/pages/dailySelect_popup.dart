@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/model/daily_model.dart';

@@ -4,7 +4,6 @@ import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 
-import 'daily_page.dart';
 import 'login_page.dart';
 
 class MenuPage extends StatefulWidget {
@@ -30,6 +29,25 @@ class _MenuPage extends State<MenuPage> {
   String date;
   UserManager mem;
 
+  show(String sMessage) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text(sMessage),
+          actions: [
+            TextButton(
+              child: Text("확인"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -45,25 +63,6 @@ class _MenuPage extends State<MenuPage> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     var member = mem;
-
-    _show(String sMessage) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text(sMessage),
-            actions: [
-              TextButton(
-                child: Text("확인"),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
 
     final profileHead = Container(
       decoration: BoxDecoration(
@@ -170,6 +169,7 @@ class _MenuPage extends State<MenuPage> {
         pass: pass,
         member: member,
         selectedIndex: 0,
+        pageName: "",
       ),
       body: Center(
         child: ListView(

@@ -54,13 +54,13 @@ class _LeaveManagePage extends State<LeaveManagePage> {
   int sStartDay = 0;
   int sEndDay = 0;
   DateTime nowDateTime = DateTime.now();
-  DateTime _selectedStartTime;
-  DateTime _selectedEndTime;
+  DateTime selectedStartTime;
+  DateTime selectedEndTime;
   String startDate;
   String endDate;
 
   bool isChanged = false;
-  DateTime _selectedTime;
+  DateTime selectedTime;
   int sDay = 0;
   String changeDate;
   String date;
@@ -76,38 +76,12 @@ class _LeaveManagePage extends State<LeaveManagePage> {
   CalendarFormat format = CalendarFormat.month; // (var)calendar
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
-
-  final _organizationList = [
-    'CW',
-    'SU',
-    'SW',
-    'CS',
-  ];
-  var organizationValue = 'CW';
-
-  final _deptList = [
-    '',
-    '1220',
-    '1230',
-    '1240',
-    '1270',
-    '2110',
-    '2120',
-    '2130',
-    '2140',
-    '2150',
-    '2160',
-    '2210',
-    '4001',
-  ];
-  var deptValue = '';
-
   final _nameTextEditController = TextEditingController();
   List<DailySelectResponseModel> dailySelectValue;
   List<bool> chkBox = [];
   int itemCount = 0;
 
-  void _getDailySelect() async {
+  void getDailySelect() async {
     APIServiceNew apiServiceNew = new APIServiceNew();
 
     List<String> sParam = [
@@ -117,7 +91,6 @@ class _LeaveManagePage extends State<LeaveManagePage> {
       member.user.userId,
       "",
       "",
-      deptValue,
       "",
       member.user.organizationCode
     ];
@@ -149,8 +122,8 @@ class _LeaveManagePage extends State<LeaveManagePage> {
 
     startDate = Date().date(null);
     endDate = Date().date(null);
-    _selectedStartTime = nowDateTime;
-    _selectedEndTime = nowDateTime;
+    selectedStartTime = nowDateTime;
+    selectedEndTime = nowDateTime;
     nameFocusNode = FocusNode();
 
     super.initState();
@@ -158,7 +131,6 @@ class _LeaveManagePage extends State<LeaveManagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
     // #메뉴네임
@@ -229,45 +201,6 @@ class _LeaveManagePage extends State<LeaveManagePage> {
                                 fontWeight: FontWeight.w600),
                             maxFontSize: 14,
                           ))),
-                      Expanded(
-                          flex: 8,
-                          child: Container(
-                              height: 40,
-                              margin: EdgeInsets.symmetric(horizontal: 5),
-                              padding: EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                  color: Colors.deepPurple[100],
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      blurRadius: 6.0,
-                                      offset: const Offset(0.0, 3.0),
-                                      color: Color.fromRGBO(0, 0, 0, 0.16),
-                                    )
-                                  ]),
-                              child: DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                      isExpanded: true,
-                                      value: deptValue,
-                                      items: _deptList.map((value) {
-                                        return DropdownMenuItem(
-                                            value: value,
-                                            child: AutoSizeText(
-                                              department(value),
-                                              style: TextStyle(
-                                                fontSize: 10,
-                                                fontFamily: 'NotoSansKR',
-                                              ),
-                                              minFontSize: 10,
-                                              maxLines: 1,
-                                            ));
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          deptValue = value;
-                                          _getDailySelect();
-                                        });
-                                      }))))
                     ],
                   ),
                   SizedBox(height: 15),
@@ -489,6 +422,7 @@ class _LeaveManagePage extends State<LeaveManagePage> {
         pass: pass,
         member: member,
         selectedIndex: 1,
+        pageName: "",
       ),
       body: GestureDetector(
           // 포커싱 제거
@@ -674,7 +608,7 @@ class _LeaveManagePage extends State<LeaveManagePage> {
     }
   }
 
-  _show(String sMessage) {
+  show(String sMessage) {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {

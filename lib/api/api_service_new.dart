@@ -21,6 +21,38 @@ class APIServiceNew {
     var headers = {'Content-Type': "application/json"};
 
     switch (sFunctionName) {
+      case "APPROVAL_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = ApprovalResultModel.fromJson(json.decode(response.body));
+        break;
+      case "BOARD_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = BoardResultModel.fromJson(json.decode(response.body));
+        break;
+      case "CARTYPE_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = CartypeResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILY_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = DailySelectResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILYREPLY_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = ReplyResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DAILYREPLY_S2":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = ReplyResultModel.fromJson(json.decode(response.body));
+        break;
+      case "DEPT_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = DeptResultModel.fromJson(json.decode(response.body));
+        break;
+      case "INFORMATION_S1":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InformationResultModel.fromJson(json.decode(response.body));
+        break;
       case "LOGIN_S1":
         final response = await http.post(url, body: sBody, headers: headers);
         result = ResultModel.fromJson(json.decode(response.body));
@@ -32,34 +64,6 @@ class APIServiceNew {
       case "WHEREIS_S1":
         final response = await http.post(url, body: sBody, headers: headers);
         result = WhereResultModel.fromJson(json.decode(response.body));
-        break;
-      case "DAILY_S1":
-        final response = await http.post(url, body: sBody, headers: headers);
-        result = DailySelectResultModel.fromJson(json.decode(response.body));
-        break;
-      case "DEPT_S1":
-        final response = await http.post(url, body: sBody, headers: headers);
-        result = DeptResultModel.fromJson(json.decode(response.body));
-        break;
-      case "BOARD_S1":
-        final response = await http.post(url, body: sBody, headers: headers);
-        result = BoardResultModel.fromJson(json.decode(response.body));
-        break;
-      case "INFORMATION_S1":
-        final response = await http.post(url, body: sBody, headers: headers);
-        result = InformationResultModel.fromJson(json.decode(response.body));
-        break;
-      case "APPROVAL_S1":
-        final response = await http.post(url, body: sBody, headers: headers);
-        result = ApprovalResultModel.fromJson(json.decode(response.body));
-        break;
-      case "DAILYREPLY_S1":
-        final response = await http.post(url, body: sBody, headers: headers);
-        result = ReplyResultModel.fromJson(json.decode(response.body));
-        break;
-      case "DAILYREPLY_S2":
-        final response = await http.post(url, body: sBody, headers: headers);
-        result = ReplyResultModel.fromJson(json.decode(response.body));
         break;
       default:
         break;

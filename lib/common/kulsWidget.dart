@@ -103,23 +103,22 @@ class KulsNavigationBottomBar extends StatelessWidget
   final String pass;
   final UserManager member;
   final int selectedIndex;
+  final String pageName;
 
-  KulsNavigationBottomBar(
-      {Key key,
-      this.globalKey,
-      this.id,
-      this.pass,
-      this.member,
-      this.selectedIndex})
-      : super(key: key);
+  KulsNavigationBottomBar({
+    Key key,
+    this.globalKey,
+    this.id,
+    this.pass,
+    this.member,
+    this.selectedIndex,
+    this.pageName,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
     int _selectedIndex = selectedIndex;
     return Container(
       decoration: BoxDecoration(
-        // borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.16),
@@ -128,20 +127,12 @@ class KulsNavigationBottomBar extends StatelessWidget
           ),
         ],
       ),
-      // margin: EdgeInsets.only(
-      //   left: screenWidth * 0.05,
-      //   right: screenWidth * 0.05,
-      //   top: screenHeight * 0.01,
-      //   bottom: screenHeight * 0.02,
-      // ),
       child: Container(
         height: 40,
-        // borderRadius: BorderRadius.circular(15),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           backgroundColor: Color.fromRGBO(248, 246, 255, 1),
-          // backgroundColor: Colors.red,
-          selectedItemColor: Colors.grey,
+          selectedItemColor: pageName != 'home' ? Colors.black : Colors.grey,
           unselectedItemColor: Colors.black,
           selectedFontSize: 10,
           unselectedFontSize: 10,
@@ -149,17 +140,7 @@ class KulsNavigationBottomBar extends StatelessWidget
           onTap: (int index) {
             if (_selectedIndex != index && index == 0) {
               globalKey.currentState.openDrawer();
-              // Navigator.push(
-              //   context,
-              //   CupertinoPageRoute(
-              //     builder: (context) => MenuPage(
-              //       id: id,
-              //       pass: pass,
-              //       member: member,
-              //     ),
-              //   ),
-              // );
-            } else if (_selectedIndex != index && index == 1) {
+            } else if (index == 1 && pageName != 'home') {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
@@ -372,21 +353,6 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: menuRow('HOME'),
                 ),
-                // SizedBox(height: 20),
-                // InkWell(
-                //   onTap: () {
-                //     Navigator.push(
-                //       context,
-                //       CupertinoPageRoute(
-                //         builder: (context) => DailyPage(
-                //           id: id,
-                //           member: member,
-                //         ),
-                //       ),
-                //     );
-                //   },
-                //   child: menuRow('일일업무 등록'),
-                // ),
                 SizedBox(height: 20),
                 InkWell(
                   onTap: () {
@@ -401,25 +367,8 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: menuRow('일일업무 관리'),
+                  child: menuRow('오늘 내 고민'),
                 ),
-                // SizedBox(height: 20),
-                // InkWell(
-                //   onTap: () {
-                //     Navigator.push(
-                //       context,
-                //       CupertinoPageRoute(
-                //         builder: (context) => WhereIsPage(
-                //           id: id,
-                //           pass: pass,
-                //           member: member,
-                //           isUpdate: false,
-                //         ),
-                //       ),
-                //     );
-                //   },
-                //   child: menuRow('행선지 등록'),
-                // ),
                 SizedBox(height: 20),
                 InkWell(
                   onTap: () {
@@ -434,7 +383,7 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     );
                   },
-                  child: menuRow('행선지 관리'),
+                  child: menuRow('너 어디니'),
                 ),
                 SizedBox(height: 20),
                 InkWell(
@@ -455,32 +404,6 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
-          // InkWell(
-          //   onTap: () {
-          //     // storage.delete(key: "login");
-          //     storage.deleteAll();
-          //     Navigator.pushReplacement(
-          //       context,
-          //       CupertinoPageRoute(
-          //         builder: (context) => LoginPage(),
-          //       ),
-          //     );
-          //   },
-          //   child: Container(
-          //     height: 70,
-          //     margin: EdgeInsets.only(
-          //       left: 45,
-          //     ),
-          //     alignment: Alignment.centerLeft,
-          //     child: Text(
-          //       'Log Out',
-          //       style: TextStyle(
-          //         fontSize: 18,
-          //         fontFamily: 'NotoSansKR',
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

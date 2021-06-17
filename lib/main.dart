@@ -89,7 +89,7 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
   void setToken(String token) {
     setState(() {
       _token = token;
-      print(_token);
+      // print(_token);
     });
   }
 

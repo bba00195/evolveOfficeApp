@@ -7,12 +7,9 @@ import 'package:evolveofficeapp/model/login_model.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import 'home_page_new.dart';
 // #endregion
 
 class LoginPage extends StatefulWidget {
@@ -68,50 +65,6 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.transparent,
         radius: 48.0,
         child: Image.asset('resource/EvolveOffice.png'),
-      ),
-    );
-    // #endregion
-
-    // #region IdIcon
-    final userIcon = Positioned(
-      left: 1.0,
-      child: Container(
-        width: 63,
-        height: 63,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32.0),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 8.0,
-              offset: const Offset(1.0, 4.0),
-              color: Color.fromRGBO(187, 235, 223, 1.0),
-            )
-          ],
-          color: Colors.white,
-        ),
-        child: Image.asset('resource/icon_user.png'),
-      ),
-    );
-    // #endregion
-
-    // #region PasswordIcon
-    final lockIcon = Positioned(
-      left: 1.0,
-      child: Container(
-        width: 63,
-        height: 63,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(32.0),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 8.0,
-              offset: const Offset(1.0, 4.0),
-              color: Color.fromRGBO(187, 235, 223, 1.0),
-            )
-          ],
-          color: Colors.white,
-        ),
-        child: Image.asset('resource/icon_lock.png'),
       ),
     );
     // #endregion

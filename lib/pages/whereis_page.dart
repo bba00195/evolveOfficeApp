@@ -56,7 +56,6 @@ class _WhereIsPage extends State<WhereIsPage> {
   Future<DailyResultModel> futureAlbum;
   final _areaTextEditController = TextEditingController();
   final _locateTextEditController = TextEditingController();
-  GlobalKey<FormState> _areaFormKey = GlobalKey<FormState>();
   GlobalKey<FormState> _locateFormKey = GlobalKey<FormState>();
 
   FocusNode areaFocusNode;
@@ -128,7 +127,6 @@ class _WhereIsPage extends State<WhereIsPage> {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
     _show(String sMessage) {
@@ -308,68 +306,6 @@ class _WhereIsPage extends State<WhereIsPage> {
             fontWeight: FontWeight.w600,
           ),
         ),
-      ),
-    );
-
-    final area = Container(
-      height: 50,
-      margin: EdgeInsets.only(
-        left: screenWidth * 0.1,
-        right: screenWidth * 0.1,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.0),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 6.0,
-            offset: const Offset(0.0, 3.0),
-            color: Color.fromRGBO(0, 0, 0, 0.16),
-          )
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            margin: EdgeInsets.only(left: 10),
-            child: Icon(
-              Icons.location_on_sharp,
-              color: Colors.red,
-              size: 32,
-            ),
-          ),
-          Expanded(
-            child: Form(
-              key: _areaFormKey,
-              child: TextField(
-                controller: _areaTextEditController,
-                focusNode: areaFocusNode,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(32.0),
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(32.0),
-                    borderSide: BorderSide(
-                      color: Colors.transparent,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintText: '지역',
-                ),
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'NotoSansKR',
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
 
@@ -818,6 +754,7 @@ class _WhereIsPage extends State<WhereIsPage> {
         pass: pass,
         member: member,
         selectedIndex: 1,
+        pageName: "",
       ),
       body: GestureDetector(
         child: Center(
