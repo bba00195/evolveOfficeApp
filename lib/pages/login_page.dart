@@ -1,6 +1,7 @@
 // #region Import
 import 'dart:async';
 import 'dart:ui';
+import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:evolveofficeapp/model/login_model.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
@@ -15,6 +16,11 @@ import 'home_page_new.dart';
 // #endregion
 
 class LoginPage extends StatefulWidget {
+  final String token;
+
+  LoginPage({
+    this.token,
+  });
   @override
   _LoginPageState createState() => new _LoginPageState();
 }
@@ -31,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
   FocusNode idFocusNode;
   FocusNode passwordFocusNode;
   Future<ResultModel> userInfo;
+  String token;
 
   @override
   void dispose() {
@@ -47,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     idFocusNode = FocusNode();
     passwordFocusNode = FocusNode();
+    token = widget.token;
   }
 
   @override
@@ -319,14 +327,16 @@ class _LoginPageState extends State<LoginPage> {
       show("비밀번호를 입력해주세요."); // 비밀번호 미입력
       return;
     }
+    List<String> sParam = [sUserId];
 
-    APIService apiService = new APIService();
-    apiService.login(_idTextEditController.text).then((value) {
+    APIServiceNew apiServiceNew = new APIServiceNew();
+    apiServiceNew.getSelect("LOGIN_S1", sParam).then((value) {
       if (value.user.isNotEmpty) {
         if (_passwordTextEditController.text !=
             value.user.elementAt(0).password) {
           show("비밀번호가 일치하지 않습니다."); // 비밀번호 불일치
         } else {
+          tokenUpdate(sUserId, token);
           var member = UserManager();
           member.user = User(
             organizationCode: value.user.elementAt(0).organizationCode,
@@ -340,6 +350,7 @@ class _LoginPageState extends State<LoginPage> {
             gradeName: value.user.elementAt(0).gradeName,
             mobileTel: value.user.elementAt(0).mobileTel,
             imgSajin: value.user.elementAt(0).imgSajin,
+            token: value.user.elementAt(0).token,
           );
           storage.write(
             key: "login",
@@ -364,6 +375,20 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         show("등록되지 않는 아이디입니다."); // 등록되지 않은 아이디
       }
+    });
+  }
+
+  void tokenUpdate(String sUserId, String sToken) async {
+    setState(() {
+      APIServiceNew apiServiceNew = new APIServiceNew();
+      List<String> sParam = [
+        sToken,
+        sUserId,
+      ];
+      apiServiceNew.getUpdate("LOGIN_U1", sParam).then((value) {
+        if (value.result.isNotEmpty) {
+        } else {}
+      });
     });
   }
 

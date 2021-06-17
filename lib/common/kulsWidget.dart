@@ -436,22 +436,22 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                   },
                   child: menuRow('행선지 관리'),
                 ),
-                // SizedBox(height: 20),
-                // InkWell(
-                //   onTap: () {
-                //     Navigator.push(
-                //       context,
-                //       CupertinoPageRoute(
-                //         builder: (context) => AprovalPage(
-                //           id: id,
-                //           pass: pass,
-                //           member: member,
-                //         ),
-                //       ),
-                //     );
-                //   },
-                //   child: menuRow('휴가원 관리'),
-                // ),
+                SizedBox(height: 20),
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => AprovalPage(
+                          id: id,
+                          pass: pass,
+                          member: member,
+                        ),
+                      ),
+                    );
+                  },
+                  child: menuRow('휴가원 관리'),
+                ),
               ],
             ),
           ),

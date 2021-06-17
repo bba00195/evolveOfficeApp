@@ -62,61 +62,66 @@ class _ProfilePage extends State<ProfilePage> {
     _passwordEditController.text = member.user.password;
   }
 
+  _show(String sMessage) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          content: Text(sMessage),
+          actions: [
+            TextButton(
+              child: Text("확인"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _profileSave(String sImg, String sPassword) async {
+    passwordFocusNode.unfocus();
+    if (tmpFile == null) {
+      if (member.user.imgSajin == '') {
+        sImg = '';
+      }
+    }
+
+    setState(() {
+      APIServiceNew apiServiceNew = new APIServiceNew();
+      List<String> sParam = [
+        sImg,
+        sPassword,
+        member.user.organizationCode,
+        member.user.userId,
+      ];
+      apiServiceNew.getUpdate("PROFILE_U1", sParam).then((value) {
+        if (value.result.isNotEmpty) {
+          if (value.result.elementAt(0).rsCode == "E") {
+            if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
+              _show("이미 등록된 내용입니다.");
+              return;
+            } else {
+              _show(value.result.elementAt(0).rsMsg);
+            }
+          } else {
+            _show("프로필 수정이 완료되었습니다.");
+            member.user.imgSajin = sImg;
+            member.user.password = sPassword;
+          }
+        } else {
+          _show("등록에 실패하였습니다.");
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-
-    _show(String sMessage) {
-      showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            content: Text(sMessage),
-            actions: [
-              TextButton(
-                child: Text("확인"),
-                onPressed: () {
-                  Navigator.of(context).pop(true);
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
-
-    void _profileSave(String sImg, String sPassword) async {
-      passwordFocusNode.unfocus();
-
-      setState(() {
-        APIServiceNew apiServiceNew = new APIServiceNew();
-        List<String> sParam = [
-          sImg,
-          sPassword,
-          member.user.organizationCode,
-          member.user.userId,
-        ];
-        apiServiceNew.getUpdate("PROFILE_U1", sParam).then((value) {
-          if (value.result.isNotEmpty) {
-            if (value.result.elementAt(0).rsCode == "E") {
-              if (value.result.elementAt(0).rsMsg.indexOf("중복") > 0) {
-                _show("이미 등록된 내용입니다.");
-                return;
-              } else {
-                _show(value.result.elementAt(0).rsMsg);
-              }
-            } else {
-              _show("프로필 수정이 완료되었습니다.");
-              member.user.imgSajin = sImg;
-              member.user.password = sPassword;
-            }
-          } else {
-            _show("등록에 실패하였습니다.");
-          }
-        });
-      });
-    }
 
     final menuName = AppBar(
       iconTheme: IconThemeData(
@@ -237,9 +242,9 @@ class _ProfilePage extends State<ProfilePage> {
       if (tmpFile != null ||
           _passwordEditController.text != member.user.password) {
         String fileName = member.user.userId + ".jpg";
-        if (member.user.imgSajin == '') {
-          fileName = '';
-        }
+        // if (member.user.imgSajin == '') {
+        //   fileName = '';
+        // }
         if (tmpFile != null) {
           upload(fileName);
         }

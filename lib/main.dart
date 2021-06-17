@@ -9,7 +9,52 @@ import 'package:evolveofficeapp/common/common.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-void main() => runApp(MyApp());
+import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  if (!kIsWeb) {
+    channel = const AndroidNotificationChannel(
+      'high_importance_channel', // id
+      'High Importance Notifications', // title
+      'This channel is used for important notifications.', // description
+      importance: Importance.high,
+    );
+
+    flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  runApp(MyApp());
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+}
+
+AndroidNotificationChannel channel;
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 class MyApp extends StatelessWidget {
   @override
@@ -38,8 +83,26 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
   static final storage =
       new FlutterSecureStorage(); //flutter_secure_storage 사용을 위한 초기화 작업
 
+  String _token;
+  Stream<String> _tokenStream;
+
+  void setToken(String token) {
+    setState(() {
+      _token = token;
+      print(_token);
+    });
+  }
+
   initState() {
     super.initState();
+    FirebaseMessaging.instance
+        .getToken(
+            vapidKey:
+                'BLl6FoM6KEevFtRtIM8_gvFsdiNcyneX6G268ZAbpBNGa1ohwoPf1Wbll0iHbRG-Leb7gu9X-_D3Qk-e_h-s8jk')
+        .then(setToken);
+    _tokenStream = FirebaseMessaging.instance.onTokenRefresh;
+    _tokenStream.listen(setToken);
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1300),
       vsync: this,
@@ -99,7 +162,7 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
-                      builder: (context) => LoginPage(),
+                      builder: (context) => LoginPage(token: _token),
                     ),
                   );
                 },
@@ -135,6 +198,7 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
             gradeName: value.user.elementAt(0).gradeName,
             mobileTel: value.user.elementAt(0).mobileTel,
             imgSajin: value.user.elementAt(0).imgSajin,
+            token: value.user.elementAt(0).token,
           );
         }
 
@@ -153,7 +217,7 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
       Navigator.pushReplacement(
         context,
         CupertinoPageRoute(
-          builder: (context) => LoginPage(),
+          builder: (context) => LoginPage(token: _token),
         ),
       );
     }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:evolveofficeapp/api/api_service.dart';
 import 'package:evolveofficeapp/api/api_service_new.dart';
@@ -16,6 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:evolveofficeapp/common/kulsWidget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   //로그인 정보를 이전 페이지에서 전달 받기 위한 변수
@@ -34,6 +37,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  GlobalKey<FormState> _passwordFormKey = GlobalKey<FormState>();
   static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
   String id;
@@ -138,12 +142,45 @@ class _HomePage extends State<HomePage> {
     super.initState();
   }
 
+  String constructFCMPayload(String token) {
+    return jsonEncode({
+      'registration_ids': [token],
+      'notification': {
+        'title': 'Hello FlutterFire!',
+        'body': 'This notification was created via FCM!',
+      },
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     _report(date);
     var member = mem;
+    Future<void> sendPushMessage() async {
+      if (member.user.token == null) {
+        print('Unable to send FCM message, no token exists.');
+        return;
+      }
+
+      try {
+        final response = await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          body: constructFCMPayload(
+              'fBKETdwHSFufWli2JlNReW:APA91bFN7ttGc1KAXxMHUK37radMw-qMbejJpc_riw6Odmq9m2WsbrwNFiM-T3G34t3q_9pr6mxMdn6SpLpfUayEa0zeEF48xb_lUQ6Sy_PQMr1zGTQKh1nD4YSbqwzxnI9dyuv7JP1N'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization':
+                'key=AAAAUta13IA:APA91bFPkMjES49IC9g6tkqJFHiVzOn-RDRkboXGspSIsrNpZkqrXYL7Qh3_xVrSBXdcvOSU8qmUQtJZs1AqMYrMR3LviCYlmAdyxLVl7LShUEhQjdXxbdpGyFFR4OsJ4LHpasQFy31Y',
+          },
+        );
+        final result = (json.decode(response.body));
+        print(result);
+      } catch (e) {
+        print(e);
+      }
+    }
 
     _show(String sMessage) {
       showDialog(
@@ -164,15 +201,17 @@ class _HomePage extends State<HomePage> {
       );
     }
 
-    DecorationImage _memberImage() {
+    Image _memberImage() {
       if (mem.user.imgSajin != "" && mem.user.imgSajin != null) {
-        return DecorationImage(
+        return Image(
           image: NetworkImage(
               'http://211.213.24.71:8080/Upload/sajin/' + mem.user.imgSajin),
           fit: BoxFit.cover,
+          key: ValueKey(
+              'http://211.213.24.71:8080/Upload/sajin/' + mem.user.imgSajin),
         );
       } else {
-        return DecorationImage(
+        return Image(
           image: AssetImage('resource/person.png'),
           fit: BoxFit.cover,
         );
@@ -249,8 +288,12 @@ class _HomePage extends State<HomePage> {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
+                            color: Colors.red,
                             borderRadius: BorderRadius.circular(20),
-                            image: _memberImage(),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: _memberImage(),
                           ),
                         ),
                         Text(
@@ -741,88 +784,88 @@ class _HomePage extends State<HomePage> {
                       ),
                     ),
                   ),
-                  // InkWell(
-                  //   onTap: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       CupertinoPageRoute(
-                  //         builder: (context) => AprovalPage(
-                  //           id: id,
-                  //           pass: pass,
-                  //           member: member,
-                  //         ),
-                  //       ),
-                  //     );
-                  //   },
-                  //   child: Container(
-                  //     padding: EdgeInsets.all(5),
-                  //     margin: EdgeInsets.all(3),
-                  //     height: screenWidth / 5.5,
-                  //     width: screenWidth / 5.5,
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.white,
-                  //       borderRadius: BorderRadius.circular(5),
-                  //       boxShadow: [
-                  //         BoxShadow(
-                  //           blurRadius: 3.0,
-                  //           offset: const Offset(1.0, 1.0),
-                  //           color: Color.fromRGBO(0, 0, 0, 0.16),
-                  //         )
-                  //       ],
-                  //     ),
-                  //     child: Column(
-                  //       mainAxisAlignment: MainAxisAlignment.start,
-                  //       crossAxisAlignment: CrossAxisAlignment.start,
-                  //       children: [
-                  //         Expanded(
-                  //           flex: 1,
-                  //           child: Row(
-                  //             mainAxisAlignment: MainAxisAlignment.start,
-                  //             crossAxisAlignment: CrossAxisAlignment.start,
-                  //             children: [
-                  //               Expanded(
-                  //                 child: AutoSizeText(
-                  //                   '',
-                  //                   style: TextStyle(
-                  //                     fontSize: 16,
-                  //                     fontWeight: FontWeight.w600,
-                  //                   ),
-                  //                   maxLines: 1,
-                  //                   minFontSize: 14,
-                  //                 ),
-                  //               ),
-                  //               Expanded(
-                  //                 child: LayoutBuilder(
-                  //                     builder: (context, constraint) {
-                  //                   return new Icon(
-                  //                     Icons.directions_boat,
-                  //                     size: constraint.biggest.height,
-                  //                     color: Color.fromRGBO(255, 101, 129, 1),
-                  //                   );
-                  //                 }),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         Expanded(
-                  //           flex: 1,
-                  //           child: Container(
-                  //             alignment: Alignment.bottomLeft,
-                  //             child: AutoSizeText(
-                  //               '휴가원',
-                  //               style: TextStyle(
-                  //                 fontSize: 12,
-                  //                 fontWeight: FontWeight.w600,
-                  //               ),
-                  //               maxLines: 1,
-                  //               minFontSize: 8,
-                  //             ),
-                  //           ),
-                  //         )
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => AprovalPage(
+                            id: id,
+                            pass: pass,
+                            member: member,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.all(3),
+                      height: screenWidth / 5.5,
+                      width: screenWidth / 5.5,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 3.0,
+                            offset: const Offset(1.0, 1.0),
+                            color: Color.fromRGBO(0, 0, 0, 0.16),
+                          )
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: AutoSizeText(
+                                    '',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    maxLines: 1,
+                                    minFontSize: 14,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: LayoutBuilder(
+                                      builder: (context, constraint) {
+                                    return new Icon(
+                                      Icons.directions_boat,
+                                      size: constraint.biggest.height,
+                                      color: Color.fromRGBO(255, 101, 129, 1),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Container(
+                              alignment: Alignment.bottomLeft,
+                              child: AutoSizeText(
+                                '휴가원',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                minFontSize: 8,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1418,6 +1461,13 @@ class _HomePage extends State<HomePage> {
         pass: pass,
         member: member,
         storage: storage,
+      ),
+      floatingActionButton: Builder(
+        builder: (context) => FloatingActionButton(
+          onPressed: sendPushMessage,
+          backgroundColor: Colors.blue,
+          child: const Icon(Icons.send),
+        ),
       ),
       // floatingActionButton: _showBackToTopButton == false
       //     ? null

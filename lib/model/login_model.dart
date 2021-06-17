@@ -10,6 +10,7 @@ class UserResponseModel {
   final String gradeName;
   final String mobileTel;
   final String imgSajin;
+  final String token;
 
   UserResponseModel({
     this.organizationCode,
@@ -23,6 +24,7 @@ class UserResponseModel {
     this.gradeName,
     this.mobileTel,
     this.imgSajin,
+    this.token,
   });
 
   factory UserResponseModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +45,7 @@ class UserResponseModel {
       imgSajin: json['UPLOAD_IMG_SAJIN'] != null
           ? json['UPLOAD_IMG_SAJIN'] as String
           : "",
+      token: json['HP_TOKEN'] != null ? json['HP_TOKEN'] as String : "",
     );
   }
 }

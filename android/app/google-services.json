@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "355789560960",
+    "project_id": "evolveofficeapp",
+    "storage_bucket": "evolveofficeapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355789560960:android:3dbade42de1f6f54291a65",
+        "android_client_info": {
+          "package_name": "com.evolve.officeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "355789560960-dbijoe9mg0stib0v7oqutl8jt29mo1kn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDU-6gkffUxhm3hGfBpPRZfFEYKWEpzSQQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "355789560960-dbijoe9mg0stib0v7oqutl8jt29mo1kn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

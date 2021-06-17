@@ -66,6 +66,9 @@ class DailySelectPages extends State<DailySelectPage> {
   FocusNode nameFocusNode;
   var organizationValue = 'CW';
 
+  List<String> deptCodeList = [];
+  List<String> deptNameList = [];
+
   final _deptList = [
     '',
     '1220',
@@ -207,6 +210,34 @@ class DailySelectPages extends State<DailySelectPage> {
         });
       }
       isSaved = true;
+    }
+  }
+
+  void deptList() async {
+    List<String> sParam = [];
+
+    APIServiceNew apiServiceNew = new APIServiceNew();
+    apiServiceNew.getSelect("DEPT_S1", sParam).then((value) {
+      setState(() {
+        if (value.dept.isNotEmpty) {
+          deptCodeList.add('');
+          deptNameList.add('ALL');
+          for (int i = 0; i < value.dept.length; i++) {
+            deptCodeList.add(value.dept.elementAt(i).deptCode);
+            deptNameList.add(value.dept.elementAt(i).deptName);
+          }
+        } else {
+          _show("조회된 데이터가 없습니다.");
+        }
+      });
+    });
+  }
+
+  String department(String value) {
+    for (int i = 0; i < deptNameList.length; i++) {
+      if (deptCodeList[i] == value) {
+        return deptNameList[i];
+      }
     }
   }
 
@@ -404,6 +435,7 @@ class DailySelectPages extends State<DailySelectPage> {
       ],
     );
     getDailySelect(date, member.user.userId, member.user.organizationCode);
+    deptList();
     super.initState();
   }
 
@@ -1067,14 +1099,14 @@ class DailySelectPages extends State<DailySelectPage> {
                       child: DropdownButton(
                         isExpanded: true,
                         value: deptValue,
-                        items: _deptList.map(
+                        items: deptCodeList.map(
                           (value) {
                             return DropdownMenuItem(
                               value: value,
                               child: AutoSizeText(
                                 department(value),
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 14,
                                   fontFamily: 'NotoSansKR',
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -1283,51 +1315,6 @@ class DailySelectPages extends State<DailySelectPage> {
         break;
       case 'CS':
         result = "쿨스종합건설";
-        break;
-      default:
-        break;
-    }
-    return result;
-  }
-
-  String department(String value) {
-    String result = '';
-    switch (value) {
-      case '':
-        result = "ALL";
-        break;
-      case '1220':
-        result = "S/W검증팀";
-        break;
-      case '1230':
-        result = "H/W개발팀";
-        break;
-      case '1240':
-        result = "헬스케어사업팀";
-        break;
-      case '1270':
-        result = "모바일솔루션팀";
-        break;
-      case '2110':
-        result = "솔루션컨설팅팀";
-        break;
-      case '2120':
-        result = "기술영업팀";
-        break;
-      case '2140':
-        result = "CE팀";
-        break;
-      case '2150':
-        result = "에너지솔루션팀";
-        break;
-      case '2160':
-        result = "물류솔루션팀";
-        break;
-      case '2210':
-        result = "경영지원팀";
-        break;
-      case '4001':
-        result = "종합건설";
         break;
       default:
         break;

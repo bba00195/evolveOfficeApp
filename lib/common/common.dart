@@ -10,6 +10,7 @@ class User {
   String gradeName; // 직급명
   String mobileTel; // 휴대폰번호
   String imgSajin; // 휴대폰번호
+  String token; //토큰
 
   User({
     this.organizationCode,
@@ -23,6 +24,7 @@ class User {
     this.gradeName,
     this.mobileTel,
     this.imgSajin,
+    this.token,
   });
 }
 

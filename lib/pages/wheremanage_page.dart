@@ -49,6 +49,55 @@ class _WhereManagePage extends State<WhereManagePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   static final storage = FlutterSecureStorage();
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
+
+  void _showPicker(BuildContext ctx) {
+    showCupertinoModalPopup(
+      context: ctx,
+      builder: (_) => Container(
+        color: Colors.white,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height * 0.3,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                CupertinoButton(
+                  child: Text(
+                    '닫기',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                CupertinoButton(
+                  child: Text('등록'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+            Expanded(
+              child: CupertinoDatePicker(
+                mode: CupertinoDatePickerMode.time,
+                minuteInterval: 10,
+                initialDateTime: DateTime.now()
+                    .add(Duration(minutes: 0 - DateTime.now().minute % 10)),
+                onDateTimeChanged: (startTime) {
+                  setState(() {
+                    // _currentHour = startTime;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String id;
   String pass;
   UserManager member;
@@ -107,20 +156,9 @@ class _WhereManagePage extends State<WhereManagePage> {
   ];
   var selectedValue = 'MYCAR';
 
-  final _deptList = [
-    '',
-    '1220',
-    '1180',
-    '1240',
-    '1270',
-    '2110',
-    '2120',
-    '2140',
-    '2150',
-    '2160',
-    '2210',
-    '4001',
-  ];
+  List<String> deptCodeList = [];
+  List<String> deptNameList = [];
+
   var deptValue = '';
 
   String _selectedStart = "";
@@ -152,24 +190,6 @@ class _WhereManagePage extends State<WhereManagePage> {
         }
       });
     });
-
-    // APIService apiService = new APIService();
-    // apiService
-    //     .whereIsManage(member.user.organizationCode, member.user.userId,
-    //         selectedDate, sOrganizationcode, deptValue)
-    //     .then((value) {
-    //   setState(() {
-    //     if (value.whereIs.isNotEmpty) {
-    //       whereIsValue = value.whereIs;
-    //       itemCount = 0;
-    //       for (var i = 0; i < value.whereIs.length; i++) {
-    //         itemCount++;
-    //       }
-    //     } else {
-    //       _show("조회된 데이터가 없습니다.");
-    //     }
-    //   });
-    // });
   }
 
   void _whereInsert(
@@ -298,6 +318,26 @@ class _WhereManagePage extends State<WhereManagePage> {
     });
   }
 
+  void deptList() async {
+    List<String> sParam = [];
+
+    APIServiceNew apiServiceNew = new APIServiceNew();
+    apiServiceNew.getSelect("DEPT_S1", sParam).then((value) {
+      setState(() {
+        if (value.dept.isNotEmpty) {
+          deptCodeList.add('');
+          deptNameList.add('ALL');
+          for (int i = 0; i < value.dept.length; i++) {
+            deptCodeList.add(value.dept.elementAt(i).deptCode);
+            deptNameList.add(value.dept.elementAt(i).deptName);
+          }
+        } else {
+          _show("조회된 데이터가 없습니다.");
+        }
+      });
+    });
+  }
+
   String vehicle(String value) {
     String result = '';
     switch (value) {
@@ -347,48 +387,11 @@ class _WhereManagePage extends State<WhereManagePage> {
   }
 
   String department(String value) {
-    String result = '';
-    switch (value) {
-      case '':
-        result = "ALL";
-        break;
-      case '1220':
-        result = "S/W검증팀";
-        break;
-      case '1180':
-        result = "H/W개발팀";
-        break;
-      case '1240':
-        result = "헬스케어사업팀";
-        break;
-      case '1270':
-        result = "모바일솔루션팀";
-        break;
-      case '2110':
-        result = "솔루션컨설팅팀";
-        break;
-      case '2120':
-        result = "기술영업팀";
-        break;
-      case '2140':
-        result = "CE팀";
-        break;
-      case '2150':
-        result = "에너지솔루션팀";
-        break;
-      case '2160':
-        result = "물류영업팀";
-        break;
-      case '2210':
-        result = "경영지원팀";
-        break;
-      case '4001':
-        result = "종합건설";
-        break;
-      default:
-        break;
+    for (int i = 0; i < deptNameList.length; i++) {
+      if (deptCodeList[i] == value) {
+        return deptNameList[i];
+      }
     }
-    return result;
   }
 
   String latitude = "";
@@ -412,6 +415,7 @@ class _WhereManagePage extends State<WhereManagePage> {
   @override
   void initState() {
     getPosition();
+    deptList();
     id = widget.id; //widget.id는 LogOutPage에서 전달받은 id를 의미한다.
     pass = widget.pass;
     member = widget.member;
@@ -466,9 +470,11 @@ class _WhereManagePage extends State<WhereManagePage> {
     } else {
       date = Date().date(null);
       _selectedTime = nowDateTime;
-      sStartTime = DateFormat('HHmm').format(DateTime.now());
+      sStartTime = DateFormat('HHmm').format(DateTime.now()
+          .add(Duration(minutes: 0 - DateTime.now().minute % 10)));
       sEndTime = "";
-      _selectedStart = DateFormat('HH:mm').format(DateTime.now());
+      _selectedStart = DateFormat('HH:mm').format(DateTime.now()
+          .add(Duration(minutes: 0 - DateTime.now().minute % 10)));
       _selectedEnd = "";
     }
     locateFocusNode = FocusNode();
@@ -718,7 +724,7 @@ class _WhereManagePage extends State<WhereManagePage> {
                       child: DropdownButton(
                         isExpanded: true,
                         value: deptValue,
-                        items: _deptList.map(
+                        items: deptCodeList.map(
                           (value) {
                             return DropdownMenuItem(
                               value: value,
@@ -858,25 +864,27 @@ class _WhereManagePage extends State<WhereManagePage> {
                               ),
                             ),
                             onPressed: () {
-                              DatePicker.showTimePicker(
-                                context,
-                                showTitleActions: true,
-                                onConfirm: (timeOfDay) {
-                                  setState(() {
-                                    _selectedStart = '${timeOfDay.hour}'
-                                            .padLeft(2, '0') +
-                                        ':' +
-                                        '${timeOfDay.minute}'.padLeft(2, '0');
-                                    sStartTime = '${timeOfDay.hour}'
-                                            .padLeft(2, '0') +
-                                        '${timeOfDay.minute}'.padLeft(2, '0');
-                                  });
-                                },
-                                currentTime: DateTime.parse(
-                                    DateFormat('yyyy-MM-dd HH:mm:00')
-                                        .format(DateTime.now())),
-                                locale: LocaleType.ko,
-                              );
+                              _showPicker(context);
+                              // DatePicker.showTimePicker(
+                              //   context,
+                              //   showTitleActions: true,
+                              //   showSecondsColumn: true,
+                              //   onConfirm: (timeOfDay) {
+                              //     setState(() {
+                              //       _selectedStart = '${timeOfDay.hour}'
+                              //               .padLeft(2, '0') +
+                              //           ':' +
+                              //           '${timeOfDay.minute}'.padLeft(2, '0');
+                              //       sStartTime = '${timeOfDay.hour}'
+                              //               .padLeft(2, '0') +
+                              //           '${timeOfDay.minute}'.padLeft(2, '0');
+                              //     });
+                              //   },
+                              //   currentTime: DateTime.parse(
+                              //       DateFormat('yyyy-MM-dd HH')
+                              //           .format(DateTime.now())),
+                              //   locale: LocaleType.ko,
+                              // );
                             },
                             child: AutoSizeText(
                               _selectedStart,
