@@ -9,6 +9,7 @@ import 'package:evolveofficeapp/common/common.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
+import 'package:horizontal_data_table/refresh/pull_to_refresh/src/smart_refresher.dart';
 import 'package:intl/intl.dart';
 
 //행선지 관리 수정 삭제
@@ -47,6 +48,8 @@ class WhereManagePage extends StatefulWidget {
 class _WhereManagePage extends State<WhereManagePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   static final storage = FlutterSecureStorage();
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   //데이터를 이전 페이지에서 전달 받은 정보를 저장하기 위한 변수
 
   void _showPicker(BuildContext ctx, bool startType) {
@@ -1403,37 +1406,49 @@ class _WhereManagePage extends State<WhereManagePage> {
         selectedIndex: 1,
         pageName: "",
       ),
-      body: GestureDetector(
-        child: Container(
-          color: Color.fromRGBO(244, 242, 255, 1),
-          child: ListView(
-            children: [
-              menuName,
-              // selectDate,selectHeader
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(screenWidth * 0.07),
-                    topRight: Radius.circular(screenWidth * 0.07),
+      body: SmartRefresher(
+        enablePullDown: true,
+        controller: _refreshController,
+        onRefresh: () {
+          getPosition();
+          carTypeList();
+          deptList();
+          _getWhereIs(date, sOrganizationcode: member.user.organizationCode);
+          _refreshController.refreshCompleted();
+          _refreshController.loadComplete();
+        },
+        child: GestureDetector(
+          child: Container(
+            color: Color.fromRGBO(244, 242, 255, 1),
+            child: ListView(
+              children: [
+                menuName,
+                // selectDate,selectHeader
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(screenWidth * 0.07),
+                      topRight: Radius.circular(screenWidth * 0.07),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      selectHeader,
+                      whereIsDataTable(),
+                      SizedBox(height: 10),
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    selectHeader,
-                    whereIsDataTable(),
-                    SizedBox(height: 10),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
+          onTap: () {
+            locateFocusNode.unfocus();
+            attributeFocusNode.unfocus();
+          },
         ),
-        onTap: () {
-          locateFocusNode.unfocus();
-          attributeFocusNode.unfocus();
-        },
       ),
     );
   }
