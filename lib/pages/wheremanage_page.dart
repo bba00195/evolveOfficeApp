@@ -565,7 +565,7 @@ class _WhereManagePage extends State<WhereManagePage> {
       ),
       child: Center(
         child: AutoSizeText(
-          '행선지 관리',
+          '너 어디니',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -1410,9 +1410,6 @@ class _WhereManagePage extends State<WhereManagePage> {
         enablePullDown: true,
         controller: _refreshController,
         onRefresh: () {
-          getPosition();
-          carTypeList();
-          deptList();
           _getWhereIs(date, sOrganizationcode: member.user.organizationCode);
           _refreshController.refreshCompleted();
           _refreshController.loadComplete();
@@ -1420,28 +1417,30 @@ class _WhereManagePage extends State<WhereManagePage> {
         child: GestureDetector(
           child: Container(
             color: Color.fromRGBO(244, 242, 255, 1),
-            child: ListView(
-              children: [
-                menuName,
-                // selectDate,selectHeader
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(screenWidth * 0.07),
-                      topRight: Radius.circular(screenWidth * 0.07),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  menuName,
+                  // selectDate,selectHeader
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(screenWidth * 0.07),
+                        topRight: Radius.circular(screenWidth * 0.07),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10),
+                        selectHeader,
+                        whereIsDataTable(),
+                        SizedBox(height: 10),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 10),
-                      selectHeader,
-                      whereIsDataTable(),
-                      SizedBox(height: 10),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           onTap: () {

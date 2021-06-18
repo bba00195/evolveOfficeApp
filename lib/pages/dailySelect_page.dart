@@ -813,7 +813,7 @@ class DailySelectPages extends State<DailySelectPage> {
       color: Color.fromRGBO(248, 246, 255, 1),
       child: Center(
         child: AutoSizeText(
-          '일일업무 관리',
+          '오늘 내 고민',
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,

@@ -142,8 +142,7 @@ class KulsNavigationBottomBar extends StatelessWidget
               globalKey.currentState.openDrawer();
             } else if (index == 1 && pageName != 'home') {
               Navigator.of(context)
-                ..pop()
-                ..push(
+                ..pushReplacement(
                   CupertinoPageRoute(
                     builder: (context) => HomePage(
                       id: id,
@@ -155,7 +154,7 @@ class KulsNavigationBottomBar extends StatelessWidget
               _selectedIndex = index;
             } else if (_selectedIndex != index && index == 2) {
               Navigator.of(context)
-                ..push(
+                ..pushReplacement(
                   CupertinoPageRoute(
                     builder: (context) => ProfilePage(
                       id: id,
