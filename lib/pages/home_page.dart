@@ -181,7 +181,7 @@ class _HomePage extends State<HomePage> {
       }
     }
 
-    Image _memberImage() {
+    _memberImage() {
       if (mem.user.imgSajin != "" && mem.user.imgSajin != null) {
         return Image(
           image: NetworkImage(
@@ -294,13 +294,15 @@ class _HomePage extends State<HomePage> {
                 Expanded(
                   flex: 4,
                   child: Container(
-                    child: Text(
+                    child: AutoSizeText(
                       Date().dateWeek(null),
                       style: TextStyle(
                         fontSize: 14,
                         fontFamily: 'NotoSansKR',
                         fontWeight: FontWeight.w600,
                       ),
+                      minFontSize: 10,
+                      maxLines: 1,
                     ),
                   ),
                 ),
@@ -589,88 +591,88 @@ class _HomePage extends State<HomePage> {
                       ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => AprovalPage(
-                            id: id,
-                            pass: pass,
-                            member: member,
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      margin: EdgeInsets.all(3),
-                      height: screenWidth / 5.5,
-                      width: screenWidth / 5.5,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5),
-                        boxShadow: [
-                          BoxShadow(
-                            blurRadius: 3.0,
-                            offset: const Offset(1.0, 1.0),
-                            color: Color.fromRGBO(0, 0, 0, 0.16),
-                          )
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: AutoSizeText(
-                                    '',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    maxLines: 1,
-                                    minFontSize: 14,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: LayoutBuilder(
-                                      builder: (context, constraint) {
-                                    return new Icon(
-                                      Icons.directions_boat,
-                                      size: constraint.biggest.height,
-                                      color: Color.fromRGBO(255, 101, 129, 1),
-                                    );
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              alignment: Alignment.bottomLeft,
-                              child: AutoSizeText(
-                                '휴가원',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                maxLines: 1,
-                                minFontSize: 8,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
+                  // InkWell(
+                  //   onTap: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       CupertinoPageRoute(
+                  //         builder: (context) => AprovalPage(
+                  //           id: id,
+                  //           pass: pass,
+                  //           member: member,
+                  //         ),
+                  //       ),
+                  //     );
+                  //   },
+                  //   child: Container(
+                  //     padding: EdgeInsets.all(5),
+                  //     margin: EdgeInsets.all(3),
+                  //     height: screenWidth / 5.5,
+                  //     width: screenWidth / 5.5,
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.white,
+                  //       borderRadius: BorderRadius.circular(5),
+                  //       boxShadow: [
+                  //         BoxShadow(
+                  //           blurRadius: 3.0,
+                  //           offset: const Offset(1.0, 1.0),
+                  //           color: Color.fromRGBO(0, 0, 0, 0.16),
+                  //         )
+                  //       ],
+                  //     ),
+                  //     child: Column(
+                  //       mainAxisAlignment: MainAxisAlignment.start,
+                  //       crossAxisAlignment: CrossAxisAlignment.start,
+                  //       children: [
+                  //         Expanded(
+                  //           flex: 1,
+                  //           child: Row(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Expanded(
+                  //                 child: AutoSizeText(
+                  //                   '',
+                  //                   style: TextStyle(
+                  //                     fontSize: 16,
+                  //                     fontWeight: FontWeight.w600,
+                  //                   ),
+                  //                   maxLines: 1,
+                  //                   minFontSize: 14,
+                  //                 ),
+                  //               ),
+                  //               Expanded(
+                  //                 child: LayoutBuilder(
+                  //                     builder: (context, constraint) {
+                  //                   return new Icon(
+                  //                     Icons.directions_boat,
+                  //                     size: constraint.biggest.height,
+                  //                     color: Color.fromRGBO(255, 101, 129, 1),
+                  //                   );
+                  //                 }),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //         Expanded(
+                  //           flex: 1,
+                  //           child: Container(
+                  //             alignment: Alignment.bottomLeft,
+                  //             child: AutoSizeText(
+                  //               '휴가원',
+                  //               style: TextStyle(
+                  //                 fontSize: 12,
+                  //                 fontWeight: FontWeight.w600,
+                  //               ),
+                  //               maxLines: 1,
+                  //               minFontSize: 8,
+                  //             ),
+                  //           ),
+                  //         )
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -1268,19 +1270,13 @@ class _HomePage extends State<HomePage> {
         member: member,
         storage: storage,
       ),
-      floatingActionButton: Builder(
-        builder: (context) => FloatingActionButton(
-          onPressed: sendPushMessage,
-          backgroundColor: Colors.blue,
-          child: const Icon(Icons.send),
-        ),
-      ),
-      // floatingActionButton: _showBackToTopButton == false
-      //     ? null
-      //     : FloatingActionButton(
-      //         onPressed: _scrollToTop,
-      //         child: Icon(Icons.arrow_upward),
-      //       ),
+      // floatingActionButton: Builder(
+      //   builder: (context) => FloatingActionButton(
+      //     onPressed: sendPushMessage,
+      //     backgroundColor: Colors.blue,
+      //     child: const Icon(Icons.send),
+      //   ),
+      // ),
     );
   }
   // #endregion

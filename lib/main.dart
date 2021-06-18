@@ -1,3 +1,4 @@
+import 'package:evolveofficeapp/api/api_service_new.dart';
 import 'package:evolveofficeapp/pages/home_page.dart';
 // import 'package:evolveofficeapp/pages/home_page_new.dart';
 import 'package:flutter/material.dart';
@@ -183,8 +184,10 @@ class _RotationTransitionExampleState extends State<_RotationTransitionExample>
     if (userInfo != null) {
       var member = UserManager();
 
-      APIService apiService = new APIService();
-      apiService.login(userInfo.split(" ")[1]).then((value) {
+      List<String> sParam = [userInfo.split(" ")[1]];
+
+      APIServiceNew apiServiceNew = new APIServiceNew();
+      apiServiceNew.getSelect("LOGIN_S1", sParam).then((value) {
         if (value.user.isNotEmpty) {
           member.user = User(
             organizationCode: value.user.elementAt(0).organizationCode,

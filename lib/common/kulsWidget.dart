@@ -141,28 +141,29 @@ class KulsNavigationBottomBar extends StatelessWidget
             if (_selectedIndex != index && index == 0) {
               globalKey.currentState.openDrawer();
             } else if (index == 1 && pageName != 'home') {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => HomePage(
-                    id: id,
-                    pass: pass,
-                    member: member,
+              Navigator.of(context)
+                ..pop()
+                ..push(
+                  CupertinoPageRoute(
+                    builder: (context) => HomePage(
+                      id: id,
+                      pass: pass,
+                      member: member,
+                    ),
                   ),
-                ),
-              );
+                );
               _selectedIndex = index;
             } else if (_selectedIndex != index && index == 2) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => ProfilePage(
-                    id: id,
-                    pass: pass,
-                    member: member,
+              Navigator.of(context)
+                ..push(
+                  CupertinoPageRoute(
+                    builder: (context) => ProfilePage(
+                      id: id,
+                      pass: pass,
+                      member: member,
+                    ),
                   ),
-                ),
-              );
+                );
               _selectedIndex = index;
             }
           },
@@ -386,21 +387,21 @@ class KulsDrawer extends StatelessWidget implements PreferredSizeWidget {
                   child: menuRow('너 어디니'),
                 ),
                 SizedBox(height: 20),
-                InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => AprovalPage(
-                          id: id,
-                          pass: pass,
-                          member: member,
-                        ),
-                      ),
-                    );
-                  },
-                  child: menuRow('휴가원 관리'),
-                ),
+                // InkWell(
+                //   onTap: () {
+                //     Navigator.push(
+                //       context,
+                //       CupertinoPageRoute(
+                //         builder: (context) => AprovalPage(
+                //           id: id,
+                //           pass: pass,
+                //           member: member,
+                //         ),
+                //       ),
+                //     );
+                //   },
+                //   child: menuRow('휴가원 관리'),
+                // ),
               ],
             ),
           ),

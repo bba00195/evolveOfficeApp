@@ -151,6 +151,10 @@ class APIServiceNew {
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
         break;
+      case "PROFILE_U2":
+        final response = await http.post(url, body: sBody, headers: headers);
+        result = InsertResultModel.fromJson(json.decode(response.body));
+        break;
       case "DAILYLIKE_U1":
         final response = await http.post(url, body: sBody, headers: headers);
         result = InsertResultModel.fromJson(json.decode(response.body));
