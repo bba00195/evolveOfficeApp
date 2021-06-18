@@ -1115,7 +1115,6 @@ class DailySelectPages extends State<DailySelectPage> {
       ),
       body: SmartRefresher(
         enablePullDown: true,
-        // enablePullUp: true,
         controller: _refreshController,
         onRefresh: () {
           _report(date);
