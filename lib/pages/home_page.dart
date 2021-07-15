@@ -157,29 +157,29 @@ class _HomePage extends State<HomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     _report(date);
     var member = mem;
-    Future<void> sendPushMessage() async {
-      if (member.user.token == null) {
-        print('Unable to send FCM message, no token exists.');
-        return;
-      }
+    // Future<void> sendPushMessage() async {
+    //   if (member.user.token == null) {
+    //     print('Unable to send FCM message, no token exists.');
+    //     return;
+    //   }
 
-      try {
-        final response = await http.post(
-          Uri.parse('https://fcm.googleapis.com/fcm/send'),
-          body: constructFCMPayload(
-              'fBKETdwHSFufWli2JlNReW:APA91bFN7ttGc1KAXxMHUK37radMw-qMbejJpc_riw6Odmq9m2WsbrwNFiM-T3G34t3q_9pr6mxMdn6SpLpfUayEa0zeEF48xb_lUQ6Sy_PQMr1zGTQKh1nD4YSbqwzxnI9dyuv7JP1N'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization':
-                'key=AAAAUta13IA:APA91bFPkMjES49IC9g6tkqJFHiVzOn-RDRkboXGspSIsrNpZkqrXYL7Qh3_xVrSBXdcvOSU8qmUQtJZs1AqMYrMR3LviCYlmAdyxLVl7LShUEhQjdXxbdpGyFFR4OsJ4LHpasQFy31Y',
-          },
-        );
-        final result = (json.decode(response.body));
-        print(result);
-      } catch (e) {
-        print(e);
-      }
-    }
+    //   try {
+    //     final response = await http.post(
+    //       Uri.parse('https://fcm.googleapis.com/fcm/send'),
+    //       body: constructFCMPayload(
+    //           'fBKETdwHSFufWli2JlNReW:APA91bFN7ttGc1KAXxMHUK37radMw-qMbejJpc_riw6Odmq9m2WsbrwNFiM-T3G34t3q_9pr6mxMdn6SpLpfUayEa0zeEF48xb_lUQ6Sy_PQMr1zGTQKh1nD4YSbqwzxnI9dyuv7JP1N'),
+    //       headers: <String, String>{
+    //         'Content-Type': 'application/json; charset=UTF-8',
+    //         'Authorization':
+    //             'key=AAAAUta13IA:APA91bFPkMjES49IC9g6tkqJFHiVzOn-RDRkboXGspSIsrNpZkqrXYL7Qh3_xVrSBXdcvOSU8qmUQtJZs1AqMYrMR3LviCYlmAdyxLVl7LShUEhQjdXxbdpGyFFR4OsJ4LHpasQFy31Y',
+    //       },
+    //     );
+    //     final result = (json.decode(response.body));
+    //     print(result);
+    //   } catch (e) {
+    //     print(e);
+    //   }
+    // }
 
     _memberImage() {
       if (mem.user.imgSajin != "" && mem.user.imgSajin != null) {
