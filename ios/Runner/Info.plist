@@ -27,9 +27,9 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to location when in the background.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open.</string>
+	<string>사용자의 위치는 현재 사용자의 위치를 바탕으로 행선지 동록을 위해 사용됩니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to the camera.</string>
+	<string>사용자 이미지를 등록하기 위해 앨범이 사용됩니다.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
